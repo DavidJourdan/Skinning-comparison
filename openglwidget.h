@@ -10,6 +10,7 @@
 #include <QOpenGLShaderProgram>
 #include <QMatrix4x4>
 #include <QPointF>
+#include <QMouseEvent>
 
 #include "mesh.h"
 
@@ -39,7 +40,7 @@ private:
 
     QMatrix4x4 viewMatrix;
 
-    QPointF posWhenPressed;
+    QPointF prevPos;
 };
 
 #endif // OPENGLWIDGET_H

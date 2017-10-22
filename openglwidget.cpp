@@ -52,6 +52,8 @@ void OpenGLWidget::paintGL()
     prog->bind();
     vao.bind();
 
+    prog->setUniformValue("viewMatrix", viewMatrix);
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
@@ -63,9 +65,11 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
     QVector3D toCam{0.0f, 0.0f, 1.0f};
     auto rotVec = QVector3D::crossProduct(movement, toCam);
 
-    constexpr float rotFactor = 10.0f;
+    constexpr float rotFactor = 1e-3;
 
     float angle = movement.length() * rotFactor;
 
     viewMatrix.rotate(angle, rotVec);
+
+    update();
 }
