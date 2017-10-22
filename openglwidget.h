@@ -29,6 +29,7 @@ protected:
     void paintGL();
 
     virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
 
 private:
     Mesh mesh;
@@ -41,6 +42,8 @@ private:
     QMatrix4x4 viewMatrix;
 
     QPointF prevPos;
+
+    QPointF screenToViewport(QPointF screenPos);
 };
 
 #endif // OPENGLWIDGET_H
