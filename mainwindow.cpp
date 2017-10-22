@@ -3,7 +3,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    glWidget = new OpenGLWidget("data/mesh.obj", this);
+    glWidget = new OpenGLWidget("/home/rdesplanques/Projects/skinning/data/mesh.obj", this);
 
     setCentralWidget(glWidget);
 }

@@ -20,7 +20,7 @@ Mesh::Mesh(const std::string &fileName)
     }
 
     // For testing purpose, just trying to get one mesh here.
-    const auto mesh = scene->mMeshes[scene->mRootNode->mMeshes[0]];
+    const auto mesh = scene->mMeshes[0];
 
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
         glm::vec3 pos;

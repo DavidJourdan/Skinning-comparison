@@ -1,5 +1,7 @@
 #include "openglwidget.h"
 
+const QString filePrefix = "/home/rdesplanques/Projects/skinning/";
+
 OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), mesh(fileName),
 vbo(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer)
 {
@@ -10,7 +12,7 @@ void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    glClearColor(0.4, 0.6, 0.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -30,8 +32,8 @@ void OpenGLWidget::initializeGL()
     ebo.allocate(indices.data(), indices.size() * sizeof(unsigned));
 
     prog = std::make_unique<QOpenGLShaderProgram>(this);
-    prog->addShaderFromSourceFile(QOpenGLShader::Vertex, "shader.vert");
-    prog->addShaderFromSourceFile(QOpenGLShader::Fragment, "shader.frag");
+    prog->addShaderFromSourceFile(QOpenGLShader::Vertex, filePrefix + "shader.vert");
+    prog->addShaderFromSourceFile(QOpenGLShader::Fragment, filePrefix + "shader.frag");
     prog->link();
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -47,5 +49,8 @@ void OpenGLWidget::paintGL()
 {
     prog->bind();
     vao.bind();
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
 }
