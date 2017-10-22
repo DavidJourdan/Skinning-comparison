@@ -1,5 +1,7 @@
 #include "openglwidget.h"
 
+#include <QVector3D>
+
 const QString filePrefix = "/home/rdesplanques/Projects/skinning/";
 
 OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), mesh(fileName),
@@ -53,4 +55,17 @@ void OpenGLWidget::paintGL()
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
+}
+
+void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    QVector3D movement{event->localPos() - prevPos};
+    QVector3D toCam{0.0f, 0.0f, 1.0f};
+    auto rotVec = QVector3D::crossProduct(movement, toCam);
+
+    constexpr float rotFactor = 10.0f;
+
+    float angle = movement.length() * rotFactor;
+
+    viewMatrix.rotate(angle, rotVec);
 }

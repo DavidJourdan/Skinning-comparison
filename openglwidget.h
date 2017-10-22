@@ -8,6 +8,8 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
+#include <QMatrix4x4>
+#include <QPointF>
 
 #include "mesh.h"
 
@@ -25,6 +27,8 @@ protected:
 
     void paintGL();
 
+    virtual void mouseMoveEvent(QMouseEvent *event);
+
 private:
     Mesh mesh;
     QOpenGLVertexArrayObject vao;
@@ -32,6 +36,10 @@ private:
     QOpenGLBuffer ebo;
 
     std::unique_ptr<QOpenGLShaderProgram> prog;
+
+    QMatrix4x4 viewMatrix;
+
+    QPointF posWhenPressed;
 };
 
 #endif // OPENGLWIDGET_H
