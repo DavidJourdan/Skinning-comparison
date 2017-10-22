@@ -37,3 +37,6 @@ LIBS += -lassimp
 DISTFILES += \
     shader.vert \
     shader.frag
+
+RESOURCES += \
+    shaders.qrc
