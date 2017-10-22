@@ -1,14 +1,14 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
 {
-    ui->setupUi(this);
+    glWidget = new OpenGLWidget("data/mesh.obj", this);
+
+    setCentralWidget(glWidget);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+
 }

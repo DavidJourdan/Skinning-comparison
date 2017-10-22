@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-10-18T18:49:48
+# Project created by QtCreator 2017-10-21T20:14:59
 #
 #-------------------------------------------------
 
@@ -24,8 +24,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    openglwidget.cpp \
+    mesh.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    openglwidget.h \
+    mesh.h
 
-FORMS    += mainwindow.ui
+LIBS += -lassimp
