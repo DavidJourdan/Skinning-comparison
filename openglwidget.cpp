@@ -2,8 +2,6 @@
 
 #include <QVector3D>
 
-const QString filePrefix = "/home/rdesplanques/Projects/skinning/";
-
 OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), mesh(fileName),
 vbo(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer)
 {
@@ -34,8 +32,8 @@ void OpenGLWidget::initializeGL()
     ebo.allocate(indices.data(), indices.size() * sizeof(unsigned));
 
     prog = std::make_unique<QOpenGLShaderProgram>(this);
-    prog->addShaderFromSourceFile(QOpenGLShader::Vertex, filePrefix + "shader.vert");
-    prog->addShaderFromSourceFile(QOpenGLShader::Fragment, filePrefix + "shader.frag");
+    prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shader.vert");
+    prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
     prog->link();
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
