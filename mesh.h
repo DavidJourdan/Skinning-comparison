@@ -12,10 +12,13 @@ public:
     Mesh(const std::string& fileName);
 
     std::vector<glm::vec3>& getVertices() { return vertices; }
+    std::vector<unsigned>& getIndices() {
+        return indices;
+    }
 
 private:
     std::vector<glm::vec3> vertices;
-    std::vector<size_t> indices;
+    std::vector<unsigned> indices;
 };
 
 #endif // MESH_H

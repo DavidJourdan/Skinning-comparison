@@ -33,3 +33,7 @@ HEADERS  += mainwindow.h \
     mesh.h
 
 LIBS += -lassimp
+
+DISTFILES += \
+    shader.vert \
+    shader.frag

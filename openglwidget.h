@@ -1,10 +1,13 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
+#include <memory>
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_5_Core>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
+#include <QOpenGLShaderProgram>
 
 #include "mesh.h"
 
@@ -26,6 +29,9 @@ private:
     Mesh mesh;
     QOpenGLVertexArrayObject vao;
     QOpenGLBuffer vbo;
+    QOpenGLBuffer ebo;
+
+    std::unique_ptr<QOpenGLShaderProgram> prog;
 };
 
 #endif // OPENGLWIDGET_H
