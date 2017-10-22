@@ -61,17 +61,16 @@ void OpenGLWidget::paintGL()
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    qDebug() << prevPos;
+//    qDebug() << prevPos;
     auto pos = screenToViewport(event->localPos());
     QVector3D movement{pos - prevPos};
-    QVector3D toCam{0.0f, 0.0f, 1.0f};
-    movement = viewMatrix * movement;
-    toCam = viewMatrix * toCam;
-    auto rotVec = QVector3D::crossProduct(toCam, movement);
-
     constexpr float rotFactor = 1e2;
-
     float angle = movement.length() * rotFactor;
+    movement.normalize();
+    QVector3D toCam{0.0f, 0.0f, 1.0f};
+    movement = viewMatrix.inverted() * movement;
+    toCam = viewMatrix.inverted() * toCam;
+    auto rotVec = QVector3D::crossProduct(toCam, movement);
 
     viewMatrix.rotate(angle, rotVec);
 
