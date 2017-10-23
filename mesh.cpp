@@ -22,13 +22,15 @@ Mesh::Mesh(const std::string &fileName)
     // For testing purpose, just trying to get one mesh here.
     const auto mesh = scene->mMeshes[0];
 
+    vertices.reserve(mesh->mNumVertices);
+
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
-        glm::vec3 pos;
-        auto oPos = mesh->mVertices[i];
-        pos.x = oPos.x;
-        pos.y = oPos.y;
-        pos.z = oPos.z;
-        vertices.push_back(pos);
+        Vertex vertex;
+
+        auto pos = mesh->mVertices[i];
+        vertex.position = QVector3D(pos.x, pos.y, pos.z);
+
+        vertices.push_back(vertex);
     }
 
     for (size_t i = 0; i < mesh->mNumFaces; ++i) {

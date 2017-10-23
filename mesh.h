@@ -4,20 +4,24 @@
 #include <string>
 #include <vector>
 
-#include <glm/vec3.hpp>
+#include<QVector3D>
+
+struct Vertex {
+    QVector3D position;
+};
 
 class Mesh
 {
 public:
     Mesh(const std::string& fileName);
 
-    std::vector<glm::vec3>& getVertices() { return vertices; }
+    std::vector<Vertex>& getVertices() { return vertices; }
     std::vector<unsigned>& getIndices() {
         return indices;
     }
 
 private:
-    std::vector<glm::vec3> vertices;
+    std::vector<Vertex> vertices;
     std::vector<unsigned> indices;
 };
 

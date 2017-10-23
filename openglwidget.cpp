@@ -24,7 +24,7 @@ void OpenGLWidget::initializeGL()
     vbo.create();
     vbo.bind();
     auto vertices = mesh.getVertices();
-    vbo.allocate(vertices.data(), vertices.size() * sizeof(glm::vec3));
+    vbo.allocate(vertices.data(), vertices.size() * sizeof(Vertex));
 
     ebo.create();
     ebo.bind();
