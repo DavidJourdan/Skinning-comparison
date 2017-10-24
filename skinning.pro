@@ -9,7 +9,10 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++14
-QMAKE_CXXFLAGS += -stdlib=libc++
+
+macx: {
+    QMAKE_CXXFLAGS += -stdlib=libc++
+}
 
 TARGET = skinning
 TEMPLATE = app
