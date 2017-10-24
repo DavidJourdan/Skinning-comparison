@@ -9,4 +9,6 @@ moc_*.h
 *.pro.user.*
 .qmake.stash
 
+.DS_Store
+
 skinning

@@ -8,6 +8,9 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+CONFIG += c++14
+QMAKE_CXXFLAGS += -stdlib=libc++
+
 TARGET = skinning
 TEMPLATE = app
 
@@ -32,7 +35,14 @@ HEADERS  += mainwindow.h \
     openglwidget.h \
     mesh.h
 
-LIBS += -lassimp
+unix:!macx {
+    LIBS += -lassimp
+}
+
+macx: {
+    LIBS += -L/usr/local/lib -lassimp
+    INCLUDEPATH += /usr/local/include
+}
 
 DISTFILES += \
     shader.vert \

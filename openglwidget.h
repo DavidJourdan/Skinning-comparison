@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_4_5_Core>
+#include <QOpenGLFunctions_4_1_Core>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
@@ -14,7 +14,7 @@
 
 #include "mesh.h"
 
-class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_5_Core
+class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 {
     Q_OBJECT
 
