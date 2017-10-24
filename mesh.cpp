@@ -41,6 +41,8 @@ Mesh::Mesh(const std::string &fileName)
         vertices.push_back(vertex);
     }
 
+    indices.reserve(mesh->mNumFaces * 3);
+
     for (size_t i = 0; i < mesh->mNumFaces; ++i) {
         auto face = mesh->mFaces[i];
         for (size_t j = 0; j < face.mNumIndices; ++j) {
