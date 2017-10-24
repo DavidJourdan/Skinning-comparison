@@ -21,6 +21,12 @@ Mesh::Mesh(const std::string &fileName)
         std::exit(EXIT_FAILURE);
     }
 
+    // Check that there is at least one mesh.
+    if (scene->mNumMeshes == 0) {
+        std::cout << "Could not load a mesh" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+
     // For testing purpose, just trying to get one mesh here.
     const auto mesh = scene->mMeshes[0];
 
