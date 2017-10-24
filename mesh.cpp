@@ -10,7 +10,9 @@ Mesh::Mesh(const std::string &fileName)
 {
     Assimp::Importer importer;
 
-    const aiScene *scene = importer.ReadFile(fileName, 0);
+    const aiScene *scene = importer.ReadFile(fileName,
+                                             aiProcess_Triangulate |
+                                             aiProcess_JoinIdenticalVertices);
 
     if (!scene) {
         std::cerr << importer.GetErrorString();
