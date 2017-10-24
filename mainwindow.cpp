@@ -1,14 +1,19 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+#include <QFileDialog>
+#include <QDir>
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
 {
-    ui->setupUi(this);
+    auto fileName = QFileDialog::getOpenFileName(nullptr, tr("Pick mesh"), QDir::homePath(), tr("Meshes (*.obj)"));
+
+    glWidget = new OpenGLWidget(fileName.toStdString(), this);
+
+    setCentralWidget(glWidget);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+
 }

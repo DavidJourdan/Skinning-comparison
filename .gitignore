@@ -1,0 +1,12 @@
+Makefile
+*.o
+
+ui_*.h
+qrc_*.cpp
+moc_*.cpp
+moc_*.h
+*.pro.user
+*.pro.user.*
+.qmake.stash
+
+skinning
