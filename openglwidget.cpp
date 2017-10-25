@@ -82,6 +82,35 @@ void OpenGLWidget::mousePressEvent(QMouseEvent *event)
     prevPos = screenToViewport(event->localPos());
 }
 
+void OpenGLWidget::keyPressEvent(QKeyEvent *event)
+{
+    //if(event->key() == Qt::Key_Escape)
+
+}
+
+void OpenGLWidget::wheelEvent(QWheelEvent *event)
+{
+    /*QPoint numPixels = event->pixelDelta();
+    QPoint numDegrees = event->angleDelta() / 8;
+
+    if (!numPixels.isNull()) {
+        scrollWithPixels(numPixels);
+    } else if (!numDegrees.isNull()) {
+        QPoint numSteps = numDegrees / 15;
+        scrollWithDegrees(numSteps);
+    }*/
+
+    QPoint numDegrees = event->angleDelta() / 8;
+    qreal direction = numDegrees.y() / qFabs(numDegrees.y());
+
+    QVector3D translation(0, 0, direction);
+    translation = viewMatrix.inverted() * translation;
+
+    viewMatrix.translate(translation);
+
+    update();
+}
+
 QPointF OpenGLWidget::screenToViewport(QPointF screenPos)
 {
     auto widthF = static_cast<float>(width());

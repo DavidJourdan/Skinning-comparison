@@ -11,6 +11,8 @@
 #include <QMatrix4x4>
 #include <QPointF>
 #include <QMouseEvent>
+#include <QWheelEvent>
+#include <QtMath>
 
 #include "mesh.h"
 
@@ -30,6 +32,8 @@ protected:
 
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
+    virtual void wheelEvent(QWheelEvent *event);
 
 private:
     Mesh mesh;
