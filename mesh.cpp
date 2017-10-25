@@ -29,7 +29,6 @@ Mesh::Mesh(const std::string &fileName)
 
         auto pos = mesh->mVertices[i];
         vertex.position = QVector3D(pos.x, pos.y, pos.z);
-
         vertices.push_back(vertex);
     }
 
@@ -37,6 +36,17 @@ Mesh::Mesh(const std::string &fileName)
         auto face = mesh->mFaces[i];
         for (size_t j = 0; j < face.mNumIndices; ++j) {
             indices.push_back(face.mIndices[j]);
+        }
+    }
+
+    weights.assign(mesh->mNumBones*mesh->mNumVertices, 0.0);
+    aiBone **bones = mesh->mBones;
+    if(bones) {
+        for(uint i = 0; i < mesh->mNumBones; i++) {
+            aiBone *b = bones[i];
+            for(uint j = 0; j < b->mNumWeights; j++) {
+                weights[mesh->mNumBones * b->mWeights[j].mVertexId + i] = b->mWeights[j].mWeight;
+            }
         }
     }
 }

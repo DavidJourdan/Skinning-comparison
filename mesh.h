@@ -23,6 +23,7 @@ public:
 private:
     std::vector<Vertex> vertices;
     std::vector<unsigned> indices;
+    std::vector<float> weights;
 };
 
 #endif // MESH_H
