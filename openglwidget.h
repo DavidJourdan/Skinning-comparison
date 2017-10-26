@@ -32,11 +32,14 @@ protected:
 
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
     QMatrix4x4 perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
-
     QVector3D viewDirection();
+    QVector3D rightDirection();
+    QVector3D upDirection();
+    void translateCamera(QVector3D dir);
 
 
 private:
@@ -54,6 +57,9 @@ private:
     QMatrix4x4 projectionMatrix;
 
     QPointF prevPos;
+
+    bool leftButtonPressed;
+    bool rightButtonPressed;
 
     QPointF screenToViewport(QPointF screenPos);
 };

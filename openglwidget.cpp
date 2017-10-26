@@ -3,7 +3,7 @@
 #include <QVector3D>
 
 OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), window(parent), mesh(fileName),
-vbo(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer)
+vbo(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer), leftButtonPressed(false), rightButtonPressed(false)
 {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -67,35 +67,76 @@ void OpenGLWidget::paintGL()
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+
+
 //    qDebug() << prevPos;
-    auto pos = screenToViewport(event->localPos());
-    QVector3D movement{pos - prevPos};
-    constexpr float rotFactor = 1e2;
-    float angle = movement.length() * rotFactor;
-    movement.normalize();
-    QVector3D toCam{0.0f, 0.0f, 1.0f};
-    movement = viewMatrix.inverted() * movement;
-    toCam = viewMatrix.inverted() * toCam;
-    auto rotVec = QVector3D::crossProduct(toCam, movement);
+    if(leftButtonPressed)
+    {
+        auto pos = screenToViewport(event->localPos());
+        QVector3D movement{pos - prevPos};
+        constexpr float rotFactor = 1e2;
+        float angle = movement.length() * rotFactor;
+        movement.normalize();
+        QVector3D toCam{0.0f, 0.0f, 1.0f};
+        movement = viewMatrix.inverted() * movement;
+        toCam = viewMatrix.inverted() * toCam;
+        auto rotVec = QVector3D::crossProduct(toCam, movement);
 
-    viewMatrix.rotate(angle, rotVec);
+        viewMatrix.rotate(angle, rotVec);
 
-    prevPos = pos;
+        prevPos = pos;
+    }
+
+    else if(rightButtonPressed)
+    {
+        auto pos = screenToViewport(event->localPos());
+
+        QVector3D movement{pos - prevPos};
+
+        movement = QVector3D(-rightDirection() * movement.x() + upDirection() * movement.y());
+
+        float speed = 2.5f;
+        viewMatrix.translate(movement * speed);
+
+        prevPos = pos;
+    }
 
     update();
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent *event)
 {
+    if(event->button() == Qt::LeftButton && !rightButtonPressed)
+        leftButtonPressed = true;
+
+    if(event->button() == Qt::RightButton && !leftButtonPressed)
+        rightButtonPressed = true;
+
     prevPos = screenToViewport(event->localPos());
+}
+
+void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    leftButtonPressed = false;
+    rightButtonPressed = false;
+    /*if(event->button() == Qt::LeftButton)
+        leftButtonPressed = false;
+    if(event->button() == Qt::RightButton)
+        rightButtonPressed = false;*/
 }
 
 void OpenGLWidget::keyPressEvent(QKeyEvent *event)
 {
     switch(event->key())
     {
-        case Qt::Key_Escape:
-            window->close();
+    case Qt::Key_Escape:
+        window->close();
+        break;
+
+    case Qt::Key_R: //reset camera
+        viewMatrix.setToIdentity();
+        viewMatrix.translate(0.0f, 0.0f, -10.0f);
+        update();
         break;
 
     default:
@@ -143,5 +184,21 @@ QPointF OpenGLWidget::screenToViewport(QPointF screenPos)
 
 QVector3D OpenGLWidget::viewDirection()
 {
-    return QVector3D(viewMatrix(2,0), viewMatrix(2,1), viewMatrix(2,2));
+    return QVector3D(viewMatrix(2,0), viewMatrix(2,1), viewMatrix(2,2)).normalized();
+}
+
+QVector3D OpenGLWidget::rightDirection()
+{
+    return -QVector3D(viewMatrix(0,0), viewMatrix(0,1), viewMatrix(0,2)).normalized();
+}
+
+QVector3D OpenGLWidget::upDirection()
+{
+    return QVector3D(viewMatrix(1,0), viewMatrix(1,1), viewMatrix(1,2)).normalized();
+}
+
+void OpenGLWidget::translateCamera(QVector3D dir)
+{
+    float cameraSpeed = 1.0f;
+    viewMatrix.translate(cameraSpeed * dir);
 }
