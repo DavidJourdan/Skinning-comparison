@@ -40,6 +40,8 @@ void OpenGLWidget::initializeGL()
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
+
+    viewMatrix.translate(0.0f, 0.0f, -10.0f);
 }
 
 void OpenGLWidget::resizeGL(int w, int h)
@@ -47,8 +49,6 @@ void OpenGLWidget::resizeGL(int w, int h)
         GLdouble aspect = w / (h ? h : 1);
         const GLdouble zNear = 1.0, zFar = 30.0, fov = 30.0;
         projectionMatrix = perspective(fov, aspect, zNear, zFar);
-
-        glMatrixMode(GL_MODELVIEW);
 }
 
 void OpenGLWidget::paintGL()
@@ -56,10 +56,11 @@ void OpenGLWidget::paintGL()
     prog->bind();
     vao.bind();
 
+    prog->setUniformValue("modelMatrix", modelMatrix);
     prog->setUniformValue("viewMatrix", viewMatrix);
     prog->setUniformValue("projectionMatrix", projectionMatrix);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
 }
@@ -104,11 +105,8 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
 
 void OpenGLWidget::wheelEvent(QWheelEvent *event)
 {
-
-
     QPoint numDegrees = event->angleDelta() / 8;
     qreal zoom = numDegrees.y() / qFabs(numDegrees.y());
-
 
     QVector3D translation = zoom*viewDirection();
 

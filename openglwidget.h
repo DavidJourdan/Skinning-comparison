@@ -49,6 +49,7 @@ private:
 
     std::unique_ptr<QOpenGLShaderProgram> prog;
 
+    QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
     QMatrix4x4 projectionMatrix;
 
