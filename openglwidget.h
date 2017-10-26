@@ -34,8 +34,12 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
+    void perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
+
 
 private:
+    QWidget * window;
+
     Mesh mesh;
     QOpenGLVertexArrayObject vao;
     QOpenGLBuffer vbo;

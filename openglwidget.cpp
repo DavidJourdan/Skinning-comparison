@@ -2,10 +2,10 @@
 
 #include <QVector3D>
 
-OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), mesh(fileName),
+OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), window(parent), mesh(fileName),
 vbo(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer)
 {
-
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void OpenGLWidget::initializeGL()
@@ -15,6 +15,8 @@ void OpenGLWidget::initializeGL()
     glClearColor(0.0, 0.0, 0.0, 1.0);
 
     glClear(GL_COLOR_BUFFER_BIT);
+
+   glEnable(GL_DEPTH_TEST);
 
     vao.create();
     if (vao.isCreated()) {
@@ -42,7 +44,19 @@ void OpenGLWidget::initializeGL()
 
 void OpenGLWidget::resizeGL(int w, int h)
 {
+    glViewport(0,0,w,h);
 
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(-30.0, 30.0, -30.0, 30.0, -30.0, 30.0);
+
+        GLdouble aspect = w / (h ? h : 1);
+
+        const GLdouble zNear = -30.0, zFar = 100.0, fov = 30.0;
+
+        perspective(fov, aspect, zNear, zFar);
+
+        glMatrixMode(GL_MODELVIEW);
 }
 
 void OpenGLWidget::paintGL()
@@ -84,8 +98,15 @@ void OpenGLWidget::mousePressEvent(QMouseEvent *event)
 
 void OpenGLWidget::keyPressEvent(QKeyEvent *event)
 {
-    //if(event->key() == Qt::Key_Escape)
+    switch(event->key())
+    {
+        case Qt::Key_Escape:
+            window->close();
+        break;
 
+    default:
+        break;
+    }
 }
 
 void OpenGLWidget::wheelEvent(QWheelEvent *event)
@@ -109,6 +130,18 @@ void OpenGLWidget::wheelEvent(QWheelEvent *event)
     viewMatrix.translate(translation);
 
     update();
+}
+
+void OpenGLWidget::perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+{
+    GLdouble xmin, xmax, ymin, ymax;
+
+    ymax = zNear * tan( fovy * M_PI / 360.0 );
+    ymin = -ymax;
+    xmin = ymin * aspect;
+    xmax = ymax * aspect;
+
+    glFrustum( xmin, xmax, ymin, ymax, zNear, zFar );
 }
 
 QPointF OpenGLWidget::screenToViewport(QPointF screenPos)
