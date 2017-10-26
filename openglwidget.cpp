@@ -44,17 +44,9 @@ void OpenGLWidget::initializeGL()
 
 void OpenGLWidget::resizeGL(int w, int h)
 {
-    glViewport(0,0,w,h);
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(-30.0, 30.0, -30.0, 30.0, -30.0, 30.0);
-
         GLdouble aspect = w / (h ? h : 1);
-
-        const GLdouble zNear = -30.0, zFar = 100.0, fov = 30.0;
-
-        perspective(fov, aspect, zNear, zFar);
+        const GLdouble zNear = 1.0, zFar = 30.0, fov = 30.0;
+        projectionMatrix = perspective(fov, aspect, zNear, zFar);
 
         glMatrixMode(GL_MODELVIEW);
 }
@@ -65,6 +57,7 @@ void OpenGLWidget::paintGL()
     vao.bind();
 
     prog->setUniformValue("viewMatrix", viewMatrix);
+    prog->setUniformValue("projectionMatrix", projectionMatrix);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -111,37 +104,32 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
 
 void OpenGLWidget::wheelEvent(QWheelEvent *event)
 {
-    /*QPoint numPixels = event->pixelDelta();
-    QPoint numDegrees = event->angleDelta() / 8;
 
-    if (!numPixels.isNull()) {
-        scrollWithPixels(numPixels);
-    } else if (!numDegrees.isNull()) {
-        QPoint numSteps = numDegrees / 15;
-        scrollWithDegrees(numSteps);
-    }*/
 
     QPoint numDegrees = event->angleDelta() / 8;
-    qreal direction = numDegrees.y() / qFabs(numDegrees.y());
+    qreal zoom = numDegrees.y() / qFabs(numDegrees.y());
 
-    QVector3D translation(0, 0, direction);
-    translation = viewMatrix.inverted() * translation;
+
+    QVector3D translation = zoom*viewDirection();
 
     viewMatrix.translate(translation);
 
     update();
 }
 
-void OpenGLWidget::perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
+QMatrix4x4 OpenGLWidget::perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
 {
-    GLdouble xmin, xmax, ymin, ymax;
+    QMatrix4x4 m;
+    const float deg2rad = M_PI/180.0;
+    float fovyRad = deg2rad*fovy;
+    float tanHalfFovy = tan (fovyRad/2.0);
 
-    ymax = zNear * tan( fovy * M_PI / 360.0 );
-    ymin = -ymax;
-    xmin = ymin * aspect;
-    xmax = ymax * aspect;
-
-    glFrustum( xmin, xmax, ymin, ymax, zNear, zFar );
+    m(0,0) = 1.0 / (aspect * tanHalfFovy);
+    m(1,1) = 1.0 / tanHalfFovy;
+    m(2,2) = -(zFar + zNear) / (zFar - zNear);
+    m(2,3) = -1.0;
+    m(3,2) = -2.0*(zFar * zNear) / (zFar - zNear);
+    return m;
 }
 
 QPointF OpenGLWidget::screenToViewport(QPointF screenPos)
@@ -153,4 +141,9 @@ QPointF OpenGLWidget::screenToViewport(QPointF screenPos)
     auto y = 1.0f - static_cast<float>(screenPos.y()) / heightF;
 
     return QPointF(x, y);
+}
+
+QVector3D OpenGLWidget::viewDirection()
+{
+    return QVector3D(viewMatrix(2,0), viewMatrix(2,1), viewMatrix(2,2));
 }

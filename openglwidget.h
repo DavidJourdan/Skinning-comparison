@@ -34,7 +34,9 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
-    void perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
+    QMatrix4x4 perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
+
+    QVector3D viewDirection();
 
 
 private:
@@ -48,6 +50,7 @@ private:
     std::unique_ptr<QOpenGLShaderProgram> prog;
 
     QMatrix4x4 viewMatrix;
+    QMatrix4x4 projectionMatrix;
 
     QPointF prevPos;
 
