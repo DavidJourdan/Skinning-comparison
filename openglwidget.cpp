@@ -119,10 +119,6 @@ void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     leftButtonPressed = false;
     rightButtonPressed = false;
-    /*if(event->button() == Qt::LeftButton)
-        leftButtonPressed = false;
-    if(event->button() == Qt::RightButton)
-        rightButtonPressed = false;*/
 }
 
 void OpenGLWidget::keyPressEvent(QKeyEvent *event)
@@ -146,14 +142,15 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
 
 void OpenGLWidget::wheelEvent(QWheelEvent *event)
 {
-    QPoint numDegrees = event->angleDelta() / 8;
-    qreal zoom = numDegrees.y() / qFabs(numDegrees.y());
+    QPoint numDegrees = event->angleDelta();
 
-    QVector3D translation = zoom*viewDirection();
+    if(qFabs(numDegrees.y()) != 0)
+    {
+        qreal zoom = numDegrees.y() / qFabs(numDegrees.y());
 
-    viewMatrix.translate(translation);
-
-    update();
+        viewMatrix.translate(zoom * viewDirection());
+        update();
+    }
 }
 
 QMatrix4x4 OpenGLWidget::perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar)
