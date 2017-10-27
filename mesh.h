@@ -5,6 +5,7 @@
 #include <vector>
 
 #include<QVector3D>
+#include "skeleton.h"
 
 struct Vertex {
     QVector3D position;
@@ -23,6 +24,7 @@ public:
 private:
     std::vector<Vertex> vertices;
     std::vector<unsigned> indices;
+    Skeleton skeleton;
 };
 
 #endif // MESH_H

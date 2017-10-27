@@ -37,7 +37,6 @@ Mesh::Mesh(const std::string &fileName)
 
         auto pos = mesh->mVertices[i];
         vertex.position = QVector3D(pos.x, pos.y, pos.z);
-
         vertices.push_back(vertex);
     }
 
@@ -48,5 +47,9 @@ Mesh::Mesh(const std::string &fileName)
         for (size_t j = 0; j < face.mNumIndices; ++j) {
             indices.push_back(face.mIndices[j]);
         }
+    }
+
+    if(mesh->mBones) {
+        skeleton= Skeleton(mesh->mNumBones, mesh->mNumVertices, mesh->mBones);
     }
 }
