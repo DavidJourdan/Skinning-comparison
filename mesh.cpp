@@ -39,14 +39,7 @@ Mesh::Mesh(const std::string &fileName)
         }
     }
 
-    weights.assign(mesh->mNumBones*mesh->mNumVertices, 0.0);
-    aiBone **bones = mesh->mBones;
-    if(bones) {
-        for(uint i = 0; i < mesh->mNumBones; i++) {
-            aiBone *b = bones[i];
-            for(uint j = 0; j < b->mNumWeights; j++) {
-                weights[mesh->mNumBones * b->mWeights[j].mVertexId + i] = b->mWeights[j].mWeight;
-            }
-        }
+    if(mesh->mBones) {
+        skeleton= Skeleton(mesh->mNumBones, mesh->mNumVertices, mesh->mBones);
     }
 }

@@ -32,11 +32,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     openglwidget.cpp \
-    mesh.cpp
+    mesh.cpp \
+    skeleton.cpp
 
 HEADERS  += mainwindow.h \
     openglwidget.h \
-    mesh.h
+    mesh.h \
+    skeleton.h
 
 unix:!macx {
     LIBS += -lassimp
