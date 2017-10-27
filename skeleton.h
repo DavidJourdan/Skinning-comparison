@@ -9,7 +9,7 @@ class Skeleton
 public:
     Skeleton(uint, uint, aiBone**);
     Skeleton();
-
+    inline float* weightsAt(uint vertex) { return weights + (vertex*nbBones);}
 private:
     int nbBones;
     int nbVertices;
