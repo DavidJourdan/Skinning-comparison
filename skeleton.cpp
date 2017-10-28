@@ -14,3 +14,11 @@ Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(num
 }
 
 Skeleton::Skeleton(){}
+
+Skeleton::~Skeleton() {
+    delete [] weights;
+}
+
+float Skeleton::simil(int vertexInd, int faceInd) {
+    
+}
