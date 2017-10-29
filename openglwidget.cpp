@@ -23,13 +23,13 @@ void OpenGLWidget::initializeGL()
 
     vbo.create();
     vbo.bind();
-    auto vertices = mesh.getVertices();
+    std::vector<Vertex>& vertices = mesh.getVertices();
     vbo.allocate(vertices.data(), vertices.size() * sizeof(Vertex));
 
     ebo.create();
     ebo.bind();
-    auto indices = mesh.getIndices();
-    ebo.allocate(indices.data(), indices.size() * sizeof(unsigned));
+    std::vector<uint>& indices = mesh.getIndices();
+    ebo.allocate(indices.data(), indices.size() * sizeof(uint));
 
     prog = std::make_unique<QOpenGLShaderProgram>(this);
     prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shader.vert");

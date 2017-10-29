@@ -6,10 +6,7 @@
 
 #include<QVector3D>
 #include "skeleton.h"
-
-struct Vertex {
-    QVector3D position;
-};
+#include "vertex.h"
 
 class Mesh
 {

@@ -33,10 +33,8 @@ Mesh::Mesh(const std::string &fileName)
     vertices.reserve(mesh->mNumVertices);
 
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
-        Vertex vertex;
-
         auto pos = mesh->mVertices[i];
-        vertex.position = QVector3D(pos.x, pos.y, pos.z);
+        Vertex vertex(pos.x, pos.y, pos.z);
         vertices.push_back(vertex);
     }
 
