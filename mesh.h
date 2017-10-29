@@ -6,10 +6,7 @@
 
 #include<QVector3D>
 #include "skeleton.h"
-
-struct Vertex {
-    QVector3D position;
-};
+#include "vertex.h"
 
 class Mesh
 {
@@ -20,11 +17,13 @@ public:
     std::vector<unsigned>& getIndices() {
         return indices;
     }
-
+    void computeCoRs(void);
 private:
     std::vector<Vertex> vertices;
     std::vector<unsigned> indices;
+    std::vector<Vertex> CoRs;
     Skeleton skeleton;
+    float area(Triangle t);
 };
 
 #endif // MESH_H

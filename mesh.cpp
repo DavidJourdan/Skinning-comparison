@@ -23,12 +23,11 @@ Mesh::Mesh(const std::string &fileName)
     const auto mesh = scene->mMeshes[0];
 
     vertices.reserve(mesh->mNumVertices);
+    CoRs.reserve(mesh->mNumVertices);
 
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
-        Vertex vertex;
-
         auto pos = mesh->mVertices[i];
-        vertex.position = QVector3D(pos.x, pos.y, pos.z);
+        Vertex vertex(pos.x, pos.y, pos.z);
         vertices.push_back(vertex);
     }
 
@@ -41,5 +40,26 @@ Mesh::Mesh(const std::string &fileName)
 
     if(mesh->mBones) {
         skeleton= Skeleton(mesh->mNumBones, mesh->mNumVertices, mesh->mBones);
+    }
+}
+
+float Mesh::area(Triangle t) {
+    Vertex v = (vertices[t.b]-vertices[t.a]).cross(vertices[t.c]-vertices[t.a]);
+    return v.len()/2.;
+}
+
+void Mesh::computeCoRs() {
+    // subdivide mesh
+    // compute CoRs
+    for(uint i= 0; i < vertices.size(); i++) {
+        Vertex c;
+        float s = 0.0;
+        uint count = indices.size()/3;
+        for(uint j = 0; j < count; j++) {
+            Triangle t = {indices[3*j], indices[3*j+1], indices[3*j+2]};
+            c += (vertices[t.a]+vertices[t.b]+vertices[t.c])/3.*skeleton.simil(i, t)*area(t);
+            s += skeleton.simil(i, t) * area(t);
+        }
+        CoRs.push_back(c/s);
     }
 }
