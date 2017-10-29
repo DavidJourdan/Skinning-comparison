@@ -4,6 +4,12 @@
 #include <assimp/scene.h>
 #include <vector>
 
+struct Triangle {
+    uint a;
+    uint b;
+    uint c;
+};
+
 class Skeleton
 {
 public:
@@ -11,10 +17,10 @@ public:
     Skeleton();
     ~Skeleton();
     inline float* weightsAt(uint vertex) { return weights + (vertex*nbBones);}
-    float simil(int vertexInd, int faceInd);
+    float simil(uint vertexInd, Triangle t);
 private:
-    int nbBones;
-    int nbVertices;
+    uint nbBones;
+    uint nbVertices;
     float *weights;
 
 };
