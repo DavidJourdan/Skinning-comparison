@@ -3,15 +3,13 @@
 class Vertex {
 public:
 	inline Vertex(float x, float y, float z) {
-		m_x = x;
-		m_y = y;
-		m_z = z;
+		m_p[0] = x;
+		m_p[1] = y;
+		m_p[2] = z;
 	}
-	inline Vertex() {m_x = m_y = m_z = 0.0;}
+	inline Vertex() {m_p[0] = m_p[1] = m_p[2] = 0.0;}
 
 	~Vertex() {}
 private:
-	float m_x;
-	float m_y;
-	float m_z;
+	float m_p[3];
 };
