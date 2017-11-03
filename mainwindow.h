@@ -9,7 +9,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = 0);
+    MainWindow(QString fileName = "", QWidget *parent = 0);
     ~MainWindow();
 
 private:

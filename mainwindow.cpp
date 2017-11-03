@@ -3,10 +3,12 @@
 #include <QFileDialog>
 #include <QDir>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QString fileName, QWidget *parent)
     : QMainWindow(parent)
 {
-    auto fileName = QFileDialog::getOpenFileName(nullptr, tr("Pick mesh"), QDir::homePath(), tr("Meshes (*.obj)"));
+    if (fileName == "") {
+        fileName = QFileDialog::getOpenFileName(nullptr, tr("Pick mesh"), QDir::homePath(), tr("Meshes (*.obj)"));
+    }
 
     glWidget = new OpenGLWidget(fileName.toStdString(), this);
 
