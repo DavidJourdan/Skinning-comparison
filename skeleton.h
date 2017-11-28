@@ -18,6 +18,11 @@ typedef struct{
     uint child;
 }Bone;
 
+typedef struct{
+    uint mother;
+    uint child;
+}Relation;
+
 class Skeleton
 {
 public:
@@ -36,6 +41,7 @@ private:
 
     std::vector<QVector3D> articulations;
     std::vector<Bone> edges;
+    std::vector<Relation> relations;
 };
 
 #endif // SKELETON_H

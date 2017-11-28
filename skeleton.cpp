@@ -49,7 +49,6 @@ void Skeleton::parseSkelFile(const std::string &file)
     std::ifstream f;
     f.open(file);
     std::string s;
-    std::string temp;
 
     std::getline(f, s);std::getline(f, s); //first two lines unuseful
 
@@ -60,7 +59,7 @@ void Skeleton::parseSkelFile(const std::string &file)
 
     articulations.reserve(num);
 
-    for(int i = 0 ; i < num ; i++) // read articulations' positions
+    for(unsigned int i = 0 ; i < num ; i++) // read articulations' positions
     {
         std::getline(f, s);
         float x, y, z;
@@ -76,5 +75,39 @@ void Skeleton::parseSkelFile(const std::string &file)
     index = s.find_first_of(" ");
     num = std::stoi(s.substr(index, s.size() - index));
 
+    edges.reserve(num);
 
+    for(unsigned int i = 0 ; i < num ; i++) // read edges
+    {
+        std::getline(f, s);
+        uint m, c;
+        int i1 = s.find_first_of(" ")+1;
+        m = std::stoi(s.substr(0, i1));
+        c = std::stoi(s.substr(i1, s.size() - i1));
+
+        Bone b; b.child=c;b.mother=m;
+        edges.push_back(b);
+    }
+
+    std::getline(f, s); // read number of relations
+    index = s.find_first_of(" ");
+    num = std::stoi(s.substr(index, s.size() - index));
+
+    std::cout << num << std::endl;
+    relations.reserve(num);
+
+    for(unsigned int i = 0 ; i < num ; i++) // read relations
+    {
+        std::getline(f, s);
+        uint m, c;
+        int i1 = s.find_first_of(" ")+1;
+        m = std::stoi(s.substr(0, i1));
+        c = std::stoi(s.substr(i1, s.size() - i1));
+
+        Relation r; r.child=c;r.mother=m;
+        relations.push_back(r);
+    }
+
+    //no need for the rest of the data
+    f.close();
 }
