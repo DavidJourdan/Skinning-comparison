@@ -10,12 +10,20 @@ Mesh::Mesh(const std::string &fileName)
 {
     Assimp::Importer importer;
 
-    const aiScene *scene = importer.ReadFile(fileName, 0);
+    const aiScene *scene = importer.ReadFile(fileName,
+                                             aiProcess_Triangulate |
+                                             aiProcess_JoinIdenticalVertices);
 
     if (!scene) {
         std::cerr << importer.GetErrorString();
 
         // Maybe throw an exception here.
+        std::exit(EXIT_FAILURE);
+    }
+
+    // Check that there is at least one mesh.
+    if (scene->mNumMeshes == 0) {
+        std::cout << "Could not load a mesh" << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
@@ -30,6 +38,8 @@ Mesh::Mesh(const std::string &fileName)
         Vertex vertex(pos.x, pos.y, pos.z);
         vertices.push_back(vertex);
     }
+
+    indices.reserve(mesh->mNumFaces * 3);
 
     for (size_t i = 0; i < mesh->mNumFaces; ++i) {
         auto face = mesh->mFaces[i];
