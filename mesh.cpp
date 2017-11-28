@@ -12,7 +12,8 @@ Mesh::Mesh(const std::string &fileName)
 
     const aiScene *scene = importer.ReadFile(fileName,
                                              aiProcess_Triangulate |
-                                             aiProcess_JoinIdenticalVertices);
+                                             aiProcess_JoinIdenticalVertices |
+                                             aiProcess_GenNormals);
 
     if (!scene) {
         std::cerr << importer.GetErrorString();
@@ -28,15 +29,19 @@ Mesh::Mesh(const std::string &fileName)
     }
 
     // For testing purpose, just trying to get one mesh here.
-    const auto mesh = scene->mMeshes[0];
+    const aiMesh* mesh = scene->mMeshes[0];
 
     vertices.reserve(mesh->mNumVertices);
     CoRs.reserve(mesh->mNumVertices);
+    normals.reserve(mesh->mNumVertices);
 
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
         auto pos = mesh->mVertices[i];
         Vertex vertex(pos.x, pos.y, pos.z);
         vertices.push_back(vertex);
+
+        auto normal = mesh->mNormals[i];
+        normals.push_back(QVector3D(normal.x, normal.y, normal.z).normalized());
     }
 
     indices.reserve(mesh->mNumFaces * 3);

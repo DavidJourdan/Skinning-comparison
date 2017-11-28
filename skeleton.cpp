@@ -17,7 +17,7 @@ Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(num
 Skeleton::Skeleton(){}
 
 Skeleton::~Skeleton() {
-    delete [] weights;
+    //delete [] weights;
 }
 
 float Skeleton::simil(uint vertexInd, Triangle t) {
