@@ -38,7 +38,8 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     openglwidget.h \
     mesh.h \
-    skeleton.h
+    skeleton.h \
+    vertex.h
 
 unix:!macx {
     LIBS += -lassimp
