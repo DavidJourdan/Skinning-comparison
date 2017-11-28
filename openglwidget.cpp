@@ -26,7 +26,7 @@ void OpenGLWidget::initializeGL()
 
     vbo.create();
     vbo.bind();
-    std::vector<Vertex>& vertices = mesh.getVertices();
+    std::vector<QVector3D>& vertices = mesh.getVertices();
     vbo.allocate(vertices.data(), vertices.size() * sizeof(Vertex));
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);

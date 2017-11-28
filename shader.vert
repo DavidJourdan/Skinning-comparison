@@ -12,5 +12,5 @@ out vec4 normal;
 void main(void)
 {
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(aPos, 1.0);
-    normal = projectionMatrix * viewMatrix * modelMatrix * vec4(aNorm, 1.0);
+    normal = vec4(aNorm, 1.0);// projectionMatrix * viewMatrix * modelMatrix * vec4(aNorm, 1.0);
 }

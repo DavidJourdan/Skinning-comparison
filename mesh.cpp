@@ -39,7 +39,7 @@ Mesh::Mesh(const std::string &fileName)
 
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
         auto pos = mesh->mVertices[i];
-        Vertex vertex(pos.x, pos.y, pos.z);
+        QVector3D vertex(pos.x, pos.y, pos.z);
         vertices.push_back(vertex);
 
         auto normal = mesh->mNormals[i];
@@ -70,15 +70,15 @@ Mesh::Mesh(const std::string &fileName)
 }
 
 float Mesh::area(Triangle t) {
-    Vertex v = (vertices[t.b]-vertices[t.a]).cross(vertices[t.c]-vertices[t.a]);
-    return v.len()/2.;
+    QVector3D v = QVector3D::crossProduct( vertices[t.b]-vertices[t.a], vertices[t.c]-vertices[t.a]);
+    return v.length()/2;
 }
 
 void Mesh::computeCoRs() {
     // subdivide mesh
     // compute CoRs
     for(uint i= 0; i < vertices.size(); i++) {
-        Vertex c;
+        QVector3D c;
         float s = 0.0;
         uint count = indices.size()/3;
         for(uint j = 0; j < count; j++) {

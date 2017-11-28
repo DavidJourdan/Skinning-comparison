@@ -53,16 +53,28 @@ void Skeleton::parseSkelFile(const std::string &file)
 
     std::getline(f, s);std::getline(f, s); //first two lines unuseful
 
-    uint numArt = 0;
+    uint num = 0;
     std::getline(f, s); // third line : number of articulations
-    int index = s.find_first_of(" ")+1;
-    numArt = std::stoi(s.substr(index, s.size() - index));
+    int index = s.find_first_of(" ");
+    num = std::stoi(s.substr(index, s.size() - index));
 
-    std::cout << numArt << std::endl;
-    articulations.reserve(numArt);
+    articulations.reserve(num);
 
-    for(int i = 0 ; i < numArt ; i++)
+    for(int i = 0 ; i < num ; i++) // read articulations' positions
     {
+        std::getline(f, s);
+        float x, y, z;
+        int i1 = s.find_first_of(" ")+1, i2 = s.find_last_of(" ")+1;
+        x = std::stof(s.substr(0, i1));
+        y = std::stof(s.substr(i1, i2-i1));
+        z = std::stof(s.substr(i2, s.size()-i2));
 
+        articulations.push_back(QVector3D(x, y, z));
     }
+
+    std::getline(f, s); // read number of edges (bones)
+    index = s.find_first_of(" ");
+    num = std::stoi(s.substr(index, s.size() - index));
+
+
 }

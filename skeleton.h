@@ -13,6 +13,11 @@ struct Triangle {
     uint c;
 };
 
+typedef struct{
+    uint mother;
+    uint child;
+}Bone;
+
 class Skeleton
 {
 public:
@@ -30,6 +35,7 @@ private:
     float *weights;
 
     std::vector<QVector3D> articulations;
+    std::vector<Bone> edges;
 };
 
 #endif // SKELETON_H

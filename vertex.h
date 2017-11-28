@@ -77,6 +77,13 @@ public:
 	inline float len() {
 		return m_p[0]*m_p[0] + m_p[1]*m_p[1] + m_p[2]*m_p[2];
 	}
+
+    inline float x() { return m_p[0];}
+
+    inline float y() { return m_p[1];}
+
+    inline float z() { return m_p[2];}
+
 private:
 	float m_p[3];
 };
