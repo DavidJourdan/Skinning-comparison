@@ -48,6 +48,7 @@ private:
     Mesh mesh;
     QOpenGLVertexArrayObject vao;
     QOpenGLBuffer vbo;
+    QOpenGLBuffer normBuffer;
     QOpenGLBuffer ebo;
 
     std::unique_ptr<QOpenGLShaderProgram> prog;

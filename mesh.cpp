@@ -6,13 +6,16 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <QDebug>
+
 Mesh::Mesh(const std::string &fileName)
 {
     Assimp::Importer importer;
 
     const aiScene *scene = importer.ReadFile(fileName,
                                              aiProcess_Triangulate |
-                                             aiProcess_JoinIdenticalVertices);
+                                             aiProcess_JoinIdenticalVertices |
+                                             aiProcess_GenNormals);
 
     if (!scene) {
         std::cerr << importer.GetErrorString();
@@ -28,15 +31,19 @@ Mesh::Mesh(const std::string &fileName)
     }
 
     // For testing purpose, just trying to get one mesh here.
-    const auto mesh = scene->mMeshes[0];
+    const aiMesh* mesh = scene->mMeshes[0];
 
     vertices.reserve(mesh->mNumVertices);
     CoRs.reserve(mesh->mNumVertices);
+    normals.reserve(mesh->mNumVertices);
 
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
         auto pos = mesh->mVertices[i];
-        Vertex vertex(pos.x, pos.y, pos.z);
+        QVector3D vertex(pos.x, pos.y, pos.z);
         vertices.push_back(vertex);
+
+        auto normal = mesh->mNormals[i];
+        normals.push_back(QVector3D(normal.x, normal.y, normal.z).normalized());
     }
 
     indices.reserve(mesh->mNumFaces * 3);
@@ -48,21 +55,30 @@ Mesh::Mesh(const std::string &fileName)
         }
     }
 
-    if(mesh->mBones) {
+    if(mesh->HasBones()) { //bones included in file
         skeleton= Skeleton(mesh->mNumBones, mesh->mNumVertices, mesh->mBones);
+    }
+
+    else //bones in another file, let's find weights and skeleton files, format skel1.*
+    {
+        std::string skelFile = fileName.substr(0, fileName.find_last_of("/")+1);
+        std::string weightFile = skelFile + "skel1.weights";
+        skelFile += "skel1.skeleton";
+
+        skeleton = Skeleton(skelFile, weightFile);
     }
 }
 
 float Mesh::area(Triangle t) {
-    Vertex v = (vertices[t.b]-vertices[t.a]).cross(vertices[t.c]-vertices[t.a]);
-    return v.len()/2.;
+    QVector3D v = QVector3D::crossProduct( vertices[t.b]-vertices[t.a], vertices[t.c]-vertices[t.a]);
+    return v.length()/2;
 }
 
 void Mesh::computeCoRs() {
     // subdivide mesh
     // compute CoRs
     for(uint i= 0; i < vertices.size(); i++) {
-        Vertex c;
+        QVector3D c;
         float s = 0.0;
         uint count = indices.size()/3;
         for(uint j = 0; j < count; j++) {

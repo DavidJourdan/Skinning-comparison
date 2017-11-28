@@ -3,7 +3,8 @@
 #include <QVector3D>
 
 OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), window(parent), mesh(fileName),
-vbo(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer), leftButtonPressed(false), rightButtonPressed(false)
+    vbo(QOpenGLBuffer::VertexBuffer), normBuffer(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer),
+    leftButtonPressed(false), rightButtonPressed(false)
 {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -25,30 +26,41 @@ void OpenGLWidget::initializeGL()
 
     vbo.create();
     vbo.bind();
-    std::vector<Vertex>& vertices = mesh.getVertices();
+    std::vector<QVector3D>& vertices = mesh.getVertices();
     vbo.allocate(vertices.data(), vertices.size() * sizeof(Vertex));
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+
+    normBuffer.create();
+    normBuffer.bind();
+    std::vector<QVector3D> normals = mesh.getNormals();
+    normBuffer.allocate(normals.data(), normals.size() * sizeof(QVector3D));
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
 
     ebo.create();
     ebo.bind();
     std::vector<uint>& indices = mesh.getIndices();
     ebo.allocate(indices.data(), indices.size() * sizeof(uint));
+    ebo.release();
 
     prog = std::make_unique<QOpenGLShaderProgram>(this);
     prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shader.vert");
     prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
     prog->link();
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(0);
 
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
 }
 
 void OpenGLWidget::resizeGL(int w, int h)
 {
-        GLdouble aspect = w / (h ? h : 1);
-        const GLdouble zNear = 1.0, zFar = 30.0, fov = 30.0;
-        projectionMatrix = perspective(fov, aspect, zNear, zFar);
+    GLdouble aspect = w / (h ? h : 1);
+    const GLdouble zNear = 1.0, zFar = 30.0, fov = 30.0;
+    projectionMatrix = perspective(fov, aspect, zNear, zFar);
 }
 
 void OpenGLWidget::paintGL()
@@ -60,6 +72,10 @@ void OpenGLWidget::paintGL()
     prog->setUniformValue("viewMatrix", viewMatrix);
     prog->setUniformValue("projectionMatrix", projectionMatrix);
 
+    prog->setUniformValue("screenWidth" , window->width());
+    prog->setUniformValue("screenHeight", window->height());
+
+    ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
