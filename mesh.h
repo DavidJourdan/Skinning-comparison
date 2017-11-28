@@ -16,6 +16,7 @@ public:
     std::vector<QVector3D>& getVertices() { return vertices; }
     std::vector<unsigned>& getIndices() { return indices;}
     std::vector<QVector3D>& getNormals() {return normals;}
+    std::vector<QVector3D> getSkelLines() { return skeleton.getSkelLines(); }
     void computeCoRs(void);
 private:
     std::vector<QVector3D> vertices;

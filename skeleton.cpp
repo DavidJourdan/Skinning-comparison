@@ -2,6 +2,8 @@
 #include <math.h>
 #define SIGMA_2 0.01
 
+using namespace std;
+
 Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(numBones), nbVertices(numVertices) {
     weights = new float[numBones*numVertices];
     for(uint i = 0; i < numBones*numVertices; i++)
@@ -50,7 +52,7 @@ void Skeleton::parseSkelFile(const std::string &file)
     f.open(file);
     std::string s;
 
-    std::getline(f, s);std::getline(f, s); //first two lines unuseful
+    std::getline(f, s);std::getline(f, s); //first two lines useless
 
     uint num = 0;
     std::getline(f, s); // third line : number of articulations
@@ -111,3 +113,17 @@ void Skeleton::parseSkelFile(const std::string &file)
     //no need for the rest of the data
     f.close();
 }
+
+std::vector<QVector3D> Skeleton::getSkelLines() {
+    vector<QVector3D> lines;
+    for(Bone b : edges) {
+        lines.push_back(articulations[b.mother]);
+        lines.push_back(articulations[b.child]);
+    }
+    for(Relation r : relations) {
+        lines.push_back(articulations[r.mother]);
+        lines.push_back(articulations[r.child]);
+    }
+    return lines;
+}
+

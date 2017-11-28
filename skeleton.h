@@ -33,6 +33,7 @@ public:
     inline float* weightsAt(uint vertex) { return weights + (vertex*nbBones);}
     float simil(uint vertexInd, Triangle t);
     void parseSkelFile(const std::string& file);
+    std::vector<QVector3D> getSkelLines();
 
 private:
     uint nbBones;

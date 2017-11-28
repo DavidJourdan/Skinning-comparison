@@ -4,6 +4,7 @@
 
 OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), window(parent), mesh(fileName),
     vbo(QOpenGLBuffer::VertexBuffer), normBuffer(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer),
+    lineBuffer(QOpenGLBuffer::VertexBuffer), lineIndices(QOpenGLBuffer::IndexBuffer),
     leftButtonPressed(false), rightButtonPressed(false)
 {
     setFocusPolicy(Qt::StrongFocus);
@@ -17,7 +18,7 @@ void OpenGLWidget::initializeGL()
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-   glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     vao.create();
     if (vao.isCreated()) {
@@ -32,7 +33,6 @@ void OpenGLWidget::initializeGL()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
-
     normBuffer.create();
     normBuffer.bind();
     std::vector<QVector3D> normals = mesh.getNormals();
@@ -46,6 +46,32 @@ void OpenGLWidget::initializeGL()
     std::vector<uint>& indices = mesh.getIndices();
     ebo.allocate(indices.data(), indices.size() * sizeof(uint));
     ebo.release();
+
+    vao.release();
+
+    linevao.create();
+    if (linevao.isCreated()) {
+        linevao.bind();
+    }
+
+    lineBuffer.create();
+    lineBuffer.bind();
+    std::vector<QVector3D> lines = mesh.getSkelLines();
+    lineBuffer.allocate(lines.data(), lines.size() * sizeof(QVector3D));
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    lineIndices.create();
+    lineIndices.bind();
+    std::vector<uint> ind;
+    for(uint i = 0; i < lines.size(); i++) {
+        ind.push_back(i);
+    }
+    lineIndices.allocate(ind.data(), ind.size() * sizeof(uint));
+    lineIndices.release();
+
+    linevao.release();
 
     prog = std::make_unique<QOpenGLShaderProgram>(this);
     prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shader.vert");
@@ -79,6 +105,15 @@ void OpenGLWidget::paintGL()
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
+    ebo.release();
+
+    vao.release();
+
+    linevao.bind();
+    lineIndices.bind();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
+    lineIndices.release();
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
