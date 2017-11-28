@@ -4,7 +4,7 @@
 
 OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), window(parent), mesh(fileName),
     vbo(QOpenGLBuffer::VertexBuffer), normBuffer(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer),
-    lineBuffer(QOpenGLBuffer::VertexBuffer), lineIndices(QOpenGLBuffer::IndexBuffer),
+    lineBuffer(QOpenGLBuffer::VertexBuffer), lineIndices(QOpenGLBuffer::IndexBuffer), lineColors(QOpenGLBuffer::VertexBuffer),
     leftButtonPressed(false), rightButtonPressed(false)
 {
     setFocusPolicy(Qt::StrongFocus);
@@ -62,11 +62,24 @@ void OpenGLWidget::initializeGL()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
+    lineColors.create();
+    lineColors.bind();
+    std::vector<QVector4D> colors(lines.size());
+    for(int i = 0; i < lines.size()/2. ; i++) {
+        QVector4D parentColor(0.0, 0.0, 0.0, 0.9); //black
+        QVector4D childColor(1.0, 0.0, 0.0, 0.9); // red
+        colors[2*i] = parentColor;
+        colors[2*i + 1] = childColor;
+    }
+    lineColors.allocate(colors.data(), colors.size() * sizeof(QVector4D));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
+    
     lineIndices.create();
     lineIndices.bind();
-    std::vector<uint> ind;
+    std::vector<uint> ind(lines.size());
     for(uint i = 0; i < lines.size(); i++) {
-        ind.push_back(i);
+        ind[i] = i;
     }
     lineIndices.allocate(ind.data(), ind.size() * sizeof(uint));
     lineIndices.release();
@@ -112,6 +125,7 @@ void OpenGLWidget::paintGL()
     linevao.bind();
     lineIndices.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glLineWidth((GLfloat)5);
     glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
     lineIndices.release();
 }

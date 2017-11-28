@@ -53,6 +53,7 @@ private:
     QOpenGLBuffer ebo;
     QOpenGLBuffer lineBuffer;
     QOpenGLBuffer lineIndices;
+    QOpenGLBuffer lineColors;
 
     std::unique_ptr<QOpenGLShaderProgram> prog;
 
