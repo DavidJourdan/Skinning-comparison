@@ -58,9 +58,9 @@ void OpenGLWidget::initializeGL()
 
 void OpenGLWidget::resizeGL(int w, int h)
 {
-        GLdouble aspect = w / (h ? h : 1);
-        const GLdouble zNear = 1.0, zFar = 30.0, fov = 30.0;
-        projectionMatrix = perspective(fov, aspect, zNear, zFar);
+    GLdouble aspect = w / (h ? h : 1);
+    const GLdouble zNear = 1.0, zFar = 30.0, fov = 30.0;
+    projectionMatrix = perspective(fov, aspect, zNear, zFar);
 }
 
 void OpenGLWidget::paintGL()
@@ -71,6 +71,9 @@ void OpenGLWidget::paintGL()
     prog->setUniformValue("modelMatrix", modelMatrix);
     prog->setUniformValue("viewMatrix", viewMatrix);
     prog->setUniformValue("projectionMatrix", projectionMatrix);
+
+    prog->setUniformValue("screenWidth" , window->width());
+    prog->setUniformValue("screenHeight", window->height());
 
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

@@ -14,6 +14,12 @@ Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(num
     }
 }
 
+Skeleton::Skeleton(const std::string &skelFile, const std::string &weightFile)
+{
+    weights = new float[1];
+    parseSkelFile(skelFile);
+}
+
 Skeleton::Skeleton(){}
 
 Skeleton::~Skeleton() {
@@ -36,4 +42,27 @@ float Skeleton::simil(uint vertexInd, Triangle t) {
         sum += vertWeight[j]*triWeight[j]*term;
     }
     return sum;
+}
+
+void Skeleton::parseSkelFile(const std::string &file)
+{
+    std::ifstream f;
+    f.open(file);
+    std::string s;
+    std::string temp;
+
+    std::getline(f, s);std::getline(f, s); //first two lines unuseful
+
+    uint numArt = 0;
+    std::getline(f, s); // third line : number of articulations
+    int index = s.find_first_of(" ")+1;
+    numArt = std::stoi(s.substr(index, s.size() - index));
+
+    std::cout << numArt << std::endl;
+    articulations.reserve(numArt);
+
+    for(int i = 0 ; i < numArt ; i++)
+    {
+
+    }
 }

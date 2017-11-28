@@ -6,6 +6,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <QDebug>
+
 Mesh::Mesh(const std::string &fileName)
 {
     Assimp::Importer importer;
@@ -53,8 +55,17 @@ Mesh::Mesh(const std::string &fileName)
         }
     }
 
-    if(mesh->mBones) {
+    if(mesh->HasBones()) { //bones included in file
         skeleton= Skeleton(mesh->mNumBones, mesh->mNumVertices, mesh->mBones);
+    }
+
+    else //bones in another file, let's find weights and skeleton files, format skel1.*
+    {
+        std::string skelFile = fileName.substr(0, fileName.find_last_of("/")+1);
+        std::string weightFile = skelFile + "skel1.weights";
+        skelFile += "skel1.skeleton";
+
+        skeleton = Skeleton(skelFile, weightFile);
     }
 }
 

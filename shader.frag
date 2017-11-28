@@ -8,17 +8,21 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
+uniform float screenWidth;
+uniform float screenHeight;
+
 out vec4 fragColor;
 
-float lightPow = 7.5;
-vec4 albedo = vec4(0.5, 0.5, 0.5, 1.0);
+float lightPow = 2.0;
 float fd = 0.8/M_PI;
 
-vec4 lightPos = vec4(0.0, 10.0, 10.0, 1.0);
+vec4 albedo = vec4(0.5, 0.5, 0.5, 1.0);
+vec4 lightPos = vec4(screenWidth/2.0, screenHeight/2.0, -20.0, 1.0);
 
 void main(void)
 {
-    vec4 wi = normalize(projectionMatrix * viewMatrix * modelMatrix * lightPos -  gl_FragCoord);
+    vec4 wi = normalize(lightPos - gl_FragCoord);
 
     fragColor = 0.15 + lightPow * fd * albedo * max(0.0, dot(normal, wi));
+
 }
