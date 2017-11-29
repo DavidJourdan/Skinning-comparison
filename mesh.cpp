@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -36,10 +37,10 @@ Mesh Mesh::fromGenericFile(const std::string &fileName)
 
     std::vector<QVector3D> vertices;
     std::vector<unsigned> indices;
+    std::vector<QVector3D> normals;
     Skeleton skeleton;
 
     vertices.reserve(mesh->mNumVertices);
-    CoRs.reserve(mesh->mNumVertices);
     normals.reserve(mesh->mNumVertices);
 
     for (size_t i = 0; i < mesh->mNumVertices; ++i) {
@@ -91,8 +92,7 @@ Mesh Mesh::fromCustomFile(const std::string &meshFileName,
         std::string first;
         lineStream >> first;
 
-        switch (first) {
-        case "v":
+        if (first == "v") {
             float x;
             float y;
             float z;
@@ -101,8 +101,7 @@ Mesh Mesh::fromCustomFile(const std::string &meshFileName,
             QVector3D vertex { x, y, z };
 
             vertices.push_back(vertex);
-            break;
-        case "f":
+        } else if (first == "f") {
             std::vector<unsigned> face;
 
             for (unsigned index; lineStream >> index;) {
@@ -129,9 +128,6 @@ Mesh Mesh::fromCustomFile(const std::string &meshFileName,
             default:
                 break;
             }
-            break;
-        default:
-            break;
         }
     }
 
@@ -145,11 +141,20 @@ float Mesh::area(Triangle t) {
 }
 
 Mesh::Mesh(std::vector<QVector3D> vertices,
-           std::vector<QVector3D> indices,
+           std::vector<unsigned> indices,
            Skeleton skeleton) : vertices { vertices },
     indices { indices }, skeleton { skeleton }
 {
+    CoRs.reserve(indices.size());
+}
 
+Mesh::Mesh(std::vector<QVector3D> vertices,
+           std::vector<unsigned> indices,
+           std::vector<QVector3D> normals,
+           Skeleton skeleton) : vertices { vertices },
+    indices { indices }, normals { normals }, skeleton { skeleton }
+{
+    CoRs.reserve(indices.size());
 }
 
 void Mesh::computeCoRs() {

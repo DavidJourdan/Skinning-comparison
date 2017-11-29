@@ -12,7 +12,12 @@ class Mesh
 {
 public:
     Mesh(std::vector<QVector3D> vertices,
-         std::vector<QVector3D> indices,
+         std::vector<unsigned> indices,
+         Skeleton skeleton);
+
+    Mesh(std::vector<QVector3D> vertices,
+         std::vector<unsigned> indices,
+         std::vector<QVector3D> normals,
          Skeleton skeleton);
 
     std::vector<QVector3D>& getVertices() { return vertices; }
