@@ -11,7 +11,9 @@
 class Mesh
 {
 public:
-    Mesh(const std::string& fileName);
+    Mesh(std::vector<QVector3D> vertices,
+         std::vector<QVector3D> indices,
+         Skeleton skeleton);
 
     std::vector<QVector3D>& getVertices() { return vertices; }
     std::vector<unsigned>& getIndices() { return indices;}
@@ -21,6 +23,10 @@ public:
     void computeCoRs(void);
     uint getBoneSelected() {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getNumberBones();}
+    static Mesh fromGenericFile(const std::string &fileName);
+    static Mesh fromCustomFile(const std::string &meshFileName,
+                               const std::string &skelFileName,
+                               const std::string &weightFileName);
 
 private:
     std::vector<QVector3D> vertices;

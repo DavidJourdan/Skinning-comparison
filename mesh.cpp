@@ -1,6 +1,7 @@
 #include "mesh.h"
 
 #include <iostream>
+#include <fstream>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -8,7 +9,7 @@
 
 #include <QDebug>
 
-Mesh::Mesh(const std::string &fileName) : boneSelected(0)
+Mesh Mesh::fromGenericFile(const std::string &fileName)
 {
     Assimp::Importer importer;
 
@@ -32,6 +33,10 @@ Mesh::Mesh(const std::string &fileName) : boneSelected(0)
 
     // For testing purpose, just trying to get one mesh here.
     const aiMesh* mesh = scene->mMeshes[0];
+
+    std::vector<QVector3D> vertices;
+    std::vector<unsigned> indices;
+    Skeleton skeleton;
 
     vertices.reserve(mesh->mNumVertices);
     CoRs.reserve(mesh->mNumVertices);
@@ -67,11 +72,84 @@ Mesh::Mesh(const std::string &fileName) : boneSelected(0)
 
         skeleton = Skeleton(skelFile);//, weightFile);
     }
+
+    return Mesh(vertices, indices, skeleton);
+}
+
+Mesh Mesh::fromCustomFile(const std::string &meshFileName,
+                          const std::string &skelFileName,
+                          const std::string &weightFileName)
+{
+    std::ifstream meshFile { meshFileName };
+
+    std::vector<QVector3D> vertices;
+    std::vector<unsigned> indices;
+
+    for (std::string line; std::getline(meshFile, line); ) {
+        std::stringstream lineStream { line };
+
+        std::string first;
+        lineStream >> first;
+
+        switch (first) {
+        case "v":
+            float x;
+            float y;
+            float z;
+
+            lineStream >> x >> y >> z;
+            QVector3D vertex { x, y, z };
+
+            vertices.push_back(vertex);
+            break;
+        case "f":
+            std::vector<unsigned> face;
+
+            for (unsigned index; lineStream >> index;) {
+                face.push_back(index - 1);
+            }
+
+            switch (face.size()) {
+            case 3:
+                for (auto index : face) {
+                    indices.push_back(index);
+                }
+
+                break;
+            case 4:
+                for (size_t i = 0; i < 3; ++i) {
+                    indices.push_back(face[i])
+                }
+
+                indices.push_back(face[2]);
+                indices.push_back(face[3]);
+                indices.push_back(face[0]);
+
+                break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    Skeleton skeleton { };
+    skeleton.parseSkelFile(skelFileName);
 }
 
 float Mesh::area(Triangle t) {
     QVector3D v = QVector3D::crossProduct( vertices[t.b]-vertices[t.a], vertices[t.c]-vertices[t.a]);
     return v.length()/2;
+}
+
+Mesh::Mesh(std::vector<QVector3D> vertices,
+           std::vector<QVector3D> indices,
+           Skeleton skeleton) : vertices { vertices },
+    indices { indices }, skeleton { skeleton }
+{
+
 }
 
 void Mesh::computeCoRs() {
