@@ -2,6 +2,8 @@
 #include <math.h>
 #define SIGMA_2 0.01
 
+using namespace std;
+
 Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(numBones), nbVertices(numVertices) {
     weights = new float[numBones*numVertices];
     for(uint i = 0; i < numBones*numVertices; i++)
@@ -14,10 +16,20 @@ Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(num
     }
 }
 
-Skeleton::Skeleton(const std::string &skelFile, const std::string &weightFile)
+Skeleton::Skeleton(const std::string &file)//, const std::string &weightFile)
 {
     weights = new float[1];
-    parseSkelFile(skelFile);
+
+    std::string weightFile = file + "skel1.weights";
+    std::string skelFile = file + "skel1.skeleton";
+
+    if(!parseSkelFile(skelFile))
+    {
+        weightFile = file + "skel.weights";
+        skelFile = file + "skel.skeleton";
+        parseSkelFile(skelFile);
+    }
+
 }
 
 Skeleton::Skeleton(){}
@@ -44,13 +56,16 @@ float Skeleton::simil(uint vertexInd, Triangle t) {
     return sum;
 }
 
-void Skeleton::parseSkelFile(const std::string &file)
+bool Skeleton::parseSkelFile(const std::string &file)
 {
     std::ifstream f;
     f.open(file);
+    if(!f.is_open())
+        return false;
+
     std::string s;
 
-    std::getline(f, s);std::getline(f, s); //first two lines unuseful
+    std::getline(f, s);std::getline(f, s); //first two lines useless
 
     uint num = 0;
     std::getline(f, s); // third line : number of articulations
@@ -93,7 +108,6 @@ void Skeleton::parseSkelFile(const std::string &file)
     index = s.find_first_of(" ");
     num = std::stoi(s.substr(index, s.size() - index));
 
-    std::cout << num << std::endl;
     relations.reserve(num);
 
     for(unsigned int i = 0 ; i < num ; i++) // read relations
@@ -110,4 +124,20 @@ void Skeleton::parseSkelFile(const std::string &file)
 
     //no need for the rest of the data
     f.close();
+
+    return true;
 }
+
+std::vector<QVector3D> Skeleton::getSkelLines() {
+    vector<QVector3D> lines;
+    for(Bone b : edges) {
+        lines.push_back(articulations[b.mother]);
+        lines.push_back(articulations[b.child]);
+    }
+    for(Relation r : relations) {
+        lines.push_back(articulations[r.mother]);
+        lines.push_back(articulations[r.child]);
+    }
+    return lines;
+}
+

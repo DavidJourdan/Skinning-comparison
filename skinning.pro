@@ -52,7 +52,9 @@ macx: {
 
 DISTFILES += \
     shader.vert \
-    shader.frag
+    shader.frag \
+    boneshader.frag \
+    boneshader.vert
 
 RESOURCES += \
     shaders.qrc

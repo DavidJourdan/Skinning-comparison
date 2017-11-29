@@ -4,7 +4,8 @@
 
 OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), window(parent), mesh(fileName),
     vbo(QOpenGLBuffer::VertexBuffer), normBuffer(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer),
-    leftButtonPressed(false), rightButtonPressed(false)
+    lineBuffer(QOpenGLBuffer::VertexBuffer), lineIndices(QOpenGLBuffer::IndexBuffer), lineColors(QOpenGLBuffer::VertexBuffer),
+    leftButtonPressed(false), rightButtonPressed(false), boneSelActiv(false)
 {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -17,7 +18,9 @@ void OpenGLWidget::initializeGL()
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-   glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     vao.create();
     if (vao.isCreated()) {
@@ -31,7 +34,6 @@ void OpenGLWidget::initializeGL()
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
-
 
     normBuffer.create();
     normBuffer.bind();
@@ -47,11 +49,65 @@ void OpenGLWidget::initializeGL()
     ebo.allocate(indices.data(), indices.size() * sizeof(uint));
     ebo.release();
 
+    vao.release();
+
+    linevao.create();
+    if (linevao.isCreated()) {
+        linevao.bind();
+    }
+
+    lineBuffer.create();
+    lineBuffer.bind();
+    std::vector<QVector3D> lines = mesh.getSkelLines();
+    lineBuffer.allocate(lines.data(), lines.size() * sizeof(QVector3D));
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    lineColors.create();
+    lineColors.bind();
+    std::vector<QVector4D> colors(lines.size());
+    uint n = mesh.getNumberBones();
+
+    for(uint i = 0; i < n ; i++) {
+        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
+        QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
+        colors[2*i] = parentColor;
+        colors[2*i + 1] = childColor;
+    }
+
+    for(uint i = 2*n ; i < lines.size() ; i++)
+    {
+        QVector4D parentColor(0.0, 0.0, 1.0, 0.9); //black
+        //QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
+        colors[i] = parentColor;
+        //colors[2*i + 1] = childColor;
+    }
+
+    lineColors.allocate(colors.data(), colors.size() * sizeof(QVector4D));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
+    
+    lineIndices.create();
+    lineIndices.bind();
+    std::vector<uint> ind(lines.size());
+    for(uint i = 0; i < lines.size(); i++) {
+        ind[i] = i;
+    }
+    lineIndices.allocate(ind.data(), ind.size() * sizeof(uint));
+    lineIndices.release();
+
+    linevao.release();
+
     prog = std::make_unique<QOpenGLShaderProgram>(this);
     prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shader.vert");
     prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
     prog->link();
 
+    boneProg = std::make_unique<QOpenGLShaderProgram>(this);
+    boneProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");
+    boneProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/boneshader.frag");
+    boneProg->link();
 
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
 }
@@ -65,6 +121,24 @@ void OpenGLWidget::resizeGL(int w, int h)
 
 void OpenGLWidget::paintGL()
 {
+
+    boneProg->bind();
+    linevao.bind();
+
+    boneProg->setUniformValue("modelMatrix", modelMatrix);
+    boneProg->setUniformValue("viewMatrix", viewMatrix);
+    boneProg->setUniformValue("projectionMatrix", projectionMatrix);
+
+    lineIndices.bind();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glLineWidth((GLfloat)15);
+    glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
+    lineIndices.release();
+    linevao.release();
+    boneProg->release();
+
+
+
     prog->bind();
     vao.bind();
 
@@ -72,13 +146,14 @@ void OpenGLWidget::paintGL()
     prog->setUniformValue("viewMatrix", viewMatrix);
     prog->setUniformValue("projectionMatrix", projectionMatrix);
 
-    prog->setUniformValue("screenWidth" , window->width());
-    prog->setUniformValue("screenHeight", window->height());
-
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
+    ebo.release();
+    vao.release();
+    prog->release();
+
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -151,6 +226,35 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         update();
         break;
 
+    case Qt::Key_Space:
+        boneSelActiv = !boneSelActiv;
+        if(boneSelActiv)
+            showBoneActiv();
+        else
+            noBoneActiv();
+        update();
+        break;
+
+    case Qt::Key_Left:
+        if(boneSelActiv)
+        {
+            mesh.setBoneSelected(mesh.getBoneSelected()-1);
+            noBoneActiv();
+            showBoneActiv();
+            update();
+        }
+        break;
+
+    case Qt::Key_Right:
+        if(boneSelActiv)
+        {
+            mesh.setBoneSelected(mesh.getBoneSelected()+1);
+            noBoneActiv();
+            showBoneActiv();
+            update();
+        }
+        break;
+
     default:
         break;
     }
@@ -214,4 +318,30 @@ void OpenGLWidget::translateCamera(QVector3D dir)
 {
     float cameraSpeed = 1.0f;
     viewMatrix.translate(cameraSpeed * dir);
+}
+
+void OpenGLWidget::showBoneActiv()
+{
+    uint i = mesh.getBoneSelected();
+    std::vector<QVector4D> d;
+    d.push_back(QVector4D(0.0, 1.0, 0.0, 0.9));
+    d.push_back(QVector4D(0.0, 1.0, 0.0, 0.9));
+    lineColors.bind();
+    lineColors.write(2*i * sizeof(QVector4D), d.data(), 2*sizeof(QVector4D));
+    lineColors.release();
+}
+
+void OpenGLWidget::noBoneActiv()
+{
+    uint n = mesh.getNumberBones();
+    std::vector<QVector4D> colors(2*n);
+    for(uint i = 0; i < n ; i++) {
+        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
+        QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
+        colors[2*i] = parentColor;
+        colors[2*i + 1] = childColor;
+    }
+    lineColors.bind();
+    lineColors.write(0, colors.data(), 2*n*sizeof(QVector4D));
+    lineColors.release();
 }

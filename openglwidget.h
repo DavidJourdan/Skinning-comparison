@@ -40,6 +40,8 @@ protected:
     QVector3D rightDirection();
     QVector3D upDirection();
     void translateCamera(QVector3D dir);
+    void showBoneActiv();
+    void noBoneActiv();
 
 
 private:
@@ -47,11 +49,16 @@ private:
 
     Mesh mesh;
     QOpenGLVertexArrayObject vao;
+    QOpenGLVertexArrayObject linevao;
     QOpenGLBuffer vbo;
     QOpenGLBuffer normBuffer;
     QOpenGLBuffer ebo;
+    QOpenGLBuffer lineBuffer;
+    QOpenGLBuffer lineIndices;
+    QOpenGLBuffer lineColors;
 
     std::unique_ptr<QOpenGLShaderProgram> prog;
+    std::unique_ptr<QOpenGLShaderProgram> boneProg;
 
     QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
@@ -61,6 +68,7 @@ private:
 
     bool leftButtonPressed;
     bool rightButtonPressed;
+    bool boneSelActiv;
 
     QPointF screenToViewport(QPointF screenPos);
 };
