@@ -117,7 +117,7 @@ Mesh Mesh::fromCustomFile(const std::string &meshFileName,
                 break;
             case 4:
                 for (size_t i = 0; i < 3; ++i) {
-                    indices.push_back(face[i])
+                    indices.push_back(face[i]);
                 }
 
                 indices.push_back(face[2]);

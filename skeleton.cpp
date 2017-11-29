@@ -141,3 +141,29 @@ std::vector<QVector3D> Skeleton::getSkelLines() {
     return lines;
 }
 
+void Skeleton::parseWeights(const string &fileName)
+{
+    ifstream file { fileName };
+    size_t vertexCount;
+    file >> std::string { } >> vertexCount;
+
+    if (vertexCount != nbVertices) {
+        std::cerr << "Weight file does not match mesh.\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    size_t vertexIndex = 0;
+    for (std::string line; std::getline(file, line); ++vertexIndex) {
+        std::stringstream lineStream { line };
+        size_t weightCount;
+        lineStream >> weightCount;
+
+        {
+            size_t index;
+            for (float w; lineStream >> index >> w;) {
+                weights[vertexIndex * nbBones + index] += w;
+            }
+        }
+    }
+}
+
