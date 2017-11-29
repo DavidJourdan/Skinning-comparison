@@ -19,6 +19,8 @@ public:
     std::vector<QVector3D> getSkelLines() { return skeleton.getSkelLines(); }
     uint getNumberBones() {return skeleton.getNumberBones();}
     void computeCoRs(void);
+    uint getBoneSelected() {return boneSelected;}
+    void setBoneSelected(uint i) {boneSelected = i%skeleton.getNumberBones();}
 
 private:
     std::vector<QVector3D> vertices;
@@ -26,6 +28,7 @@ private:
     std::vector<unsigned> indices;
     std::vector<QVector3D> CoRs;
     Skeleton skeleton;
+    uint boneSelected;
     float area(Triangle t);
 };
 

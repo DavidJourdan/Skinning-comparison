@@ -5,7 +5,7 @@
 OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), window(parent), mesh(fileName),
     vbo(QOpenGLBuffer::VertexBuffer), normBuffer(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer),
     lineBuffer(QOpenGLBuffer::VertexBuffer), lineIndices(QOpenGLBuffer::IndexBuffer), lineColors(QOpenGLBuffer::VertexBuffer),
-    leftButtonPressed(false), rightButtonPressed(false)
+    leftButtonPressed(false), rightButtonPressed(false), boneSelActiv(false)
 {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -226,6 +226,35 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         update();
         break;
 
+    case Qt::Key_Space:
+        boneSelActiv = !boneSelActiv;
+        if(boneSelActiv)
+            showBoneActiv();
+        else
+            noBoneActiv();
+        update();
+        break;
+
+    case Qt::Key_Left:
+        if(boneSelActiv)
+        {
+            mesh.setBoneSelected(mesh.getBoneSelected()-1);
+            noBoneActiv();
+            showBoneActiv();
+            update();
+        }
+        break;
+
+    case Qt::Key_Right:
+        if(boneSelActiv)
+        {
+            mesh.setBoneSelected(mesh.getBoneSelected()+1);
+            noBoneActiv();
+            showBoneActiv();
+            update();
+        }
+        break;
+
     default:
         break;
     }
@@ -289,4 +318,30 @@ void OpenGLWidget::translateCamera(QVector3D dir)
 {
     float cameraSpeed = 1.0f;
     viewMatrix.translate(cameraSpeed * dir);
+}
+
+void OpenGLWidget::showBoneActiv()
+{
+    uint i = mesh.getBoneSelected();
+    std::vector<QVector4D> d;
+    d.push_back(QVector4D(0.0, 1.0, 0.0, 0.9));
+    d.push_back(QVector4D(0.0, 1.0, 0.0, 0.9));
+    lineColors.bind();
+    lineColors.write(2*i * sizeof(QVector4D), d.data(), 2*sizeof(QVector4D));
+    lineColors.release();
+}
+
+void OpenGLWidget::noBoneActiv()
+{
+    uint n = mesh.getNumberBones();
+    std::vector<QVector4D> colors(2*n);
+    for(uint i = 0; i < n ; i++) {
+        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
+        QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
+        colors[2*i] = parentColor;
+        colors[2*i + 1] = childColor;
+    }
+    lineColors.bind();
+    lineColors.write(0, colors.data(), 2*n*sizeof(QVector4D));
+    lineColors.release();
 }

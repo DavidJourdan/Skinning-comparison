@@ -40,6 +40,8 @@ protected:
     QVector3D rightDirection();
     QVector3D upDirection();
     void translateCamera(QVector3D dir);
+    void showBoneActiv();
+    void noBoneActiv();
 
 
 private:
@@ -66,6 +68,7 @@ private:
 
     bool leftButtonPressed;
     bool rightButtonPressed;
+    bool boneSelActiv;
 
     QPointF screenToViewport(QPointF screenPos);
 };

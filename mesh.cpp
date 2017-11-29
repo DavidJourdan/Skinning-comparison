@@ -8,7 +8,7 @@
 
 #include <QDebug>
 
-Mesh::Mesh(const std::string &fileName)
+Mesh::Mesh(const std::string &fileName) : boneSelected(0)
 {
     Assimp::Importer importer;
 
