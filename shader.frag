@@ -13,7 +13,7 @@ out vec4 fragColor;
 float lightPow = 2.0;
 float fd = 1.0/M_PI;
 
-vec4 albedo = vec4(0.5, 0.5, 0.5, 0.3);
+vec4 albedo = vec4(0.5, 0.5, 0.5, 0.5);
 vec4 lightPos = vec4(0.0, -20.0, 0.0, 1.0);
 
 void main(void)

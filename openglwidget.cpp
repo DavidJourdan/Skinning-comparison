@@ -67,12 +67,23 @@ void OpenGLWidget::initializeGL()
     lineColors.create();
     lineColors.bind();
     std::vector<QVector4D> colors(lines.size());
-    for(int i = 0; i < lines.size()/2. ; i++) {
-        QVector4D parentColor(0.0, 0.0, 0.0, 0.9); //black
-        QVector4D childColor(1.0, 0.0, 0.0, 0.9); // red
+    uint n = mesh.getNumberBones();
+
+    for(uint i = 0; i < n ; i++) {
+        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
+        QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
         colors[2*i] = parentColor;
         colors[2*i + 1] = childColor;
     }
+
+    for(uint i = 2*n ; i < lines.size() ; i++)
+    {
+        QVector4D parentColor(0.0, 0.0, 1.0, 0.9); //black
+        //QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
+        colors[i] = parentColor;
+        //colors[2*i + 1] = childColor;
+    }
+
     lineColors.allocate(colors.data(), colors.size() * sizeof(QVector4D));
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
@@ -120,7 +131,7 @@ void OpenGLWidget::paintGL()
 
     lineIndices.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glLineWidth((GLfloat)5);
+    glLineWidth((GLfloat)15);
     glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
     lineIndices.release();
     linevao.release();

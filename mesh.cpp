@@ -62,10 +62,10 @@ Mesh::Mesh(const std::string &fileName)
     else //bones in another file, let's find weights and skeleton files, format skel1.*
     {
         std::string skelFile = fileName.substr(0, fileName.find_last_of("/")+1);
-        std::string weightFile = skelFile + "skel1.weights";
-        skelFile += "skel1.skeleton";
+        //std::string weightFile = skelFile + "skel1.weights";
+        //skelFile += "skel1.skeleton";
 
-        skeleton = Skeleton(skelFile, weightFile);
+        skeleton = Skeleton(skelFile);//, weightFile);
     }
 }
 

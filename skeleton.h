@@ -27,13 +27,14 @@ class Skeleton
 {
 public:
     Skeleton(uint, uint, aiBone**);
-    Skeleton(const std::string& skelFile, const std::string& weightFile);
+    Skeleton(const std::string& file);//, const std::string& weightFile);
     Skeleton();
     ~Skeleton();
     inline float* weightsAt(uint vertex) { return weights + (vertex*nbBones);}
     float simil(uint vertexInd, Triangle t);
-    void parseSkelFile(const std::string& file);
+    bool parseSkelFile(const std::string& file);
     std::vector<QVector3D> getSkelLines();
+    uint getNumberBones() {return edges.size();}
 
 private:
     uint nbBones;
