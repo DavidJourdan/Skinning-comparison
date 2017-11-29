@@ -19,6 +19,8 @@ void OpenGLWidget::initializeGL()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     vao.create();
     if (vao.isCreated()) {
@@ -91,6 +93,10 @@ void OpenGLWidget::initializeGL()
     prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
     prog->link();
 
+    boneProg = std::make_unique<QOpenGLShaderProgram>(this);
+    boneProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");
+    boneProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/boneshader.frag");
+    boneProg->link();
 
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
 }
@@ -104,6 +110,24 @@ void OpenGLWidget::resizeGL(int w, int h)
 
 void OpenGLWidget::paintGL()
 {
+
+    boneProg->bind();
+    linevao.bind();
+
+    boneProg->setUniformValue("modelMatrix", modelMatrix);
+    boneProg->setUniformValue("viewMatrix", viewMatrix);
+    boneProg->setUniformValue("projectionMatrix", projectionMatrix);
+
+    lineIndices.bind();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glLineWidth((GLfloat)5);
+    glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
+    lineIndices.release();
+    linevao.release();
+    boneProg->release();
+
+
+
     prog->bind();
     vao.bind();
 
@@ -111,23 +135,14 @@ void OpenGLWidget::paintGL()
     prog->setUniformValue("viewMatrix", viewMatrix);
     prog->setUniformValue("projectionMatrix", projectionMatrix);
 
-    prog->setUniformValue("screenWidth" , window->width());
-    prog->setUniformValue("screenHeight", window->height());
-
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
     ebo.release();
-
     vao.release();
+    prog->release();
 
-    linevao.bind();
-    lineIndices.bind();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glLineWidth((GLfloat)5);
-    glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
-    lineIndices.release();
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)

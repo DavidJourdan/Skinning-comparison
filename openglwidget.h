@@ -56,6 +56,7 @@ private:
     QOpenGLBuffer lineColors;
 
     std::unique_ptr<QOpenGLShaderProgram> prog;
+    std::unique_ptr<QOpenGLShaderProgram> boneProg;
 
     QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
