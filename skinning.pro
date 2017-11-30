@@ -39,7 +39,8 @@ HEADERS  += mainwindow.h \
     openglwidget.h \
     mesh.h \
     skeleton.h \
-    vertex.h
+    vertex.h \
+    config.h
 
 unix:!macx {
     LIBS += -lassimp

@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "config.h"
 #include <QApplication>
 #include <QSurfaceFormat>
 #include <QCommandLineOption>
@@ -29,11 +30,13 @@ int main(int argc, char *argv[])
 
     parser.process(a);
 
-    auto inputFile = parser.value(inputFileOption);
-    auto skelFile = parser.value(skelFileOption);
-    auto weightFile = parser.value(weightFileOption);
+    auto inputFile = parser.value(inputFileOption).toStdString();
+    auto skelFile = parser.value(skelFileOption).toStdString();
+    auto weightFile = parser.value(weightFileOption).toStdString();
 
-    MainWindow w(inputFile);
+    Config config { inputFile, skelFile, weightFile };
+
+    MainWindow w(config);
     w.showMaximized();
 
     return a.exec();

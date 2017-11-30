@@ -77,11 +77,9 @@ Mesh Mesh::fromGenericFile(const std::string &fileName)
     return Mesh(vertices, indices, skeleton);
 }
 
-Mesh Mesh::fromCustomFile(const std::string &meshFileName,
-                          const std::string &skelFileName,
-                          const std::string &weightFileName)
+Mesh Mesh::fromCustomFile(const Config &config)
 {
-    std::ifstream meshFile { meshFileName };
+    std::ifstream meshFile { config.inputFile };
 
     std::vector<QVector3D> vertices;
     std::vector<unsigned> indices;
@@ -132,8 +130,8 @@ Mesh Mesh::fromCustomFile(const std::string &meshFileName,
     }
 
     Skeleton skeleton { };
-    skeleton.parseSkelFile(skelFileName);
-    skeleton.parseWeights(weightFileName);
+    skeleton.parseSkelFile(config.skelFile);
+    skeleton.parseWeights(config.weightFile);
 
     return Mesh(vertices, indices, skeleton);
 }

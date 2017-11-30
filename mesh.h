@@ -7,6 +7,7 @@
 #include<QVector3D>
 #include "skeleton.h"
 #include "vertex.h"
+#include "config.h"
 
 class Mesh
 {
@@ -29,9 +30,7 @@ public:
     uint getBoneSelected() {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getNumberBones();}
     static Mesh fromGenericFile(const std::string &fileName);
-    static Mesh fromCustomFile(const std::string &meshFileName,
-                               const std::string &skelFileName,
-                               const std::string &weightFileName);
+    static Mesh fromCustomFile(const Config &config);
 
 private:
     std::vector<QVector3D> vertices;
