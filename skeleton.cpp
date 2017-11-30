@@ -1,5 +1,6 @@
 #include "skeleton.h"
 #include <math.h>
+#include <sstream>
 #define SIGMA_2 0.01
 
 using namespace std;
@@ -145,7 +146,8 @@ void Skeleton::parseWeights(const string &fileName)
 {
     ifstream file { fileName };
     size_t vertexCount;
-    file >> std::string { } >> vertexCount;
+    std::string magic;
+    file >> magic >> vertexCount;
 
     if (vertexCount != nbVertices) {
         std::cerr << "Weight file does not match mesh.\n";

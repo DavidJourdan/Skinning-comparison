@@ -133,6 +133,9 @@ Mesh Mesh::fromCustomFile(const std::string &meshFileName,
 
     Skeleton skeleton { };
     skeleton.parseSkelFile(skelFileName);
+    skeleton.parseWeights(weightFileName);
+
+    return Mesh(vertices, indices, skeleton);
 }
 
 float Mesh::area(Triangle t) {

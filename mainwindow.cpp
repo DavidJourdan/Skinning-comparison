@@ -3,7 +3,7 @@
 #include <QFileDialog>
 #include <QDir>
 
-MainWindow::MainWindow(QString fileName, QWidget *parent)
+MainWindow::MainWindow(QString fileName, QString skelFile, QString weightFile, QWidget *parent)
     : QMainWindow(parent)
 {
     if (fileName == "") {
