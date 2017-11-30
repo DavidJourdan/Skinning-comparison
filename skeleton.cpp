@@ -1,5 +1,6 @@
 #include "skeleton.h"
 #include <math.h>
+#include <locale>
 #define SIGMA_2 0.01
 
 using namespace std;
@@ -58,6 +59,9 @@ float Skeleton::simil(uint vertexInd, Triangle t) {
 
 bool Skeleton::parseSkelFile(const std::string &file)
 {
+    // std::stof has to inpterpret dots as a decimal-point character
+    std::locale::global(std::locale("POSIX"));
+
     std::ifstream f;
     f.open(file);
     if(!f.is_open())
