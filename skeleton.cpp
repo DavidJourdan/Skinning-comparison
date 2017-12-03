@@ -156,6 +156,7 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 
     weights = new float[vertexCount * edges.size()];
 
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     size_t vertexIndex = 0;
     for (std::string line; std::getline(file, line); ++vertexIndex) {
         std::stringstream lineStream { line };
