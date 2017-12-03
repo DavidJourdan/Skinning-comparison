@@ -132,13 +132,13 @@ Mesh Mesh::fromCustomFile(const Config &config)
     auto normals = std::vector<QVector3D>(vertices.size());
 
     for (size_t i = 0; i < indices.size(); i += 3) {
-        const auto& a = vertices[i];
-        const auto& b = vertices[i + 1];
-        const auto& c = vertices[i + 2];
+        const auto& a = vertices[indices[i]];
+        const auto& b = vertices[indices[i + 1]];
+        const auto& c = vertices[indices[i + 2]];
 
         const auto cross = QVector3D::crossProduct(b - a, c - a);
         for (size_t j = 0; j < 3; ++j) {
-            normals[i + j] += cross;
+            normals[indices[i + j]] += cross;
         }
     }
 
@@ -148,7 +148,7 @@ Mesh Mesh::fromCustomFile(const Config &config)
 
     Skeleton skeleton { };
     skeleton.parseSkelFile(config.skelFile);
-    skeleton.parseWeights(config.weightFile);
+    skeleton.parseWeights(config.weightFile, vertices.size());
 
     return Mesh(vertices, indices, normals, skeleton);
 }

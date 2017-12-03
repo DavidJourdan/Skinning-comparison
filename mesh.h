@@ -34,8 +34,8 @@ public:
 
 private:
     std::vector<QVector3D> vertices;
-    std::vector<QVector3D> normals;
     std::vector<unsigned> indices;
+    std::vector<QVector3D> normals;
     std::vector<QVector3D> CoRs;
     Skeleton skeleton;
     uint boneSelected;
