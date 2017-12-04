@@ -22,11 +22,12 @@ void OpenGLWidget::editBone(size_t i)
 
     const auto length = (child - center).length();
 
-    QVector3D eye = center + QVector3D(3.0 * length, 0.0, 0.0);
-    QVector3D up { 0.0, 1.0, 0.0 };
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(-center);
 
-    viewMatrix.setToIdentity();
-    viewMatrix.lookAt(eye, center, up);
+    const auto col = QVector4D { 0.0, 0.0, -3.0f * length, 1.0 };
+    viewMatrix.setColumn(3, col);
+
     update();
 }
 
@@ -107,7 +108,7 @@ void OpenGLWidget::initializeGL()
     lineColors.allocate(colors.data(), colors.size() * sizeof(QVector4D));
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
-    
+
     lineIndices.create();
     lineIndices.bind();
     std::vector<uint> ind(lines.size());
@@ -184,11 +185,11 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
     if(leftButtonPressed)
     {
         auto pos = screenToViewport(event->localPos());
-        QVector3D movement{pos - prevPos};
+        QVector3D movement{ pos - prevPos };
         constexpr float rotFactor = 1e2;
         float angle = movement.length() * rotFactor;
         movement.normalize();
-        QVector3D toCam{0.0f, 0.0f, 1.0f};
+        QVector3D toCam{ 0.0f, 0.0f, 1.0f };
         movement = viewMatrix.inverted() * movement;
         toCam = viewMatrix.inverted() * toCam;
         auto rotVec = QVector3D::crossProduct(toCam, movement);
