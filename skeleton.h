@@ -36,6 +36,9 @@ public:
     std::vector<QVector3D> getSkelLines();
     uint getNumberBones() {return edges.size();}
 
+    const std::vector<QVector3D> &getArticulations() const { return articulations; }
+    const std::vector<Bone> &getEdges() const { return edges; }
+
     void parseWeights(const std::string &fileName, size_t meshVertexCount);
 
 private:

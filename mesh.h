@@ -29,6 +29,14 @@ public:
     void computeCoRs(void);
     uint getBoneSelected() {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getNumberBones();}
+
+    const std::vector<QVector3D> &getArticulations() const
+    {
+        return skeleton.getArticulations();
+    }
+
+    const std::vector<Bone> &getEdges() const { return skeleton.getEdges(); }
+
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);
 

@@ -24,6 +24,9 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 public:
     OpenGLWidget(const Config &config, QWidget *parent);
 
+public slots:
+    void editBone(size_t i);
+
 protected:
     void initializeGL();
 

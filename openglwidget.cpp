@@ -11,6 +11,17 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
     setFocusPolicy(Qt::StrongFocus);
 }
 
+void OpenGLWidget::editBone(size_t i)
+{
+    const auto articulations = mesh.getArticulations();
+    const auto edges = mesh.getEdges();
+
+    const auto &bone = edges.at(i);
+    const auto &center = articulations.at(bone.mother);
+
+
+}
+
 void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
