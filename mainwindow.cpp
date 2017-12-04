@@ -3,14 +3,9 @@
 #include <QFileDialog>
 #include <QDir>
 
-MainWindow::MainWindow(QString fileName, QWidget *parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { parent }
 {
-    if (fileName == "") {
-        fileName = QFileDialog::getOpenFileName(nullptr, tr("Pick mesh"), QDir::homePath(), tr("Meshes (*.obj)"));
-    }
-
-    glWidget = new OpenGLWidget(fileName.toStdString(), this);
+    glWidget = new OpenGLWidget(config, this);
 
     setCentralWidget(glWidget);
 }

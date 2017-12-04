@@ -2,7 +2,8 @@
 
 #include <QVector3D>
 
-OpenGLWidget::OpenGLWidget(std::string fileName, QWidget *parent) : QOpenGLWidget(parent), window(parent), mesh(fileName),
+OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidget(parent), window(parent),
+    mesh { Mesh::fromCustomFile(config) },
     vbo(QOpenGLBuffer::VertexBuffer), normBuffer(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer),
     lineBuffer(QOpenGLBuffer::VertexBuffer), lineIndices(QOpenGLBuffer::IndexBuffer), lineColors(QOpenGLBuffer::VertexBuffer),
     leftButtonPressed(false), rightButtonPressed(false), boneSelActiv(false)

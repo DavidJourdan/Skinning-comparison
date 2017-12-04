@@ -1,6 +1,7 @@
 #include "skeleton.h"
 #include <math.h>
 #include <locale>
+#include <sstream>
 #define SIGMA_2 0.01
 
 using namespace std;
@@ -143,5 +144,35 @@ std::vector<QVector3D> Skeleton::getSkelLines() {
         lines.push_back(articulations[r.child]);
     }
     return lines;
+}
+
+void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
+{
+    ifstream file { fileName };
+    size_t vertexCount;
+    std::string magic;
+    file >> magic >> vertexCount;
+
+    if (vertexCount != meshVertexCount) {
+        std::cerr << "Weight file does not match mesh.\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    weights = new float[vertexCount * edges.size()];
+
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    size_t vertexIndex = 0;
+    for (std::string line; std::getline(file, line); ++vertexIndex) {
+        std::stringstream lineStream { line };
+        size_t weightCount;
+        lineStream >> weightCount;
+
+        {
+            size_t index;
+            for (float w; lineStream >> index >> w;) {
+                weights[vertexIndex * edges.size() + index] += w;
+            }
+        }
+    }
 }
 

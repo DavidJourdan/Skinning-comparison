@@ -3,13 +3,14 @@
 
 #include <QMainWindow>
 #include "openglwidget.h"
+#include "config.h"
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    MainWindow(QString fileName = "", QWidget *parent = 0);
+    MainWindow(const Config &config, QWidget *parent = 0);
     ~MainWindow();
 
 private:

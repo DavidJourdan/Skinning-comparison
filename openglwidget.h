@@ -15,13 +15,14 @@
 #include <QtMath>
 
 #include "mesh.h"
+#include "config.h"
 
 class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 {
     Q_OBJECT
 
 public:
-    OpenGLWidget(std::string fileName, QWidget *parent);
+    OpenGLWidget(const Config &config, QWidget *parent);
 
 protected:
     void initializeGL();
