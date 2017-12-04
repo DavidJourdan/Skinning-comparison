@@ -28,7 +28,6 @@ class Skeleton
 public:
     Skeleton(const std::string &weightFile, const std::string &skelFile, size_t meshVertexCount);
     Skeleton(uint, uint, aiBone**);
-    Skeleton(const std::string& file);//, const std::string& weightFile);
     Skeleton();
     ~Skeleton();
     inline float* weightsAt(uint vertex) { return weights + (vertex*edges.size());}
@@ -40,7 +39,6 @@ public:
     void parseWeights(const std::string &fileName, size_t meshVertexCount);
 
 private:
-    uint nbBones;
     float *weights;
 
     std::vector<QVector3D> articulations;

@@ -6,7 +6,10 @@
 
 using namespace std;
 
-Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(numBones) {
+// TODO: implement bone hierarchy loading. 
+// This is difficult because Assimp doesn't really have a structure for that, 
+// we need to look for bone.mName in the node hierarchy
+Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones) {
     weights = new float[numBones*numVertices];
     for(uint i = 0; i < numBones*numVertices; i++)
         weights[i] = 0.0;
@@ -15,20 +18,6 @@ Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(num
         for(uint j = 0; j < b->mNumWeights; j++) {
             weights[numBones * b->mWeights[j].mVertexId + i] = b->mWeights[j].mWeight;
         }
-    }
-}
-Skeleton::Skeleton(const string &file)//, const std::string &weightFile)
-{
-    weights = new float[1];
-
-    std::string weightFile = file + "skel1.weights";
-    std::string skelFile = file + "skel1.skeleton";
-
-    if(!parseSkelFile(skelFile))
-    {
-        weightFile = file + "skel.weights";
-        skelFile = file + "skel.skeleton";
-        parseSkelFile(skelFile);
     }
 }
 
@@ -51,6 +40,7 @@ Skeleton::~Skeleton() {
 }
 
 float Skeleton::simil(uint vertexInd, Triangle t) {
+    size_t nbBones = edges.size();
     float *vertWeight = weightsAt(vertexInd);
     float *triWeight = new float[nbBones];
     for(uint i = 0; i < nbBones; i++)
