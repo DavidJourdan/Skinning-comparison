@@ -13,19 +13,20 @@ struct Triangle {
     uint c;
 };
 
-typedef struct{
+struct Bone {
     uint mother;
     uint child;
-}Bone;
+};
 
-typedef struct{
+struct Relation {
     uint mother;
     uint child;
-}Relation;
+};
 
 class Skeleton
 {
 public:
+    Skeleton(const std::string &weightFile, const std::string &skelFile, size_t meshVertexCount);
     Skeleton(uint, uint, aiBone**);
     Skeleton(const std::string& file);//, const std::string& weightFile);
     Skeleton();
@@ -40,7 +41,6 @@ public:
 
 private:
     uint nbBones;
-    uint nbVertices;
     float *weights;
 
     std::vector<QVector3D> articulations;

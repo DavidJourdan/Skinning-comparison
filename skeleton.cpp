@@ -6,7 +6,7 @@
 
 using namespace std;
 
-Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(numBones), nbVertices(numVertices) {
+Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(numBones) {
     weights = new float[numBones*numVertices];
     for(uint i = 0; i < numBones*numVertices; i++)
         weights[i] = 0.0;
@@ -17,8 +17,7 @@ Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones): nbBones(num
         }
     }
 }
-
-Skeleton::Skeleton(const std::string &file)//, const std::string &weightFile)
+Skeleton::Skeleton(const string &file)//, const std::string &weightFile)
 {
     weights = new float[1];
 
@@ -31,7 +30,18 @@ Skeleton::Skeleton(const std::string &file)//, const std::string &weightFile)
         skelFile = file + "skel.skeleton";
         parseSkelFile(skelFile);
     }
+}
 
+Skeleton::Skeleton(const string &skelFile, const string &weightFile, size_t meshVertexCount) {
+    parseSkelFile(skelFile);
+    size_t numBones = edges.size();
+    weights = new float[numBones*meshVertexCount];
+
+    // important step here: will cause a segfault if not all the weights are initialized
+    for(uint i = 0; i < numBones*meshVertexCount; i++)
+        weights[i] = 0.0;
+
+    parseWeights(weightFile, meshVertexCount);
 }
 
 Skeleton::Skeleton(){}
@@ -159,7 +169,8 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
     }
 
     weights = new float[vertexCount * edges.size()];
-    // important step here: will cause a segfault if not all the weights are initialized
+
+    
     for(uint i = 0; i < vertexCount * edges.size(); i++)
         weights[i] = 0.0;
 
@@ -170,11 +181,9 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
         size_t weightCount;
         lineStream >> weightCount;
 
-        {
-            size_t index;
-            for (float w; lineStream >> index >> w;) {
-                weights[vertexIndex * edges.size() + index] += w;
-            }
+        size_t index;
+        for (float w; lineStream >> index >> w;) {
+            weights[vertexIndex * edges.size() + index] += w;
         }
     }
 }

@@ -32,7 +32,7 @@ Mesh Mesh::fromGenericFile(const std::string &fileName)
         std::exit(EXIT_FAILURE);
     }
 
-    // For testing purpose, just trying to get one mesh here.
+    // For testing purposes, just trying to get one mesh here.
     const aiMesh* mesh = scene->mMeshes[0];
 
     std::vector<QVector3D> vertices;
@@ -146,9 +146,7 @@ Mesh Mesh::fromCustomFile(const Config &config)
         normal.normalize();
     }
 
-    Skeleton skeleton { };
-    skeleton.parseSkelFile(config.skelFile);
-    skeleton.parseWeights(config.weightFile, vertices.size());
+    Skeleton skeleton(config.skelFile, config.weightFile, vertices.size());
 
     return Mesh(vertices, indices, normals, skeleton);
 }

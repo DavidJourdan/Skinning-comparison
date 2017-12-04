@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
                                         "skelFile" };
     parser.addOption(skelFileOption);
 
-    QCommandLineOption weightFileOption { "w", "File to read weigths from",
+    QCommandLineOption weightFileOption { "w", "File to read weights from",
                                         "weightFile" };
     parser.addOption(weightFileOption);
 
