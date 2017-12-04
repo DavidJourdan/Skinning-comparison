@@ -30,7 +30,7 @@ public:
     Skeleton(const std::string& file);//, const std::string& weightFile);
     Skeleton();
     ~Skeleton();
-    inline float* weightsAt(uint vertex) { return weights + (vertex*nbBones);}
+    inline float* weightsAt(uint vertex) { return weights + (vertex*edges.size());}
     float simil(uint vertexInd, Triangle t);
     bool parseSkelFile(const std::string& file);
     std::vector<QVector3D> getSkelLines();

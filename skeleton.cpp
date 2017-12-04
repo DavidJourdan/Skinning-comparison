@@ -159,6 +159,9 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
     }
 
     weights = new float[vertexCount * edges.size()];
+    // important step here: will cause a segfault if not all the weights are initialized
+    for(uint i = 0; i < vertexCount * edges.size(); i++)
+        weights[i] = 0.0;
 
     file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     size_t vertexIndex = 0;
