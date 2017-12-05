@@ -31,7 +31,7 @@ void OpenGLWidget::initializeGL()
     vbo.create();
     vbo.bind();
     std::vector<QVector3D>& vertices = mesh.getVertices();
-    vbo.allocate(vertices.data(), vertices.size() * sizeof(Vertex));
+    vbo.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
@@ -79,10 +79,7 @@ void OpenGLWidget::initializeGL()
 
     for(uint i = 2*n ; i < lines.size() ; i++)
     {
-        QVector4D parentColor(0.0, 0.0, 1.0, 0.9); //black
-        //QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
-        colors[i] = parentColor;
-        //colors[2*i + 1] = childColor;
+        colors[i] = QVector4D(0.0, 0.0, 1.0, 0.9); // blue
     }
 
     lineColors.allocate(colors.data(), colors.size() * sizeof(QVector4D));
@@ -99,6 +96,11 @@ void OpenGLWidget::initializeGL()
     lineIndices.release();
 
     linevao.release();
+
+    for(uint i = 0; i <10; i++) {
+        QVector3D c = mesh.computeCoR(i);
+        std::cout << c.x() << " " << c.y() << " " << c.z() << std::endl;
+    }
 
     prog = std::make_unique<QOpenGLShaderProgram>(this);
     prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shader.vert");

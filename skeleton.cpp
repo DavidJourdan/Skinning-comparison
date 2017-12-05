@@ -39,21 +39,29 @@ Skeleton::~Skeleton() {
     //delete [] weights;
 }
 
-float Skeleton::simil(uint vertexInd, Triangle t) {
+double Skeleton::simil(uint vertexInd, Triangle t) {
     size_t nbBones = edges.size();
     float *vertWeight = weightsAt(vertexInd);
-    float *triWeight = new float[nbBones];
+    float *triWeights = new float[nbBones];
     for(uint i = 0; i < nbBones; i++)
-        triWeight[i] = (weightsAt(t.a)[i] + weightsAt(t.b)[i] + weightsAt(t.c)[i]);
-    float sum = 0.0;
+        triWeights[i] = (weightsAt(t.a)[i] + weightsAt(t.b)[i] + weightsAt(t.c)[i])/3.;
+    double sum = 0.0;
     for(uint j = 0; j < nbBones; j++) {
-        float term = 0.0;
+        double factor = 0.0;
         for(uint k = 0; k < nbBones; k++)
             if(k != j) {
-                term += vertWeight[k]*triWeight[k]*
-                    exp(pow(vertWeight[j]*triWeight[k]-vertWeight[k]*triWeight[j], 2)/SIGMA_2);
+                factor += (double) vertWeight[k]*triWeights[k]*
+                    exp(pow(vertWeight[j]*triWeights[k]-vertWeight[k]*triWeights[j], 2)/SIGMA_2);
             }
-        sum += vertWeight[j]*triWeight[j]*term;
+        sum += (double) vertWeight[j]*triWeights[j]*factor;
+    }
+    if(isnan(sum) || isinf(sum)) {
+        for(uint i = 0; i < nbBones; i++)
+            cout << triWeights[i];
+        cout << endl;
+        for(uint i = 0; i < nbBones; i++)
+            cout << vertWeight[i];
+        cout << endl;
     }
     return sum;
 }
@@ -177,4 +185,3 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
         }
     }
 }
-
