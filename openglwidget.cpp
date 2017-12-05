@@ -186,15 +186,28 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
     {
         auto pos = screenToViewport(event->localPos());
         QVector3D movement{ pos - prevPos };
-        constexpr float rotFactor = 1e2;
-        float angle = movement.length() * rotFactor;
-        movement.normalize();
-        QVector3D toCam{ 0.0f, 0.0f, 1.0f };
-        movement = viewMatrix.inverted() * movement;
-        toCam = viewMatrix.inverted() * toCam;
-        auto rotVec = QVector3D::crossProduct(toCam, movement);
 
-        viewMatrix.rotate(angle, rotVec);
+        constexpr float rotFactor = 1e2;
+
+        auto movementX = QVector3D(movement.x(), 0.0, 0.0);
+        auto movementY = QVector3D(0.0, movement.y(), 0.0);
+
+        const auto angle0 = rotFactor * movementY.length();
+        const auto angle1 = rotFactor * movementX.x();
+
+        QVector3D toCam{ 0.0f, 0.0f, 1.0f };
+
+        movementY = viewMatrix.inverted() * movementY;
+        movementX = viewMatrix.inverted() * movementX;
+
+        toCam = viewMatrix.inverted() * toCam;
+        const auto yAxis = QVector3D { 0.0, 1.0, 0.0 };
+
+        const auto rotVec0 = QVector3D::crossProduct(toCam, movementY);
+        const auto rotVec1 = yAxis;
+
+        viewMatrix.rotate(angle0, rotVec0);
+        viewMatrix.rotate(angle1, rotVec1);
 
         prevPos = pos;
     }
