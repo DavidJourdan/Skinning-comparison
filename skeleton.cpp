@@ -97,7 +97,7 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
         QMatrix4x4 transformation { };
 
-        const auto translationVector = QVector4D(x, y, z, 1.0);
+        const auto translationVector = -QVector4D(x, y, z, 1.0);
         transformation.setColumn(3, translationVector);
 
         transformations.push_back(transformation);
@@ -151,13 +151,21 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
 std::vector<QVector3D> Skeleton::getSkelLines() {
     vector<QVector3D> lines;
+
     for(Bone b : edges) {
-        lines.push_back(articulations[b.mother]);
-        lines.push_back(articulations[b.child]);
+        auto m = -transformations[b.mother].column(3).toVector3D();
+        lines.push_back(m);
+
+        auto c = -transformations[b.child].column(3).toVector3D();
+        lines.push_back(c);
     }
+
     for(Relation r : relations) {
-        lines.push_back(articulations[r.mother]);
-        lines.push_back(articulations[r.child]);
+        auto m = -transformations[r.mother].column(3).toVector3D();
+        lines.push_back(m);
+
+        auto c = -transformations[r.child].column(3).toVector3D();
+        lines.push_back(c);
     }
     return lines;
 }
