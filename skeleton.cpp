@@ -79,6 +79,10 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
     articulations.reserve(num);
 
+    children.reserve(num);
+
+    transformations.reserve(num);
+
     for(unsigned int i = 0 ; i < num ; i++) // read articulations' positions
     {
         std::getline(f, s);
@@ -89,6 +93,14 @@ bool Skeleton::parseSkelFile(const std::string &file)
         z = std::stof(s.substr(i2, s.size()-i2));
 
         articulations.push_back(QVector3D(x, y, z));
+        children.push_back(std::vector<size_t>());
+
+        QMatrix4x4 transformation { };
+
+        const auto translationVector = QVector4D(x, y, z, 1.0);
+        transformation.setColumn(3, translationVector);
+
+        transformations.push_back(transformation);
     }
 
     std::getline(f, s); // read number of edges (bones)
@@ -107,6 +119,8 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
         Bone b; b.child=c;b.mother=m;
         edges.push_back(b);
+
+        children[m].push_back(c);
     }
 
     std::getline(f, s); // read number of relations
@@ -125,6 +139,8 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
         Relation r; r.child=c;r.mother=m;
         relations.push_back(r);
+
+        children[m].push_back(c);
     }
 
     //no need for the rest of the data
@@ -174,6 +190,21 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
         size_t index;
         for (float w; lineStream >> index >> w;) {
             weights[vertexIndex * edges.size() + index] += w;
+        }
+    }
+}
+
+void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &axis)
+{
+    std::vector<size_t> stack;
+    stack.push_back(boneIndex);
+
+    while (!stack.empty()) {
+        const auto currentBoneIndex = stack.back();
+        stack.pop_back();
+        transformations[currentBoneIndex].rotate(angle, axis);
+        for (auto c : children[currentBoneIndex]) {
+            stack.push_back(c);
         }
     }
 }
