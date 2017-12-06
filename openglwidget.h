@@ -26,6 +26,7 @@ public:
 
 public slots:
     void editBone(size_t i);
+    void moveBone(size_t i);
 
 protected:
     void initializeGL();

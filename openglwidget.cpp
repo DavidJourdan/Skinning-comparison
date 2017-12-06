@@ -31,6 +31,11 @@ void OpenGLWidget::editBone(size_t i)
     update();
 }
 
+void OpenGLWidget::moveBone(size_t i)
+{
+
+}
+
 void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -195,7 +200,7 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
         const auto angle0 = rotFactor * movementY.length();
         const auto angle1 = rotFactor * movementX.x();
 
-        QVector3D toCam{ 0.0f, 0.0f, 1.0f };
+        QVector3D toCam { 0.0f, 0.0f, 1.0f };
 
         movementY = viewMatrix.inverted() * movementY;
         movementX = viewMatrix.inverted() * movementX;
@@ -292,6 +297,13 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_E:
         if (boneSelActiv) {
             editBone(mesh.getBoneSelected());
+        }
+        break;
+
+    case Qt::Key_A:
+        if (boneSelActiv) {
+            editBone(mesh.getBoneSelected());
+
         }
         break;
 
