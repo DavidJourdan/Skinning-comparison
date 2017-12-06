@@ -31,9 +31,16 @@ void OpenGLWidget::editBone(size_t i)
     update();
 }
 
-void OpenGLWidget::moveBone(size_t i)
+void OpenGLWidget::moveBone(float angle)
 {
+    if (boneSelActiv) {
+        QVector3D toCam(0.0, 0.0, 1.0);
+        toCam = viewMatrix.inverted() * toCam;
 
+        mesh.rotateBone(angle, toCam);
+        updateSkeleton();
+        update();
+    }
 }
 
 void OpenGLWidget::initializeGL()
@@ -300,11 +307,15 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         }
         break;
 
-    case Qt::Key_A:
+    case Qt::Key_A: // Move _a_rticulation.
         if (boneSelActiv) {
             editBone(mesh.getBoneSelected());
 
         }
+        break;
+
+    case Qt::Key_C: // Rotate _c_ounterclockwise.
+        moveBone(30.0);
         break;
 
     default:
@@ -349,6 +360,13 @@ QPointF OpenGLWidget::screenToViewport(QPointF screenPos)
     auto y = 1.0f - static_cast<float>(screenPos.y()) / heightF;
 
     return QPointF(x, y);
+}
+
+void OpenGLWidget::updateSkeleton()
+{
+    const auto lines = mesh.getSkelLines();
+    lineBuffer.bind();
+    lineBuffer.write(0, lines.data(), sizeof(QVector3D) * lines.size());
 }
 
 QVector3D OpenGLWidget::viewDirection()

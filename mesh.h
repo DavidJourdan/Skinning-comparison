@@ -40,6 +40,8 @@ public:
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);
 
+    void rotateBone(float angle, QVector3D axis);
+
 private:
     std::vector<QVector3D> vertices;
     std::vector<unsigned> indices;

@@ -97,7 +97,7 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
         QMatrix4x4 transformation { };
 
-        const auto translationVector = -QVector4D(x, y, z, 1.0);
+        const auto translationVector = QVector4D(-x, -y, -z, 1.0);
         transformation.setColumn(3, translationVector);
 
         transformations.push_back(transformation);
@@ -204,13 +204,16 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 
 void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &axis)
 {
+    QMatrix4x4 rotationMat { };
+    rotationMat.rotate(angle, axis);
+
     std::vector<size_t> stack;
     stack.push_back(boneIndex);
 
     while (!stack.empty()) {
         const auto currentBoneIndex = stack.back();
         stack.pop_back();
-        transformations[currentBoneIndex].rotate(angle, axis);
+        transformations[currentBoneIndex] = rotationMat * transformations[currentBoneIndex];
         for (auto c : children[currentBoneIndex]) {
             stack.push_back(c);
         }

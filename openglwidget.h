@@ -26,7 +26,7 @@ public:
 
 public slots:
     void editBone(size_t i);
-    void moveBone(size_t i);
+    void moveBone(float angle);
 
 protected:
     void initializeGL();
@@ -76,6 +76,8 @@ private:
     bool boneSelActiv;
 
     QPointF screenToViewport(QPointF screenPos);
+
+    void updateSkeleton();
 };
 
 #endif // OPENGLWIDGET_H
