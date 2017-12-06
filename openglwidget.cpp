@@ -318,6 +318,10 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         moveBone(30.0);
         break;
 
+    case Qt::Key_W: // Rotate clock_w_ise.
+        moveBone(-30.0);
+        break;
+
     default:
         break;
     }

@@ -48,7 +48,7 @@ private:
     std::vector<QVector3D> normals;
     std::vector<QVector3D> CoRs;
     Skeleton skeleton;
-    uint boneSelected;
+    uint boneSelected { 0 };
     float area(Triangle t);
 };
 

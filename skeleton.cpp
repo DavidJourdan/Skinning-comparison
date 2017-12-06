@@ -6,8 +6,8 @@
 
 using namespace std;
 
-// TODO: implement bone hierarchy loading. 
-// This is difficult because Assimp doesn't really have a structure for that, 
+// TODO: implement bone hierarchy loading.
+// This is difficult because Assimp doesn't really have a structure for that,
 // we need to look for bone.mName in the node hierarchy
 Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones) {
     weights = new float[numBones*numVertices];
@@ -81,7 +81,7 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
     children.reserve(num);
 
-    transformations.reserve(num);
+    transformations = std::vector<QMatrix4x4>(num);
 
     for(unsigned int i = 0 ; i < num ; i++) // read articulations' positions
     {
@@ -94,13 +94,6 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
         articulations.push_back(QVector3D(x, y, z));
         children.push_back(std::vector<size_t>());
-
-        QMatrix4x4 transformation { };
-
-        const auto translationVector = QVector4D(-x, -y, -z, 1.0);
-        transformation.setColumn(3, translationVector);
-
-        transformations.push_back(transformation);
     }
 
     std::getline(f, s); // read number of edges (bones)
@@ -153,18 +146,18 @@ std::vector<QVector3D> Skeleton::getSkelLines() {
     vector<QVector3D> lines;
 
     for(Bone b : edges) {
-        auto m = -transformations[b.mother].column(3).toVector3D();
+        auto m = articulations[b.mother];
         lines.push_back(m);
 
-        auto c = -transformations[b.child].column(3).toVector3D();
+        auto c = articulations[b.child];
         lines.push_back(c);
     }
 
     for(Relation r : relations) {
-        auto m = -transformations[r.mother].column(3).toVector3D();
+        auto m = articulations[r.mother];
         lines.push_back(m);
 
-        auto c = -transformations[r.child].column(3).toVector3D();
+        auto c = articulations[r.child];
         lines.push_back(c);
     }
     return lines;
@@ -184,7 +177,7 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 
     weights = new float[vertexCount * edges.size()];
 
-    
+
     for(uint i = 0; i < vertexCount * edges.size(); i++)
         weights[i] = 0.0;
 
@@ -204,17 +197,28 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 
 void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &axis)
 {
-    QMatrix4x4 rotationMat { };
-    rotationMat.rotate(angle, axis);
+    const auto articulationIndex = edges[boneIndex].mother;
+
+    QMatrix4x4 translation0 { };
+    translation0.translate(articulations[articulationIndex]);
+
+    QMatrix4x4 translation1 { };
+    translation1.translate(-articulations[articulationIndex]);
+
+    QMatrix4x4 rotation { };
+    rotation.rotate(angle, axis);
+
+    const auto transformation = translation0 * rotation * translation1;
 
     std::vector<size_t> stack;
-    stack.push_back(boneIndex);
+    stack.push_back(articulationIndex);
 
     while (!stack.empty()) {
-        const auto currentBoneIndex = stack.back();
+        const auto currentArticulationIndex = stack.back();
         stack.pop_back();
-        transformations[currentBoneIndex] = rotationMat * transformations[currentBoneIndex];
-        for (auto c : children[currentBoneIndex]) {
+        transformations[currentArticulationIndex] = transformation * transformations[currentArticulationIndex];
+        articulations[currentArticulationIndex] = transformation * articulations[currentArticulationIndex];
+        for (auto c : children[currentArticulationIndex]) {
             stack.push_back(c);
         }
     }
