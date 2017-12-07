@@ -127,8 +127,8 @@ bool Skeleton::parseSkelFile(const std::string &file)
         std::getline(f, s);
         uint m, c;
         int i1 = s.find_first_of(" ")+1;
-        m = std::stoi(s.substr(0, i1));
-        c = std::stoi(s.substr(i1, s.size() - i1));
+        c = std::stoi(s.substr(0, i1));
+        m = std::stoi(s.substr(i1, s.size() - i1));
 
         Relation r; r.child=c;r.mother=m;
         relations.push_back(r);
