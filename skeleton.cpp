@@ -197,21 +197,24 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 
 void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &axis)
 {
-    const auto articulationIndex = edges[boneIndex].mother;
+    const auto mIndex = edges[boneIndex].mother;
 
     QMatrix4x4 translation0 { };
-    translation0.translate(articulations[articulationIndex]);
+    translation0.translate(articulations[mIndex]);
 
     QMatrix4x4 translation1 { };
-    translation1.translate(-articulations[articulationIndex]);
+    translation1.translate(-articulations[mIndex]);
 
     QMatrix4x4 rotation { };
     rotation.rotate(angle, axis);
 
     const auto transformation = translation0 * rotation * translation1;
 
+    transformations[mIndex] = transformation * transformations[mIndex];
+
     std::vector<size_t> stack;
-    stack.push_back(articulationIndex);
+    const auto cIndex = edges[boneIndex].child;
+    stack.push_back(cIndex);
 
     while (!stack.empty()) {
         const auto currentArticulationIndex = stack.back();
