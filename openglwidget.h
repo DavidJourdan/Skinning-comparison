@@ -51,15 +51,19 @@ private:
     Mesh mesh;
     QOpenGLVertexArrayObject vao;
     QOpenGLVertexArrayObject linevao;
+    QOpenGLVertexArrayObject pointvao;
     QOpenGLBuffer vbo;
     QOpenGLBuffer normBuffer;
     QOpenGLBuffer ebo;
     QOpenGLBuffer lineBuffer;
     QOpenGLBuffer lineIndices;
     QOpenGLBuffer lineColors;
+    QOpenGLBuffer pointBuffer;
+    QOpenGLBuffer pointColors;
 
     std::unique_ptr<QOpenGLShaderProgram> prog;
     std::unique_ptr<QOpenGLShaderProgram> boneProg;
+    std::unique_ptr<QOpenGLShaderProgram> pointsProg;
 
     QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
@@ -72,6 +76,7 @@ private:
     bool boneSelActiv;
 
     QPointF screenToViewport(QPointF screenPos);
+    void computeCoRs();
 };
 
 #endif // OPENGLWIDGET_H

@@ -197,7 +197,5 @@ QVector3D Mesh::computeCoR(uint i) {
             cout << "area " << area(t) << endl;
         }
     }
-    cout << "c: " << c.x() << " " << c.y() << " " << c.z() << endl;
-    cout << "s: " << s << endl;
     return c/((float) s);
 }
