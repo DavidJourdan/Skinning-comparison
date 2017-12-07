@@ -314,7 +314,7 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         }
         break;
 
-    case Qt::Key_C: // Rotate _c_ounterclockwise.
+    case Qt::Key_X: // Rotate counterclockwise.
         moveBone(30.0);
         break;
 
