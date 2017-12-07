@@ -4,6 +4,7 @@
 #include <assimp/scene.h>
 #include <vector>
 #include <QVector3D>
+#include <QMatrix4x4>
 #include <iostream>
 #include <fstream>
 
@@ -36,14 +37,21 @@ public:
     std::vector<QVector3D> getSkelLines();
     uint getNumberBones() {return edges.size();}
 
+    const std::vector<QVector3D> &getArticulations() const { return articulations; }
+    const std::vector<Bone> &getEdges() const { return edges; }
+
     void parseWeights(const std::string &fileName, size_t meshVertexCount);
+
+    void rotateBone(const size_t boneIndex, float angle, const QVector3D &axis);
 
 private:
     float *weights;
 
     std::vector<QVector3D> articulations;
+    std::vector<std::vector<size_t>> children;
     std::vector<Bone> edges;
     std::vector<Relation> relations;
+    std::vector<QMatrix4x4> transformations;
 };
 
 #endif // SKELETON_H

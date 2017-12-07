@@ -142,6 +142,11 @@ Mesh Mesh::fromCustomFile(const Config &config)
     return Mesh(vertices, indices, normals, skeleton);
 }
 
+void Mesh::rotateBone(float angle, QVector3D axis)
+{
+    skeleton.rotateBone(boneSelected, angle, axis);
+}
+
 float Mesh::area(Triangle t) {
     QVector3D v = QVector3D::crossProduct( vertices[t.b]-vertices[t.a], vertices[t.c]-vertices[t.a]);
     return v.length()/2;

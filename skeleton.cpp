@@ -6,8 +6,8 @@
 
 using namespace std;
 
-// TODO: implement bone hierarchy loading. 
-// This is difficult because Assimp doesn't really have a structure for that, 
+// TODO: implement bone hierarchy loading.
+// This is difficult because Assimp doesn't really have a structure for that,
 // we need to look for bone.mName in the node hierarchy
 Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones) {
     weights = new float[numBones*numVertices];
@@ -79,6 +79,10 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
     articulations.reserve(num);
 
+    children.reserve(num);
+
+    transformations = std::vector<QMatrix4x4>(num);
+
     for(unsigned int i = 0 ; i < num ; i++) // read articulations' positions
     {
         std::getline(f, s);
@@ -89,6 +93,7 @@ bool Skeleton::parseSkelFile(const std::string &file)
         z = std::stof(s.substr(i2, s.size()-i2));
 
         articulations.push_back(QVector3D(x, y, z));
+        children.push_back(std::vector<size_t>());
     }
 
     std::getline(f, s); // read number of edges (bones)
@@ -107,6 +112,8 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
         Bone b; b.child=c;b.mother=m;
         edges.push_back(b);
+
+        children[m].push_back(c);
     }
 
     std::getline(f, s); // read number of relations
@@ -120,11 +127,13 @@ bool Skeleton::parseSkelFile(const std::string &file)
         std::getline(f, s);
         uint m, c;
         int i1 = s.find_first_of(" ")+1;
-        m = std::stoi(s.substr(0, i1));
-        c = std::stoi(s.substr(i1, s.size() - i1));
+        c = std::stoi(s.substr(0, i1));
+        m = std::stoi(s.substr(i1, s.size() - i1));
 
         Relation r; r.child=c;r.mother=m;
         relations.push_back(r);
+
+        children[m].push_back(c);
     }
 
     //no need for the rest of the data
@@ -135,13 +144,21 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
 std::vector<QVector3D> Skeleton::getSkelLines() {
     vector<QVector3D> lines;
+
     for(Bone b : edges) {
-        lines.push_back(articulations[b.mother]);
-        lines.push_back(articulations[b.child]);
+        auto m = articulations[b.mother];
+        lines.push_back(m);
+
+        auto c = articulations[b.child];
+        lines.push_back(c);
     }
+
     for(Relation r : relations) {
-        lines.push_back(articulations[r.mother]);
-        lines.push_back(articulations[r.child]);
+        auto m = articulations[r.mother];
+        lines.push_back(m);
+
+        auto c = articulations[r.child];
+        lines.push_back(c);
     }
     return lines;
 }
@@ -160,7 +177,7 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 
     weights = new float[vertexCount * edges.size()];
 
-    
+
     for(uint i = 0; i < vertexCount * edges.size(); i++)
         weights[i] = 0.0;
 
@@ -174,6 +191,32 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
         size_t index;
         for (float w; lineStream >> index >> w;) {
             weights[vertexIndex * edges.size() + index] += w;
+        }
+    }
+}
+
+void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &axis)
+{
+    uint mIndex = edges[boneIndex].mother;
+ 
+    QMatrix4x4 transform { };
+ 
+    transform.translate(articulations[mIndex]);
+    transform.rotate(angle, axis);
+    transform.translate(-articulations[mIndex]);
+ 
+    transformations[mIndex] = transform * transformations[mIndex];
+    std::vector<size_t> stack;
+    uint cIndex = edges[boneIndex].child;
+    stack.push_back(cIndex);
+ 
+    while (!stack.empty()) {
+        mIndex = stack.back();
+        stack.pop_back();
+        transformations[mIndex] = transform * transformations[mIndex];
+        articulations[mIndex] = transform * articulations[mIndex];
+        for (uint c : children[mIndex]) {
+            stack.push_back(c);
         }
     }
 }

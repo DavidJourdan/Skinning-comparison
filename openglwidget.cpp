@@ -11,6 +11,38 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
     setFocusPolicy(Qt::StrongFocus);
 }
 
+void OpenGLWidget::editBone(size_t i)
+{
+    const auto articulations = mesh.getArticulations();
+    const auto edges = mesh.getEdges();
+
+    const auto &bone = edges.at(i);
+    const auto &center = articulations.at(bone.mother);
+    const auto &child = articulations.at(bone.child);
+
+    const auto length = (child - center).length();
+
+    modelMatrix.setToIdentity();
+    modelMatrix.translate(-center);
+
+    const auto col = QVector4D { 0.0, 0.0, -3.0f * length, 1.0 };
+    viewMatrix.setColumn(3, col);
+
+    update();
+}
+
+void OpenGLWidget::moveBone(float angle)
+{
+    if (boneSelActiv) {
+        QVector3D toCam(0.0, 0.0, 1.0);
+        toCam = viewMatrix.inverted() * toCam;
+
+        mesh.rotateBone(angle, toCam);
+        updateSkeleton();
+        update();
+    }
+}
+
 void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -88,7 +120,7 @@ void OpenGLWidget::initializeGL()
     lineColors.allocate(colors.data(), colors.size() * sizeof(QVector4D));
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
-    
+
     lineIndices.create();
     lineIndices.bind();
     std::vector<uint> ind(lines.size());
@@ -165,16 +197,29 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
     if(leftButtonPressed)
     {
         auto pos = screenToViewport(event->localPos());
-        QVector3D movement{pos - prevPos};
-        constexpr float rotFactor = 1e2;
-        float angle = movement.length() * rotFactor;
-        movement.normalize();
-        QVector3D toCam{0.0f, 0.0f, 1.0f};
-        movement = viewMatrix.inverted() * movement;
-        toCam = viewMatrix.inverted() * toCam;
-        auto rotVec = QVector3D::crossProduct(toCam, movement);
+        QVector3D movement{ pos - prevPos };
 
-        viewMatrix.rotate(angle, rotVec);
+        constexpr float rotFactor = 1e2;
+
+        auto movementX = QVector3D(movement.x(), 0.0, 0.0);
+        auto movementY = QVector3D(0.0, movement.y(), 0.0);
+
+        const auto angle0 = rotFactor * movementY.length();
+        const auto angle1 = rotFactor * movementX.x();
+
+        QVector3D toCam { 0.0f, 0.0f, 1.0f };
+
+        movementY = viewMatrix.inverted() * movementY;
+        movementX = viewMatrix.inverted() * movementX;
+
+        toCam = viewMatrix.inverted() * toCam;
+        const auto yAxis = QVector3D { 0.0, 1.0, 0.0 };
+
+        const auto rotVec0 = QVector3D::crossProduct(toCam, movementY);
+        const auto rotVec1 = yAxis;
+
+        viewMatrix.rotate(angle0, rotVec0);
+        viewMatrix.rotate(angle1, rotVec1);
 
         prevPos = pos;
     }
@@ -256,6 +301,27 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         }
         break;
 
+    case Qt::Key_E:
+        if (boneSelActiv) {
+            editBone(mesh.getBoneSelected());
+        }
+        break;
+
+    case Qt::Key_A: // Move _a_rticulation.
+        if (boneSelActiv) {
+            editBone(mesh.getBoneSelected());
+
+        }
+        break;
+
+    case Qt::Key_X: // Rotate counterclockwise.
+        moveBone(30.0);
+        break;
+
+    case Qt::Key_W: // Rotate clock_w_ise.
+        moveBone(-30.0);
+        break;
+
     default:
         break;
     }
@@ -298,6 +364,13 @@ QPointF OpenGLWidget::screenToViewport(QPointF screenPos)
     auto y = 1.0f - static_cast<float>(screenPos.y()) / heightF;
 
     return QPointF(x, y);
+}
+
+void OpenGLWidget::updateSkeleton()
+{
+    const auto lines = mesh.getSkelLines();
+    lineBuffer.bind();
+    lineBuffer.write(0, lines.data(), sizeof(QVector3D) * lines.size());
 }
 
 QVector3D OpenGLWidget::viewDirection()

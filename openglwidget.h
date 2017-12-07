@@ -24,6 +24,10 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 public:
     OpenGLWidget(const Config &config, QWidget *parent);
 
+public slots:
+    void editBone(size_t i);
+    void moveBone(float angle);
+
 protected:
     void initializeGL();
 
@@ -72,6 +76,8 @@ private:
     bool boneSelActiv;
 
     QPointF screenToViewport(QPointF screenPos);
+
+    void updateSkeleton();
 };
 
 #endif // OPENGLWIDGET_H

@@ -29,8 +29,18 @@ public:
     void computeCoRs(void);
     uint getBoneSelected() {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getNumberBones();}
+
+    const std::vector<QVector3D> &getArticulations() const
+    {
+        return skeleton.getArticulations();
+    }
+
+    const std::vector<Bone> &getEdges() const { return skeleton.getEdges(); }
+
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);
+
+    void rotateBone(float angle, QVector3D axis);
 
 private:
     std::vector<QVector3D> vertices;
@@ -38,7 +48,7 @@ private:
     std::vector<QVector3D> normals;
     std::vector<QVector3D> CoRs;
     Skeleton skeleton;
-    uint boneSelected;
+    uint boneSelected { 0 };
     float area(Triangle t);
 };
 
