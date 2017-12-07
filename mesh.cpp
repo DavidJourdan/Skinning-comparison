@@ -10,6 +10,8 @@
 
 #include <QDebug>
 
+using namespace std;
+
 Mesh Mesh::fromGenericFile(const std::string &fileName)
 {
     Assimp::Importer importer;
@@ -183,4 +185,22 @@ void Mesh::computeCoRs() {
         }
         CoRs.push_back(c/s);
     }
+}
+
+QVector3D Mesh::computeCoR(uint i) {
+    QVector3D c;
+    double s = 0.0;
+    uint count = indices.size()/3;
+    for(uint j = 0; j < count; j++) {
+        Triangle t = {indices[3*j], indices[3*j+1], indices[3*j+2]};
+        double similArea = (double) skeleton.simil(i, t)*area(t);
+        
+        c += (vertices[t.a]+vertices[t.b]+vertices[t.c])/3.*((float) similArea);
+        s += similArea;
+        if(isnan(similArea) || isinf(similArea)) {
+            cout << "simil " << skeleton.simil(i, t) << endl;
+            cout << "area " << area(t) << endl;
+        }
+    }
+    return c/((float) s);
 }

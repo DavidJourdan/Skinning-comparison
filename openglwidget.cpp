@@ -6,6 +6,7 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
     mesh { Mesh::fromCustomFile(config) },
     vbo(QOpenGLBuffer::VertexBuffer), normBuffer(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer),
     lineBuffer(QOpenGLBuffer::VertexBuffer), lineIndices(QOpenGLBuffer::IndexBuffer), lineColors(QOpenGLBuffer::VertexBuffer),
+    pointBuffer(QOpenGLBuffer::VertexBuffer), pointColors(QOpenGLBuffer::VertexBuffer),
     leftButtonPressed(false), rightButtonPressed(false), boneSelActiv(false)
 {
     setFocusPolicy(Qt::StrongFocus);
@@ -55,6 +56,7 @@ void OpenGLWidget::initializeGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    // VERTICES
     vao.create();
     if (vao.isCreated()) {
         vao.bind();
@@ -63,7 +65,7 @@ void OpenGLWidget::initializeGL()
     vbo.create();
     vbo.bind();
     std::vector<QVector3D>& vertices = mesh.getVertices();
-    vbo.allocate(vertices.data(), vertices.size() * sizeof(Vertex));
+    vbo.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
@@ -84,6 +86,7 @@ void OpenGLWidget::initializeGL()
 
     vao.release();
 
+    // SKELETON
     linevao.create();
     if (linevao.isCreated()) {
         linevao.bind();
@@ -103,18 +106,15 @@ void OpenGLWidget::initializeGL()
     uint n = mesh.getNumberBones();
 
     for(uint i = 0; i < n ; i++) {
-        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
-        QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
+        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //red
+        QVector4D childColor(1.0, 1.0, 1.0, 0.9); // white
         colors[2*i] = parentColor;
         colors[2*i + 1] = childColor;
     }
 
     for(uint i = 2*n ; i < lines.size() ; i++)
     {
-        QVector4D parentColor(0.0, 0.0, 1.0, 0.9); //black
-        //QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
-        colors[i] = parentColor;
-        //colors[2*i + 1] = childColor;
+        colors[i] = QVector4D(0.0, 0.0, 1.0, 0.9); // blue
     }
 
     lineColors.allocate(colors.data(), colors.size() * sizeof(QVector4D));
@@ -132,6 +132,32 @@ void OpenGLWidget::initializeGL()
 
     linevao.release();
 
+    // CENTERS OF ROTATION
+    pointvao.create();
+    if (pointvao.isCreated()) {
+        pointvao.bind();
+    }
+
+    pointBuffer.create();
+    pointBuffer.bind();
+    std::vector<QVector3D> points(vertices);
+    pointBuffer.allocate(points.data(), points.size() * sizeof(QVector3D));
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    pointColors.create();
+    pointColors.bind();
+    std::vector<QVector4D> ptColors(points.size());
+
+    for(uint i = 0 ; i < points.size() ; i++) {
+        ptColors[i] = QVector4D(0.0, 0.0, 0.0, 0.0); // invisible for now
+    }
+
+    pointColors.allocate(ptColors.data(), ptColors.size() * sizeof(QVector4D));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
+    
     prog = std::make_unique<QOpenGLShaderProgram>(this);
     prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shader.vert");
     prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
@@ -141,6 +167,11 @@ void OpenGLWidget::initializeGL()
     boneProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");
     boneProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/boneshader.frag");
     boneProg->link();
+
+    pointsProg = std::make_unique<QOpenGLShaderProgram>(this);
+    pointsProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");
+    pointsProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/boneshader.frag");
+    pointsProg->link();
 
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
 }
@@ -164,13 +195,11 @@ void OpenGLWidget::paintGL()
 
     lineIndices.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glLineWidth((GLfloat)15);
+    glLineWidth((GLfloat)5);
     glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
     lineIndices.release();
     linevao.release();
     boneProg->release();
-
-
 
     prog->bind();
     vao.bind();
@@ -186,6 +215,20 @@ void OpenGLWidget::paintGL()
     ebo.release();
     vao.release();
     prog->release();
+
+    pointsProg->bind();
+    pointvao.bind();
+
+    pointsProg->setUniformValue("modelMatrix", modelMatrix);
+    pointsProg->setUniformValue("viewMatrix", viewMatrix);
+    pointsProg->setUniformValue("projectionMatrix", projectionMatrix);
+
+    pointBuffer.bind();
+    glPointSize((GLfloat)5);
+    glDrawArrays(GL_POINTS, 0, mesh.getVertices().size());
+    pointBuffer.release();
+    pointvao.release();
+    boneProg->release();
 
 }
 
@@ -322,6 +365,9 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         moveBone(-30.0);
         break;
 
+    case Qt::Key_C:
+        computeCoRs();
+        break;
     default:
         break;
     }
@@ -418,4 +464,21 @@ void OpenGLWidget::noBoneActiv()
     lineColors.bind();
     lineColors.write(0, colors.data(), 2*n*sizeof(QVector4D));
     lineColors.release();
+}
+
+void OpenGLWidget::computeCoRs() {
+    std::vector<QVector3D> CoRs(100);
+    for(uint i = 0; i <100; i++) {
+        CoRs[i] = mesh.computeCoR(i);
+        std::cout << CoRs[i].x() << " " << CoRs[i].y() << " " << CoRs[i].z() << " " << std::endl;
+        std::cout << mesh.getVertices()[i].x() << " " << mesh.getVertices()[i].y() << " " << mesh.getVertices()[i].z() << " "<< std::endl;
+    }
+    pointBuffer.bind();
+    pointBuffer.write(0, CoRs.data(), CoRs.size()*sizeof(QVector3D));
+    pointBuffer.release();
+
+    std::vector<QVector4D> colors(100, QVector4D(1.0, 0.0, 0.0, 1.0));
+    pointColors.bind();
+    pointColors.write(0, colors.data(), colors.size()*sizeof(QVector4D));
+    pointColors.release();
 }

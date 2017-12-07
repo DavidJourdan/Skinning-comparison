@@ -6,7 +6,6 @@
 
 #include<QVector3D>
 #include "skeleton.h"
-#include "vertex.h"
 #include "config.h"
 
 class Mesh
@@ -27,6 +26,7 @@ public:
     std::vector<QVector3D> getSkelLines() { return skeleton.getSkelLines(); }
     uint getNumberBones() {return skeleton.getNumberBones();}
     void computeCoRs(void);
+    QVector3D computeCoR(uint i);
     uint getBoneSelected() {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getNumberBones();}
 

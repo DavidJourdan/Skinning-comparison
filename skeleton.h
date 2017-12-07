@@ -32,7 +32,7 @@ public:
     Skeleton();
     ~Skeleton();
     inline float* weightsAt(uint vertex) { return weights + (vertex*edges.size());}
-    float simil(uint vertexInd, Triangle t);
+    double simil(uint vertexInd, Triangle t);
     bool parseSkelFile(const std::string& file);
     std::vector<QVector3D> getSkelLines();
     uint getNumberBones() {return edges.size();}
