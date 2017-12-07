@@ -185,6 +185,8 @@ void OpenGLWidget::resizeGL(int w, int h)
 
 void OpenGLWidget::paintGL()
 {
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     boneProg->bind();
     linevao.bind();
@@ -201,6 +203,22 @@ void OpenGLWidget::paintGL()
     linevao.release();
     boneProg->release();
 
+    pointsProg->bind();
+    pointvao.bind();
+
+    pointsProg->setUniformValue("modelMatrix", modelMatrix);
+    pointsProg->setUniformValue("viewMatrix", viewMatrix);
+    pointsProg->setUniformValue("projectionMatrix", projectionMatrix);
+
+    pointBuffer.bind();
+    glPointSize((GLfloat)5);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+    glDrawArrays(GL_POINTS, 0, mesh.getVertices().size());
+    pointBuffer.release();
+    pointvao.release();
+    boneProg->release();
+
+
     prog->bind();
     vao.bind();
 
@@ -215,21 +233,6 @@ void OpenGLWidget::paintGL()
     ebo.release();
     vao.release();
     prog->release();
-
-    pointsProg->bind();
-    pointvao.bind();
-
-    pointsProg->setUniformValue("modelMatrix", modelMatrix);
-    pointsProg->setUniformValue("viewMatrix", viewMatrix);
-    pointsProg->setUniformValue("projectionMatrix", projectionMatrix);
-
-    pointBuffer.bind();
-    glPointSize((GLfloat)5);
-    glDrawArrays(GL_POINTS, 0, mesh.getVertices().size());
-    pointBuffer.release();
-    pointvao.release();
-    boneProg->release();
-
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -467,8 +470,9 @@ void OpenGLWidget::noBoneActiv()
 }
 
 void OpenGLWidget::computeCoRs() {
-    std::vector<QVector3D> CoRs(100);
-    for(uint i = 0; i <100; i++) {
+    uint nbCors = 25;
+    std::vector<QVector3D> CoRs(nbCors);
+    for(uint i = 0; i <nbCors; i++) {
         CoRs[i] = mesh.computeCoR(i);
         std::cout << CoRs[i].x() << " " << CoRs[i].y() << " " << CoRs[i].z() << " " << std::endl;
         std::cout << mesh.getVertices()[i].x() << " " << mesh.getVertices()[i].y() << " " << mesh.getVertices()[i].z() << " "<< std::endl;
@@ -477,7 +481,7 @@ void OpenGLWidget::computeCoRs() {
     pointBuffer.write(0, CoRs.data(), CoRs.size()*sizeof(QVector3D));
     pointBuffer.release();
 
-    std::vector<QVector4D> colors(100, QVector4D(1.0, 0.0, 0.0, 1.0));
+    std::vector<QVector4D> colors(nbCors, QVector4D(1.0, 0.0, 0.0, 0.7));
     pointColors.bind();
     pointColors.write(0, colors.data(), colors.size()*sizeof(QVector4D));
     pointColors.release();
