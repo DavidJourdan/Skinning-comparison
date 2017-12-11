@@ -31,7 +31,6 @@ public:
     Skeleton(uint, uint, aiBone**);
     Skeleton();
     ~Skeleton();
-    inline float* weightsAt(uint vertex) { return weights + (vertex*edges.size());}
     double simil(uint vertexInd, Triangle t);
     bool parseSkelFile(const std::string& file);
     std::vector<QVector3D> getSkelLines();
@@ -45,7 +44,8 @@ public:
     void rotateBone(const size_t boneIndex, float angle, const QVector3D &axis);
 
 private:
-    float *weights;
+    float **weights;
+    uint **boneInd;
 
     std::vector<QVector3D> articulations;
     std::vector<std::vector<size_t>> children;

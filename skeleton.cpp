@@ -10,25 +10,30 @@ using namespace std;
 // This is difficult because Assimp doesn't really have a structure for that,
 // we need to look for bone.mName in the node hierarchy
 Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones) {
-    weights = new float[numBones*numVertices];
-    for(uint i = 0; i < numBones*numVertices; i++)
-        weights[i] = 0.0;
+    vector<vector<float>> vectorWeight(numVertices);
+    vector<vector<uint>> vectorBone(numVertices);
+
     for(uint i = 0; i < numBones; i++) {
         aiBone *b = bones[i];
         for(uint j = 0; j < b->mNumWeights; j++) {
-            weights[numBones * b->mWeights[j].mVertexId + i] = b->mWeights[j].mWeight;
+            vectorWeight[b->mWeights[j].mVertexId].push_back(b->mWeights[j].mWeight);
+            vectorBone[b->mWeights[j].mVertexId].push_back(i);
         }
+    }
+
+    weights = new float*[numVertices];
+    boneInd = new uint*[numVertices];
+    for(uint i = 0; i < numVertices; i++) {
+        weights[i] = vectorWeight[i].data();
+        boneInd[i] = vectorBone[i].data();
     }
 }
 
 Skeleton::Skeleton(const string &skelFile, const string &weightFile, size_t meshVertexCount) {
     parseSkelFile(skelFile);
     size_t numBones = edges.size();
-    weights = new float[numBones*meshVertexCount];
-
-    // important step here: will cause a segfault if not all the weights are initialized
-    for(uint i = 0; i < numBones*meshVertexCount; i++)
-        weights[i] = 0.0;
+    weights = new float*[meshVertexCount];
+    boneInd = new uint*[meshVertexCount];   
 
     parseWeights(weightFile, meshVertexCount);
 }
@@ -183,22 +188,22 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
         std::exit(EXIT_FAILURE);
     }
 
-    weights = new float[vertexCount * edges.size()];
-
-
-    for(uint i = 0; i < vertexCount * edges.size(); i++)
-        weights[i] = 0.0;
-
     file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    size_t vertexIndex = 0;
+
+    uint vertexIndex = 0;
     for (std::string line; std::getline(file, line); ++vertexIndex) {
         std::stringstream lineStream { line };
         size_t weightCount;
         lineStream >> weightCount;
 
-        size_t index;
-        for (float w; lineStream >> index >> w;) {
-            weights[vertexIndex * edges.size() + index] += w;
+        weights[vertexIndex] = new float[weightCount];
+        boneInd[vertexIndex] = new uint[weightCount];
+
+        uint bone, i;
+        for (float w; lineStream >> bone >> w;) {
+            weights[vertexIndex][i] = w;
+            boneInd[vertexIndex][i] = bone;
+            i++;
         }
     }
 }
