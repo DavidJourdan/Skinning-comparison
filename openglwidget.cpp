@@ -1,6 +1,7 @@
 #include "openglwidget.h"
 
 #include <QVector3D>
+#include <math.h>
 
 OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidget(parent), window(parent),
     mesh { Mesh::fromCustomFile(config) },
@@ -140,7 +141,7 @@ void OpenGLWidget::initializeGL()
 
     pointBuffer.create();
     pointBuffer.bind();
-    std::vector<QVector3D> points(vertices);
+    std::vector<QVector3D> points(vertices.size(), QVector3D(-10, -10, -10));
     pointBuffer.allocate(points.data(), points.size() * sizeof(QVector3D));
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -185,6 +186,8 @@ void OpenGLWidget::resizeGL(int w, int h)
 
 void OpenGLWidget::paintGL()
 {
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     boneProg->bind();
     linevao.bind();
@@ -201,6 +204,22 @@ void OpenGLWidget::paintGL()
     linevao.release();
     boneProg->release();
 
+    pointsProg->bind();
+    pointvao.bind();
+
+    pointsProg->setUniformValue("modelMatrix", modelMatrix);
+    pointsProg->setUniformValue("viewMatrix", viewMatrix);
+    pointsProg->setUniformValue("projectionMatrix", projectionMatrix);
+
+    pointBuffer.bind();
+    glPointSize((GLfloat)5);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+    glDrawArrays(GL_POINTS, 0, mesh.getVertices().size());
+    pointBuffer.release();
+    pointvao.release();
+    boneProg->release();
+
+
     prog->bind();
     vao.bind();
 
@@ -215,21 +234,6 @@ void OpenGLWidget::paintGL()
     ebo.release();
     vao.release();
     prog->release();
-
-    pointsProg->bind();
-    pointvao.bind();
-
-    pointsProg->setUniformValue("modelMatrix", modelMatrix);
-    pointsProg->setUniformValue("viewMatrix", viewMatrix);
-    pointsProg->setUniformValue("projectionMatrix", projectionMatrix);
-
-    pointBuffer.bind();
-    glPointSize((GLfloat)5);
-    glDrawArrays(GL_POINTS, 0, mesh.getVertices().size());
-    pointBuffer.release();
-    pointvao.release();
-    boneProg->release();
-
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
@@ -467,17 +471,16 @@ void OpenGLWidget::noBoneActiv()
 }
 
 void OpenGLWidget::computeCoRs() {
-    std::vector<QVector3D> CoRs(100);
-    for(uint i = 0; i <100; i++) {
-        CoRs[i] = mesh.computeCoR(i);
-        std::cout << CoRs[i].x() << " " << CoRs[i].y() << " " << CoRs[i].z() << " " << std::endl;
-        std::cout << mesh.getVertices()[i].x() << " " << mesh.getVertices()[i].y() << " " << mesh.getVertices()[i].z() << " "<< std::endl;
+    uint nbCors = round(mesh.getVertices().size()/10.) - 1;
+    std::vector<QVector3D> CoRs(nbCors*10, QVector3D(-10.0, -10.0, -10.0));
+    for(uint i = 0; i <nbCors; i++) {
+        CoRs[10*i] = mesh.computeCoR(10*i);
     }
     pointBuffer.bind();
     pointBuffer.write(0, CoRs.data(), CoRs.size()*sizeof(QVector3D));
     pointBuffer.release();
 
-    std::vector<QVector4D> colors(100, QVector4D(1.0, 0.0, 0.0, 1.0));
+    std::vector<QVector4D> colors(10*nbCors, QVector4D(1.0, 0.0, 0.0, 0.7));
     pointColors.bind();
     pointColors.write(0, colors.data(), colors.size()*sizeof(QVector4D));
     pointColors.release();
