@@ -25,7 +25,7 @@ public:
     std::vector<QVector3D>& getNormals() {return normals;}
     std::vector<QVector3D> getSkelLines() { return skeleton.getSkelLines(); }
     uint getNumberBones() {return skeleton.getNumberBones();}
-    void computeCoRs(void);
+    std::vector<QVector3D> computeCoRs(void);
     QVector3D computeCoR(uint i);
     uint getBoneSelected() {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getNumberBones();}

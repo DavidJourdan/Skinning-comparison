@@ -171,7 +171,7 @@ Mesh::Mesh(std::vector<QVector3D> vertices,
     CoRs.reserve(indices.size());
 }
 
-void Mesh::computeCoRs() {
+vector<QVector3D> Mesh::computeCoRs() {
     // subdivide mesh
     // compute CoRs
     for(uint i= 0; i < vertices.size(); i++) {
@@ -185,6 +185,7 @@ void Mesh::computeCoRs() {
         }
         CoRs.push_back(c/s);
     }
+    return CoRs;
 }
 
 QVector3D Mesh::computeCoR(uint i) {

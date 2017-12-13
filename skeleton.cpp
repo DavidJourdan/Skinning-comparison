@@ -48,7 +48,7 @@ float Skeleton::simil(uint vertexInd, Triangle t) {
     uint a = 0, b = 0, c = 0;
     vector<float> triWeights;
     vector<uint> triInds;
-    while(weights[vertexInd][i] > 0) {
+    while(weights[vertexInd][i] > 0) { // weight arrays end with a negative number
         uint bone = boneInd[vertexInd][i];
         float w = 0.0;
 
