@@ -114,7 +114,7 @@ void OpenGLWidget::initializeGL()
     boneDataBuffer.allocate(boneData.data(), sizeof(GLfloat) * vertices.size() * MAX_BONE_COUNT);
 
     for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
-        glVertexAttribPointer(2 + i, 1, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4));
+        glVertexAttribPointer(2 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
         glEnableVertexAttribArray(2 + i);
     }
 
@@ -125,7 +125,7 @@ void OpenGLWidget::initializeGL()
     boneIndexBuffer.allocate(boneIndices.data(), sizeof(GLuint) * vertices.size() * MAX_BONE_COUNT);
 
     for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
-        glVertexAttribIPointer(2 + MAX_BONE_COUNT / 4 + i, 1, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4));
+        glVertexAttribIPointer(2 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
         glEnableVertexAttribArray(2 + MAX_BONE_COUNT / 4 + i);
     }
 
@@ -135,7 +135,7 @@ void OpenGLWidget::initializeGL()
 
     boneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
 
-    glVertexAttribIPointer(2 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(0));
+    glVertexAttribIPointer(2 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(2 + (2 * MAX_BONE_COUNT) / 4);
 
     ebo.create();
