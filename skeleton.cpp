@@ -31,7 +31,6 @@ Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones) {
 
 Skeleton::Skeleton(const string &skelFile, const string &weightFile, size_t meshVertexCount) {
     parseSkelFile(skelFile);
-    size_t numBones = edges.size();
     weights = new float*[meshVertexCount];
     boneInd = new uint*[meshVertexCount];   
 
@@ -44,30 +43,57 @@ Skeleton::~Skeleton() {
     //delete [] weights;
 }
 
-double Skeleton::simil(uint vertexInd, Triangle t) {
-    size_t nbBones = edges.size();
-    float *vertWeight = weightsAt(vertexInd);
-    float *triWeights = new float[nbBones];
-    for(uint i = 0; i < nbBones; i++)
-        triWeights[i] = (weightsAt(t.a)[i] + weightsAt(t.b)[i] + weightsAt(t.c)[i])/3.;
-    double sum = 0.0;
-    for(uint j = 0; j < nbBones; j++) {
-        double factor = 0.0;
-        for(uint k = 0; k < nbBones; k++)
+float Skeleton::simil(uint vertexInd, Triangle t) {
+    uint i = 0;
+    uint a = 0, b = 0, c = 0;
+    vector<float> triWeights;
+    vector<uint> triInds;
+    while(weights[vertexInd][i] > 0) {
+        uint bone = boneInd[vertexInd][i];
+        float w = 0.0;
+
+        // get matching bone indices (if either vertex or triangle doesn't have a weight 
+        // on a given bone, we don't compute it)
+        while(boneInd[t.a][a] < bone && weights[t.a][a] > 0) // bone indices are sorted 
+            ++a;
+        if(boneInd[t.a][a] == bone) {
+            w += weights[t.a][a];
+        }
+
+        while(boneInd[t.b][b] < bone && weights[t.b][b] > 0)
+            ++b;
+        if(boneInd[t.b][b] == bone) {
+            w += weights[t.b][b];
+        }
+
+        while(boneInd[t.c][c] < bone && weights[t.c][c] > 0)
+            ++c;
+        if(boneInd[t.c][c] == bone) {
+            w += weights[t.c][c];
+        }
+
+        if(w > 0) {
+            w = w/3.; // barycenter of weights
+            triWeights.push_back(w);
+            triInds.push_back(i); // list of bone indices with non-zero weights for vertex and triangle
+        }
+
+        ++i;
+    }
+
+    float sum = 0.0;
+    for(uint j = 0; j < triInds.size(); j++) {
+        float factor = 0.0;
+        float w_j = weights[vertexInd][triInds[j]];
+        for(uint k = 0; k < triInds.size(); k++)
             if(k != j) {
-                factor += (double) vertWeight[k]*triWeights[k]*
-                    exp(pow(vertWeight[j]*triWeights[k]-vertWeight[k]*triWeights[j], 2)/SIGMA_2);
+                float w_k = weights[vertexInd][triInds[k]];
+                factor += w_k * triWeights[k] *
+                    exp(- pow(w_j*triWeights[k] - w_k*triWeights[j], 2) / SIGMA_2);
             }
-        sum += (double) vertWeight[j]*triWeights[j]*factor;
+        sum += w_j * triWeights[j] * factor;
     }
-    if(isnan(sum) || isinf(sum)) {
-        for(uint i = 0; i < nbBones; i++)
-            cout << triWeights[i];
-        cout << endl;
-        for(uint i = 0; i < nbBones; i++)
-            cout << vertWeight[i];
-        cout << endl;
-    }
+
     return sum;
 }
 
@@ -196,15 +222,16 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
         size_t weightCount;
         lineStream >> weightCount;
 
-        weights[vertexIndex] = new float[weightCount];
+        weights[vertexIndex] = new float[weightCount+1];
         boneInd[vertexIndex] = new uint[weightCount];
 
-        uint bone, i;
+        uint bone, i = 0;
         for (float w; lineStream >> bone >> w;) {
             weights[vertexIndex][i] = w;
             boneInd[vertexIndex][i] = bone;
             i++;
         }
+        weights[vertexIndex][i] = -1;
     }
 }
 

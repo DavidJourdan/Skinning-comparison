@@ -31,7 +31,7 @@ public:
     Skeleton(uint, uint, aiBone**);
     Skeleton();
     ~Skeleton();
-    double simil(uint vertexInd, Triangle t);
+    float simil(uint vertexInd, Triangle t);
     bool parseSkelFile(const std::string& file);
     std::vector<QVector3D> getSkelLines();
     uint getNumberBones() {return edges.size();}

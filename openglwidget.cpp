@@ -471,16 +471,16 @@ void OpenGLWidget::noBoneActiv()
 }
 
 void OpenGLWidget::computeCoRs() {
-    uint nbCors = round(mesh.getVertices().size()/10.) - 1;
-    std::vector<QVector3D> CoRs(nbCors*10, QVector3D(-10.0, -10.0, -10.0));
+    uint nbCors = round(mesh.getVertices().size()/100.) - 1;
+    std::vector<QVector3D> CoRs(nbCors*100, QVector3D(-10.0, -10.0, -10.0));
     for(uint i = 0; i <nbCors; i++) {
-        CoRs[10*i] = mesh.computeCoR(10*i);
+        CoRs[100*i] = mesh.computeCoR(100*i);
     }
     pointBuffer.bind();
     pointBuffer.write(0, CoRs.data(), CoRs.size()*sizeof(QVector3D));
     pointBuffer.release();
 
-    std::vector<QVector4D> colors(10*nbCors, QVector4D(1.0, 0.0, 0.0, 0.7));
+    std::vector<QVector4D> colors(nbCors*100, QVector4D(1.0, 0.0, 0.0, 0.7));
     pointColors.bind();
     pointColors.write(0, colors.data(), colors.size()*sizeof(QVector4D));
     pointColors.release();
