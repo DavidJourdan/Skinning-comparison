@@ -118,9 +118,8 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
     articulations.reserve(num);
 
-    children.reserve(num);
-
-    transformations = std::vector<QMatrix4x4>(num);
+    outgoingEdges.reserve(num);
+    outgoingRelations.reserve(num);
 
     for(unsigned int i = 0 ; i < num ; i++) // read articulations' positions
     {
@@ -132,7 +131,8 @@ bool Skeleton::parseSkelFile(const std::string &file)
         z = std::stof(s.substr(i2, s.size()-i2));
 
         articulations.push_back(QVector3D(x, y, z));
-        children.push_back(std::vector<size_t>());
+        outgoingEdges.push_back(std::vector<size_t>());
+        outgoingRelations.push_back(std::vector<size_t>());
     }
 
     std::getline(f, s); // read number of edges (bones)
@@ -140,6 +140,8 @@ bool Skeleton::parseSkelFile(const std::string &file)
     num = std::stoi(s.substr(index, s.size() - index));
 
     edges.reserve(num);
+
+    transformations = std::vector<QMatrix4x4>(num);
 
     for(unsigned int i = 0 ; i < num ; i++) // read edges
     {
@@ -152,7 +154,7 @@ bool Skeleton::parseSkelFile(const std::string &file)
         Bone b; b.child=c;b.mother=m;
         edges.push_back(b);
 
-        children[m].push_back(c);
+        outgoingEdges[m].push_back(edges.size() - 1);
     }
 
     std::getline(f, s); // read number of relations
@@ -172,7 +174,7 @@ bool Skeleton::parseSkelFile(const std::string &file)
         Relation r; r.child=c;r.mother=m;
         relations.push_back(r);
 
-        children[m].push_back(c);
+        outgoingRelations[m].push_back(relations.size() - 1);
     }
 
     //no need for the rest of the data
@@ -237,26 +239,38 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 
 void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &axis)
 {
-    uint mIndex = edges[boneIndex].mother;
- 
     QMatrix4x4 transform { };
+
+    const auto mIndex = edges[boneIndex].mother;
  
     transform.translate(articulations[mIndex]);
     transform.rotate(angle, axis);
     transform.translate(-articulations[mIndex]);
  
-    transformations[mIndex] = transform * transformations[mIndex];
     std::vector<size_t> stack;
-    uint cIndex = edges[boneIndex].child;
-    stack.push_back(cIndex);
+    stack.push_back(boneIndex);
  
     while (!stack.empty()) {
-        mIndex = stack.back();
+        auto bIdx = stack.back();
         stack.pop_back();
-        transformations[mIndex] = transform * transformations[mIndex];
-        articulations[mIndex] = transform * articulations[mIndex];
-        for (uint c : children[mIndex]) {
+
+        transformations[bIdx] = transform * transformations[bIdx];
+
+        const auto cIdx = edges[bIdx].child;
+        articulations[cIdx] = transform * articulations[cIdx];
+
+        for (auto c : outgoingEdges[cIdx]) {
             stack.push_back(c);
+        }
+
+        for (auto r : outgoingRelations[cIdx]) {
+            const auto art = relations[r].child;
+
+            articulations[art] = transform * articulations[art];
+
+            for (auto b : outgoingEdges[art]) {
+                stack.push_back(b);
+            }
         }
     }
 }

@@ -53,7 +53,8 @@ private:
     uint **boneInd;
 
     std::vector<QVector3D> articulations;
-    std::vector<std::vector<size_t>> children;
+    std::vector<std::vector<size_t>> outgoingEdges;
+    std::vector<std::vector<size_t>> outgoingRelations;
     std::vector<Bone> edges;
     std::vector<Relation> relations;
     std::vector<QMatrix4x4> transformations;
