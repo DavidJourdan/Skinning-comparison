@@ -43,6 +43,9 @@ public:
 
     void rotateBone(const size_t boneIndex, float angle, const QVector3D &axis);
 
+    float **getWeights() { return weights; }
+    unsigned **getBoneIndices() { return boneInd; }
+
 private:
     float **weights;
     uint **boneInd;

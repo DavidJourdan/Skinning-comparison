@@ -58,6 +58,9 @@ private:
     QOpenGLVertexArrayObject pointvao;
     QOpenGLBuffer vbo;
     QOpenGLBuffer normBuffer;
+    QOpenGLBuffer boneDataBuffer;
+    QOpenGLBuffer boneIndexBuffer;
+    QOpenGLBuffer boneListSizeBuffer;
     QOpenGLBuffer ebo;
     QOpenGLBuffer lineBuffer;
     QOpenGLBuffer lineIndices;

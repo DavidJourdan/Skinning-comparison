@@ -3,12 +3,23 @@
 #include <QVector3D>
 #include <math.h>
 
-OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidget(parent), window(parent),
+OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidget(parent),
+    window(parent),
     mesh { Mesh::fromCustomFile(config) },
-    vbo(QOpenGLBuffer::VertexBuffer), normBuffer(QOpenGLBuffer::VertexBuffer), ebo(QOpenGLBuffer::IndexBuffer),
-    lineBuffer(QOpenGLBuffer::VertexBuffer), lineIndices(QOpenGLBuffer::IndexBuffer), lineColors(QOpenGLBuffer::VertexBuffer),
-    pointBuffer(QOpenGLBuffer::VertexBuffer), pointColors(QOpenGLBuffer::VertexBuffer),
-    leftButtonPressed(false), rightButtonPressed(false), boneSelActiv(false)
+    vbo(QOpenGLBuffer::VertexBuffer),
+    normBuffer(QOpenGLBuffer::VertexBuffer),
+    boneDataBuffer { QOpenGLBuffer::VertexBuffer },
+    boneIndexBuffer { QOpenGLBuffer::VertexBuffer },
+    boneListSizeBuffer { QOpenGLBuffer::VertexBuffer },
+    ebo(QOpenGLBuffer::IndexBuffer),
+    lineBuffer(QOpenGLBuffer::VertexBuffer),
+    lineIndices(QOpenGLBuffer::IndexBuffer),
+    lineColors(QOpenGLBuffer::VertexBuffer),
+    pointBuffer(QOpenGLBuffer::VertexBuffer),
+    pointColors(QOpenGLBuffer::VertexBuffer),
+    leftButtonPressed(false),
+    rightButtonPressed(false),
+    boneSelActiv(false)
 {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -78,6 +89,54 @@ void OpenGLWidget::initializeGL()
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
+
+    constexpr size_t MAX_BONE_COUNT = 8;
+    auto boneData = std::vector<GLfloat>(MAX_BONE_COUNT * vertices.size());
+    auto boneIndices = std::vector<GLuint>(MAX_BONE_COUNT * vertices.size());
+    auto boneListSizes = std::vector<GLuint>(vertices.size());
+
+    const auto weights = mesh.getWeights();
+    const auto pBoneIndices = mesh.getBoneIndices();
+
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        for (size_t j = 0; weights[i][j] != -1.0f; ++j) {
+            const auto idx = i * MAX_BONE_COUNT + j;
+            boneData[idx] = weights[i][j];
+            boneIndices[idx] = pBoneIndices[i][j];
+            ++boneListSizes[i];
+        }
+    }
+
+    boneDataBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    boneDataBuffer.create();
+    boneDataBuffer.bind();
+
+    boneDataBuffer.allocate(sizeof(boneData[0]) * vertices.size() * MAX_BONE_COUNT);
+
+    for (size_t i = 0; i < MAX_BONE_COUNT; ++i) {
+        glVertexAttribPointer(2 + i, 1, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i));
+        glEnableVertexAttribArray(2 + i);
+    }
+
+    boneIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    boneIndexBuffer.create();
+    boneIndexBuffer.bind();
+
+    boneIndexBuffer.allocate(sizeof(boneIndices[0]) * vertices.size() * MAX_BONE_COUNT);
+
+    for (size_t i = 0; i < MAX_BONE_COUNT; ++i) {
+        glVertexAttribPointer(2 + MAX_BONE_COUNT + i, 1, GL_UNSIGNED_INT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i));
+        glEnableVertexAttribArray(2 + MAX_BONE_COUNT + i);
+    }
+
+    boneListSizeBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    boneListSizeBuffer.create();
+    boneListSizeBuffer.bind();
+
+    boneListSizeBuffer.allocate(sizeof(boneListSizes[0]) * vertices.size());
+
+    glVertexAttribPointer(2 + 2 * MAX_BONE_COUNT, 1, GL_UNSIGNED_INT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(2 + 2 * MAX_BONE_COUNT);
 
     ebo.create();
     ebo.bind();

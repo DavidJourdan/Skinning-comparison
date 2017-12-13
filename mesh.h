@@ -42,6 +42,9 @@ public:
 
     void rotateBone(float angle, QVector3D axis);
 
+    float **getWeights() { return skeleton.getWeights(); }
+    unsigned **getBoneIndices() { return skeleton.getBoneIndices(); }
+
 private:
     std::vector<QVector3D> vertices;
     std::vector<unsigned> indices;
