@@ -46,6 +46,8 @@ public:
     float **getWeights() { return weights; }
     unsigned **getBoneIndices() { return boneInd; }
 
+    const std::vector<QMatrix4x4> &getTransformations() const { return transformations; }
+
 private:
     float **weights;
     uint **boneInd;

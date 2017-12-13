@@ -44,6 +44,7 @@ public:
 
     float **getWeights() { return skeleton.getWeights(); }
     unsigned **getBoneIndices() { return skeleton.getBoneIndices(); }
+    const std::vector<QMatrix4x4> &getTransformations() const { return skeleton.getTransformations(); }
 
 private:
     std::vector<QVector3D> vertices;

@@ -111,10 +111,10 @@ void OpenGLWidget::initializeGL()
     boneDataBuffer.create();
     boneDataBuffer.bind();
 
-    boneDataBuffer.allocate(sizeof(boneData[0]) * vertices.size() * MAX_BONE_COUNT);
+    boneDataBuffer.allocate(boneData.data(), sizeof(GLfloat) * vertices.size() * MAX_BONE_COUNT);
 
-    for (size_t i = 0; i < MAX_BONE_COUNT; ++i) {
-        glVertexAttribPointer(2 + i, 1, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i));
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribPointer(2 + i, 1, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4));
         glEnableVertexAttribArray(2 + i);
     }
 
@@ -122,21 +122,21 @@ void OpenGLWidget::initializeGL()
     boneIndexBuffer.create();
     boneIndexBuffer.bind();
 
-    boneIndexBuffer.allocate(sizeof(boneIndices[0]) * vertices.size() * MAX_BONE_COUNT);
+    boneIndexBuffer.allocate(boneIndices.data(), sizeof(GLuint) * vertices.size() * MAX_BONE_COUNT);
 
-    for (size_t i = 0; i < MAX_BONE_COUNT; ++i) {
-        glVertexAttribPointer(2 + MAX_BONE_COUNT + i, 1, GL_UNSIGNED_INT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i));
-        glEnableVertexAttribArray(2 + MAX_BONE_COUNT + i);
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribIPointer(2 + MAX_BONE_COUNT / 4 + i, 1, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4));
+        glEnableVertexAttribArray(2 + MAX_BONE_COUNT / 4 + i);
     }
 
     boneListSizeBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
     boneListSizeBuffer.create();
     boneListSizeBuffer.bind();
 
-    boneListSizeBuffer.allocate(sizeof(boneListSizes[0]) * vertices.size());
+    boneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
 
-    glVertexAttribPointer(2 + 2 * MAX_BONE_COUNT, 1, GL_UNSIGNED_INT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(2 + 2 * MAX_BONE_COUNT);
+    glVertexAttribIPointer(2 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(2 + (2 * MAX_BONE_COUNT) / 4);
 
     ebo.create();
     ebo.bind();
@@ -285,6 +285,9 @@ void OpenGLWidget::paintGL()
     prog->setUniformValue("modelMatrix", modelMatrix);
     prog->setUniformValue("viewMatrix", viewMatrix);
     prog->setUniformValue("projectionMatrix", projectionMatrix);
+
+    const auto& transformations = mesh.getTransformations();
+    prog->setUniformValueArray("tArr", transformations.data(), transformations.size());
 
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
