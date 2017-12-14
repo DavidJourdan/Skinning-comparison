@@ -19,7 +19,7 @@ void OpenGLWidget::editBone(size_t i)
     const auto edges = mesh.getEdges();
 
     const auto &bone = edges.at(i);
-    const auto &center = articulations.at(bone.mother);
+    const auto &center = articulations.at(bone.parent);
     const auto &child = articulations.at(bone.child);
 
     const auto length = (child - center).length();

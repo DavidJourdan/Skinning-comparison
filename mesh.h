@@ -27,7 +27,7 @@ public:
     uint getNumberBones() {return skeleton.getNumberBones();}
     std::vector<QVector3D> computeCoRs(void);
     QVector3D computeCoR(uint i);
-    uint getBoneSelected() {return boneSelected;}
+    uint getBoneSelected() const {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getNumberBones();}
 
     const std::vector<QVector3D> &getArticulations() const

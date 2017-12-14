@@ -15,13 +15,15 @@ struct Triangle {
 };
 
 struct Bone {
-    uint mother;
-    uint child;
-};
-
-struct Relation {
-    uint mother;
-    uint child;
+    bool edge; // false if it's a PARENT_RELATION
+    uint parent; // index of parent joint position
+    uint child; // index of child joint position
+    size_t childNb;
+    uint *successors; //array of Bone indices
+    Bone(bool edge, uint parInd, uint childInd, uint childNb = 0): edge(edge), parent(parInd), 
+        child(childInd), childNb(childNb) {
+            successors = (childNb != 0) ? new uint[childNb] : nullptr;
+    }
 };
 
 class Skeleton
@@ -34,7 +36,7 @@ public:
     float simil(uint vertexInd, Triangle t);
     bool parseSkelFile(const std::string& file);
     std::vector<QVector3D> getSkelLines();
-    uint getNumberBones() {return edges.size();}
+    uint getNumberBones() {return boneNb;}
 
     const std::vector<QVector3D> &getArticulations() const { return articulations; }
     const std::vector<Bone> &getEdges() const { return edges; }
@@ -46,11 +48,10 @@ public:
 private:
     float **weights;
     uint **boneInd;
+    uint boneNb;
 
     std::vector<QVector3D> articulations;
-    std::vector<std::vector<size_t>> children;
     std::vector<Bone> edges;
-    std::vector<Relation> relations;
     std::vector<QMatrix4x4> transformations;
 };
 
