@@ -90,7 +90,7 @@ void OpenGLWidget::initializeGL()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
 
-    constexpr size_t MAX_BONE_COUNT = 8;
+    constexpr size_t MAX_BONE_COUNT = 12;
     auto boneData = std::vector<GLfloat>(MAX_BONE_COUNT * vertices.size());
     auto boneIndices = std::vector<GLuint>(MAX_BONE_COUNT * vertices.size());
     auto boneListSizes = std::vector<GLuint>(vertices.size());
