@@ -123,8 +123,6 @@ bool Skeleton::parseSkelFile(const std::string &file)
     //siblings[bone.parent] is the list of bones indices sharing the same parent than bone (including bone itself)
     vector<vector<uint>> siblings(num);
 
-    transformations = std::vector<QMatrix4x4>(num);
-
     for(unsigned int i = 0 ; i < num ; i++) // read articulations' positions
     {
         std::getline(f, s);
@@ -142,6 +140,8 @@ bool Skeleton::parseSkelFile(const std::string &file)
     num = std::stoi(s.substr(index, s.size() - index));
 
     boneNb = num;
+
+    transformations = std::vector<QMatrix4x4>(num);
 
     for(unsigned int i = 0 ; i < num ; i++) // read edges
     {
@@ -245,27 +245,30 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 
 void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &axis)
 {
-    uint mIndex = bones[boneIndex].parent;
- 
     QMatrix4x4 transform { };
+ 
+    uint mIndex = bones[boneIndex].parent;
  
     transform.translate(articulations[mIndex]);
     transform.rotate(angle, axis);
     transform.translate(-articulations[mIndex]);
  
-    // breadth-first search in the skeleton tree
+    // depth-first search in the skeleton tree
     std::vector<uint> stack;
     stack.push_back(boneIndex);
  
     while (!stack.empty()) {
-        uint curBoneI = stack.back();
+        uint bIdx = stack.back();
         stack.pop_back();
-        transformations[curBoneI] = transform * transformations[curBoneI];
-        uint c = bones[curBoneI].child;
-        articulations[c] = transform * articulations[c];
 
-        for (uint i = 0; i < bones[curBoneI].successorNb; i++) {
-            stack.push_back(bones[curBoneI].successors[i]);
+        if(bIdx < boneNb) // only the edge type has a transformation attached
+            transformations[bIdx] = transform * transformations[bIdx];
+
+        uint cIdx = bones[bIdx].child;
+        articulations[cIdx] = transform * articulations[cIdx];
+
+        for (uint i = 0; i < bones[bIdx].successorNb; i++) {
+            stack.push_back(bones[bIdx].successors[i]);
         }
     }
 }
