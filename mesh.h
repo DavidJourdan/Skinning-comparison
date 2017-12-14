@@ -35,7 +35,7 @@ public:
         return skeleton.getArticulations();
     }
 
-    const std::vector<Bone> &getEdges() const { return skeleton.getEdges(); }
+    const std::vector<Bone> &getBones() const { return skeleton.getBones(); }
 
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);

@@ -176,14 +176,14 @@ bool Skeleton::parseSkelFile(const std::string &file)
     }
 
     // write the edges array at once, for better data locality
-    edges.reserve(tempEdges.size());
+    bones.reserve(tempEdges.size());
     try{
         for(uint i = 0; i < tempEdges.size(); i++) {
             Bone t = tempEdges[i];
             vector<uint> successors = siblings[tempEdges[i].child];
-            edges.push_back(Bone(t.edge, t.parent, t.child, successors.size()));
+            bones.push_back(Bone(t.isEdge, t.parent, t.child, successors.size()));
             for(uint j = 0; j < successors.size(); j++){
-                edges[i].successors[j] = successors[j];
+                bones[i].successors[j] = successors[j];
             }
         }
     } catch(bad_alloc& ba) {
@@ -199,7 +199,7 @@ bool Skeleton::parseSkelFile(const std::string &file)
 std::vector<QVector3D> Skeleton::getSkelLines() {
     vector<QVector3D> lines;
 
-    for(Bone b : edges) {
+    for(Bone b : bones) {
         QVector3D p = articulations[b.parent];
         lines.push_back(p);
 
@@ -245,7 +245,7 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 
 void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &axis)
 {
-    uint mIndex = edges[boneIndex].parent;
+    uint mIndex = bones[boneIndex].parent;
  
     QMatrix4x4 transform { };
  
@@ -261,11 +261,11 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
         uint curBoneI = stack.back();
         stack.pop_back();
         transformations[curBoneI] = transform * transformations[curBoneI];
-        uint c = edges[curBoneI].child;
+        uint c = bones[curBoneI].child;
         articulations[c] = transform * articulations[c];
 
-        for (uint i = 0; i < edges[curBoneI].childNb; i++) {
-            stack.push_back(edges[curBoneI].successors[i]);
+        for (uint i = 0; i < bones[curBoneI].successorNb; i++) {
+            stack.push_back(bones[curBoneI].successors[i]);
         }
     }
 }

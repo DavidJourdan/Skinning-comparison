@@ -15,14 +15,14 @@ struct Triangle {
 };
 
 struct Bone {
-    bool edge; // false if it's a PARENT_RELATION
+    bool isEdge; // false if it's a PARENT_RELATION
     uint parent; // index of parent joint position
     uint child; // index of child joint position
-    size_t childNb;
+    size_t successorNb;
     uint *successors; //array of Bone indices
-    Bone(bool edge, uint parInd, uint childInd, uint childNb = 0): edge(edge), parent(parInd), 
-        child(childInd), childNb(childNb) {
-            successors = (childNb != 0) ? new uint[childNb] : nullptr;
+    Bone(bool edge, uint parInd, uint childInd, size_t childNb = 0): isEdge(edge), 
+        parent(parInd), child(childInd), successorNb(childNb) {
+            successors = (successorNb != 0) ? new uint[successorNb] : nullptr;
     }
 };
 
@@ -39,7 +39,7 @@ public:
     uint getNumberBones() {return boneNb;}
 
     const std::vector<QVector3D> &getArticulations() const { return articulations; }
-    const std::vector<Bone> &getEdges() const { return edges; }
+    const std::vector<Bone> &getBones() const { return bones; }
 
     void parseWeights(const std::string &fileName, size_t meshVertexCount);
 
@@ -51,7 +51,7 @@ private:
     uint boneNb;
 
     std::vector<QVector3D> articulations;
-    std::vector<Bone> edges;
+    std::vector<Bone> bones;
     std::vector<QMatrix4x4> transformations;
 };
 
