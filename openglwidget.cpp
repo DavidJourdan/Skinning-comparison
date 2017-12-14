@@ -27,10 +27,10 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
 void OpenGLWidget::editBone(size_t i)
 {
     const auto articulations = mesh.getArticulations();
-    const auto edges = mesh.getEdges();
+    const auto edges = mesh.getBones();
 
     const auto &bone = edges.at(i);
-    const auto &center = articulations.at(bone.mother);
+    const auto &center = articulations.at(bone.parent);
     const auto &child = articulations.at(bone.child);
 
     const auto length = (child - center).length();
@@ -163,7 +163,7 @@ void OpenGLWidget::initializeGL()
     lineColors.create();
     lineColors.bind();
     std::vector<QVector4D> colors(lines.size());
-    uint n = mesh.getNumberBones();
+    uint n = mesh.getEdgeNumber();
 
     for(uint i = 0; i < n ; i++) {
         QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //red
@@ -519,7 +519,7 @@ void OpenGLWidget::showBoneActiv()
 
 void OpenGLWidget::noBoneActiv()
 {
-    uint n = mesh.getNumberBones();
+    uint n = mesh.getEdgeNumber();
     std::vector<QVector4D> colors(2*n);
     for(uint i = 0; i < n ; i++) {
         QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black

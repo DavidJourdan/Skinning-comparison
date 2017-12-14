@@ -24,18 +24,18 @@ public:
     std::vector<unsigned>& getIndices() { return indices;}
     std::vector<QVector3D>& getNormals() {return normals;}
     std::vector<QVector3D> getSkelLines() { return skeleton.getSkelLines(); }
-    uint getNumberBones() {return skeleton.getNumberBones();}
+    size_t getEdgeNumber() {return skeleton.getEdgeNumber();}
     std::vector<QVector3D> computeCoRs(void);
     QVector3D computeCoR(uint i);
-    uint getBoneSelected() {return boneSelected;}
-    void setBoneSelected(uint i) {boneSelected = i%skeleton.getNumberBones();}
+    uint getBoneSelected() const {return boneSelected;}
+    void setBoneSelected(uint i) {boneSelected = i%skeleton.getEdgeNumber();}
 
     const std::vector<QVector3D> &getArticulations() const
     {
         return skeleton.getArticulations();
     }
 
-    const std::vector<Bone> &getEdges() const { return skeleton.getEdges(); }
+    const std::vector<Bone> &getBones() const { return skeleton.getBones(); }
 
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);
