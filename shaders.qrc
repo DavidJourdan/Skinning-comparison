@@ -4,5 +4,7 @@
         <file>shader.vert</file>
         <file>boneshader.frag</file>
         <file>boneshader.vert</file>
+        <file>corshader.frag</file>
+        <file>corshader.vert</file>
     </qresource>
 </RCC>
