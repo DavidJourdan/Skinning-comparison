@@ -67,6 +67,9 @@ private:
     QOpenGLBuffer lineColors;
     QOpenGLBuffer pointBuffer;
     QOpenGLBuffer pointColors;
+    QOpenGLBuffer corBoneDataBuffer;
+    QOpenGLBuffer corBoneIndexBuffer;
+    QOpenGLBuffer corBoneListSizeBuffer;
 
     std::unique_ptr<QOpenGLShaderProgram> prog;
     std::unique_ptr<QOpenGLShaderProgram> boneProg;

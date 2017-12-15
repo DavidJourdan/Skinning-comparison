@@ -17,6 +17,9 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
     lineColors(QOpenGLBuffer::VertexBuffer),
     pointBuffer(QOpenGLBuffer::VertexBuffer),
     pointColors(QOpenGLBuffer::VertexBuffer),
+    corBoneDataBuffer(QOpenGLBuffer::VertexBuffer),
+    corBoneIndexBuffer(QOpenGLBuffer::VertexBuffer),
+    corBoneListSizeBuffer(QOpenGLBuffer::VertexBuffer),
     leftButtonPressed(false),
     rightButtonPressed(false),
     boneSelActiv(false)
@@ -99,7 +102,7 @@ void OpenGLWidget::initializeGL()
     const auto pBoneIndices = mesh.getBoneIndices();
 
     for (size_t i = 0; i < vertices.size(); ++i) {
-        for (size_t j = 0; weights[i][j] != -1.0f; ++j) {
+        for (size_t j = 0; weights[i][j] > 0; ++j) {
             const auto idx = i * MAX_BONE_COUNT + j;
             boneData[idx] = weights[i][j];
             boneIndices[idx] = pBoneIndices[i][j];
@@ -200,7 +203,7 @@ void OpenGLWidget::initializeGL()
 
     pointBuffer.create();
     pointBuffer.bind();
-    std::vector<QVector3D> points(vertices.size(), QVector3D(-10, -10, -10));
+    std::vector<QVector3D> points(vertices.size(), QVector3D(0, 0, 10));
     pointBuffer.allocate(points.data(), points.size() * sizeof(QVector3D));
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -217,6 +220,37 @@ void OpenGLWidget::initializeGL()
     pointColors.allocate(ptColors.data(), ptColors.size() * sizeof(QVector4D));
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
+
+    corBoneDataBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    corBoneDataBuffer.create();
+    corBoneDataBuffer.bind();
+
+    corBoneDataBuffer.allocate(boneData.data(), sizeof(GLfloat) * vertices.size() * MAX_BONE_COUNT);
+
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribPointer(2 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(2 + i);
+    }
+
+    corBoneIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    corBoneIndexBuffer.create();
+    corBoneIndexBuffer.bind();
+
+    corBoneIndexBuffer.allocate(boneIndices.data(), sizeof(GLuint) * vertices.size() * MAX_BONE_COUNT);
+
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribIPointer(2 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
+        glEnableVertexAttribArray(2 + MAX_BONE_COUNT / 4 + i);
+    }
+
+    corBoneListSizeBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    corBoneListSizeBuffer.create();
+    corBoneListSizeBuffer.bind();
+
+    corBoneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
+
+    glVertexAttribIPointer(2 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(2 + (2 * MAX_BONE_COUNT) / 4);
     
     prog = std::make_unique<QOpenGLShaderProgram>(this);
     prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shader.vert");
@@ -229,8 +263,8 @@ void OpenGLWidget::initializeGL()
     boneProg->link();
 
     pointsProg = std::make_unique<QOpenGLShaderProgram>(this);
-    pointsProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");
-    pointsProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/boneshader.frag");
+    pointsProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/corshader.vert");
+    pointsProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/corshader.frag");
     pointsProg->link();
 
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
@@ -270,6 +304,9 @@ void OpenGLWidget::paintGL()
     pointsProg->setUniformValue("viewMatrix", viewMatrix);
     pointsProg->setUniformValue("projectionMatrix", projectionMatrix);
 
+    const auto& transformations = mesh.getTransformations();
+    prog->setUniformValueArray("tArr", transformations.data(), transformations.size());
+
     pointBuffer.bind();
     glPointSize((GLfloat)5);
     glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
@@ -286,7 +323,6 @@ void OpenGLWidget::paintGL()
     prog->setUniformValue("viewMatrix", viewMatrix);
     prog->setUniformValue("projectionMatrix", projectionMatrix);
 
-    const auto& transformations = mesh.getTransformations();
     prog->setUniformValueArray("tArr", transformations.data(), transformations.size());
 
     ebo.bind();
