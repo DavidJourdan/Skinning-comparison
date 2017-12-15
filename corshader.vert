@@ -5,18 +5,15 @@ const uint MAX_BONE_COUNT = 12;
 const uint MAX_TRANSFORMATION_COUNT = 50;
 
 layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
-layout (location = 2) in vec4 weights[MAX_BONE_COUNT / 4];
-layout (location = 5) in uvec4 indices[MAX_BONE_COUNT / 4];
-layout (location = 8) in uint size;
+layout (location = 1) in vec4 weights[MAX_BONE_COUNT / 4];
+layout (location = 4) in uvec4 indices[MAX_BONE_COUNT / 4];
+layout (location = 7) in uint size;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
 uniform mat4 tArr[MAX_TRANSFORMATION_COUNT];
-
-out vec4 color;
 
 float getWeight(uint i) {
     uint q = i / 4;
@@ -41,5 +38,4 @@ void main(void)
     }
 
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * tMat * vec4(aPos, 1.0);
-    color = vec4(aColor, 1.0);
 }

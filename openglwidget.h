@@ -66,7 +66,6 @@ private:
     QOpenGLBuffer lineIndices;
     QOpenGLBuffer lineColors;
     QOpenGLBuffer pointBuffer;
-    QOpenGLBuffer pointColors;
     QOpenGLBuffer corBoneDataBuffer;
     QOpenGLBuffer corBoneIndexBuffer;
     QOpenGLBuffer corBoneListSizeBuffer;
