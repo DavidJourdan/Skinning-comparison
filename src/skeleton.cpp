@@ -144,6 +144,9 @@ bool Skeleton::parseSkelFile(const std::string &file)
     transformations = std::vector<QMatrix4x4>(num);
     quaternions = std::vector<QVector4D>(num, QVector4D(0, 0, 0, 1));
 
+    transformationsDQNonDualPart = std::vector<QVector4D>(num);
+    transformationsDQDualPart = std::vector<QVector4D>(num);
+
     for(unsigned int i = 0 ; i < num ; i++) // read edges
     {
         std::getline(f, s);
@@ -271,6 +274,11 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
             quaternions[bIdx] = quat.toVector4D();
         }
 
+            DualQuaternion tr = DualQuaternion::transformMatrixToDQuat(transformations[bIdx]);
+            transformationsDQNonDualPart[bIdx] = tr.getNonDualPart().toVector4D();
+            transformationsDQDualPart[bIdx] = tr.getDualPart().toVector4D();
+        }
+
         uint cIdx = bones[bIdx].child;
         articulations[cIdx] = transform * articulations[cIdx]; 
 
@@ -280,17 +288,4 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
     }
 }
 
-const std::vector<DualQuaternion>& Skeleton::getDQuatTransormations() const
-{
-    std::vector<DualQuaternion> res;
-    for(QMatrix4x4 mat : transformations)
-    {
-
-        DualQuaternion dq;
-        dq = DualQuaternion::transformMatrixToDQuat(mat);
-        res.push_back(dq);
-    }
-
-    return res;
-}
 

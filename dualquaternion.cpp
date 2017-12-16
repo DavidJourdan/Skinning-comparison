@@ -1,6 +1,6 @@
 #include "dualquaternion.hpp"
 
-DualQuaternion::DualQuaternion()
+DualQuaternion::DualQuaternion() : dualPart(0, 0, 0, 0)
 {
 
 }

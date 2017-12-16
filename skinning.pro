@@ -50,7 +50,8 @@ DISTFILES += \
     shaders/optimized_cors.frag \
     shaders/optimized_cors.vert \
     shaders/pointshader.frag \
-    shaders/pointshader.vert
+    shaders/pointshader.vert \
+    shaders/dqshader.vert
 
 RESOURCES += \
     shaders/shaders.qrc

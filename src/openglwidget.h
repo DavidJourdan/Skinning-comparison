@@ -78,6 +78,7 @@ private:
 
     QOpenGLShaderProgram lbsProg;
     QOpenGLShaderProgram optimizedCorsProg;
+    QOpenGLShaderProgram dqsProg;
     QOpenGLShaderProgram boneProg;
     QOpenGLShaderProgram pointsProg;
 

@@ -273,6 +273,11 @@ void OpenGLWidget::initializeGL()
 
     curProg = &lbsProg;
 
+    dqsProg = std::make_unique<QOpenGLShaderProgram>(this);
+    dqsProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/dqshader.vert");
+    dqsProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
+    dqsProg->link();
+
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
 }
 
@@ -335,7 +340,8 @@ void OpenGLWidget::paintGL()
     curProg->setUniformValueArray("tArr", transformations.data(), transformations.size());
     curProg->setUniformValueArray("qArr", quaternions.data(), quaternions.size());
 
-    std::vector<DualQuaternion> dq = mesh.getDQuatTransformations();
+    const auto& dualPart = mesh.getDQuatTransformationsDualPart();
+    dqsProg->setUniformValueArray("dqTrDual", dualPart.data(), dualPart.size());
 
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, meshMode);
