@@ -12,13 +12,14 @@ out vec4 fragColor;
 
 float lightPow = 2.0;
 float fd = 1.0/M_PI;
-
-vec4 albedo = vec4(0.5, 0.5, 0.5, 0.5);
+float alpha = 0.6;
+vec4 albedo = vec4(0.5, 0.5, 0.5, 1.0);
 vec4 lightPos = vec4(0.0, -20.0, 0.0, 1.0);
 
 void main(void)
 {
-    vec4 wi = normalize(lightPos - gl_FragCoord);
+    vec4 wi = normalize(lightPos - gl_FragCoord/gl_FragCoord.w);
 
-    fragColor = 0.15 + lightPow * fd * albedo * abs(dot(normal, vec4(0.0, 0.0, 1.0, 0.0)));
+    fragColor = vec4(0.15, 0.15, 0.15, 1.0) + lightPow * fd * albedo * abs(dot(normal/normal.w, vec4(0.0, 1.0, 1.0, 1.0)));
+    fragColor.w = alpha;
 }
