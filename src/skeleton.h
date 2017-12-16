@@ -65,6 +65,7 @@ private:
     std::vector<Bone> bones;
     std::vector<QMatrix4x4> transformations;
     std::vector<QVector4D> quaternions;
+    //std::vector<DualQuaternion> transformationsDQ;
 };
 
 #endif // SKELETON_H
