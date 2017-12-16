@@ -38,3 +38,13 @@ DualQuaternion DualQuaternion::transformDQFromRotAndTransl(DualQuaternion t, QQu
     QQuaternion tDual = t.getDualPart();
     return DualQuaternion(q, tDual*q);
 }
+
+QQuaternion DualQuaternion::getNonDualPart() const
+{
+    return nonDualPart;
+}
+
+QQuaternion DualQuaternion::getDualPart() const
+{
+    return dualPart;
+}

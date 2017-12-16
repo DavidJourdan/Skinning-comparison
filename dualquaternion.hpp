@@ -12,13 +12,14 @@ class DualQuaternion
 public:
     DualQuaternion();
     DualQuaternion(QQuaternion nonDual, QQuaternion dual);
+    DualQuaternion(const DualQuaternion& dq) {nonDualPart = dq.getNonDualPart(); dualPart = dq.getDualPart();}
 
     static DualQuaternion transformMatrixToDQuat(QMatrix4x4 mat);
 
     static DualQuaternion transformDQFromRotAndTransl(DualQuaternion t, QQuaternion q);
 
-    inline QQuaternion getNonDualPart() {return nonDualPart;}
-    inline QQuaternion getDualPart() {return dualPart;}
+    QQuaternion getNonDualPart() const;
+    QQuaternion getDualPart() const;
 
 private:
     QQuaternion nonDualPart;
