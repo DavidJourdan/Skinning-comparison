@@ -16,6 +16,7 @@
 
 #include "mesh.h"
 #include "config.h"
+#include "dualquaternion.hpp"
 
 class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 {

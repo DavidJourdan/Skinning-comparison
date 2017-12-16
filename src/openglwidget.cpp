@@ -335,6 +335,8 @@ void OpenGLWidget::paintGL()
     curProg->setUniformValueArray("tArr", transformations.data(), transformations.size());
     curProg->setUniformValueArray("qArr", quaternions.data(), quaternions.size());
 
+    std::vector<DualQuaternion> dq = mesh.getDQuatTransformations();
+
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, meshMode);
 

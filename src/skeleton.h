@@ -54,7 +54,7 @@ public:
     const std::vector<QMatrix4x4> &getTransformations() const { return transformations; }
     const std::vector<QVector4D> &getQuaternions() const { return quaternions; }
 
-    std::vector<DualQuaternion> getDQuatTransormations();
+    const std::vector<DualQuaternion> &getDQuatTransormations() const;
 
 private:
     float **weights;
