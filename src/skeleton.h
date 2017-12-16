@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "dualquaternion.hpp"
+
 struct Triangle {
     uint a;
     uint b;
@@ -51,6 +53,8 @@ public:
 
     const std::vector<QMatrix4x4> &getTransformations() const { return transformations; }
     const std::vector<QVector4D> &getQuaternions() const { return quaternions; }
+
+    std::vector<DualQuaternion> getDQuatTransormations();
 
 private:
     float **weights;
