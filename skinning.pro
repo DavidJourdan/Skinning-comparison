@@ -33,13 +33,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     openglwidget.cpp \
     mesh.cpp \
-    skeleton.cpp
+    skeleton.cpp \
+    dualquaternion.cpp
 
 HEADERS  += mainwindow.h \
     openglwidget.h \
     mesh.h \
     skeleton.h \
-    config.h
+    config.h \
+    dualquaternion.hpp
 
 unix:!macx {
     LIBS += -lassimp
