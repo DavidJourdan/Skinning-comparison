@@ -4,5 +4,6 @@
         <file>shader.vert</file>
         <file>boneshader.frag</file>
         <file>boneshader.vert</file>
+        <file>dqshader.vert</file>
     </qresource>
 </RCC>

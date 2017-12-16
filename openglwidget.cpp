@@ -235,6 +235,11 @@ void OpenGLWidget::initializeGL()
     pointsProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/boneshader.frag");
     pointsProg->link();
 
+    dqsProg = std::make_unique<QOpenGLShaderProgram>(this);
+    dqsProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/dqshader.vert");
+    dqsProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
+    dqsProg->link();
+
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
 }
 
@@ -281,17 +286,36 @@ void OpenGLWidget::paintGL()
     boneProg->release();
 
 
-    prog->bind();
+//    prog->bind();
+//    vao.bind();
+
+//    prog->setUniformValue("modelMatrix", modelMatrix);
+//    prog->setUniformValue("viewMatrix", viewMatrix);
+//    prog->setUniformValue("projectionMatrix", projectionMatrix);
+
+//    const auto& transformations = mesh.getTransformations();
+//    prog->setUniformValueArray("tArr", transformations.data(), transformations.size());
+
+//    ebo.bind();
+//    glPolygonMode(GL_FRONT_AND_BACK, meshMode);
+
+//    glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
+//    ebo.release();
+//    vao.release();
+//    prog->release();
+
+    dqsProg->bind();
     vao.bind();
 
-    prog->setUniformValue("modelMatrix", modelMatrix);
-    prog->setUniformValue("viewMatrix", viewMatrix);
-    prog->setUniformValue("projectionMatrix", projectionMatrix);
+    dqsProg->setUniformValue("modelMatrix", modelMatrix);
+    dqsProg->setUniformValue("viewMatrix", viewMatrix);
+    dqsProg->setUniformValue("projectionMatrix", projectionMatrix);
 
-    const auto& transformations = mesh.getTransformations();
-    prog->setUniformValueArray("tArr", transformations.data(), transformations.size());
+    const auto& nonDualPart = mesh.getDQuatTransformationsNonDualPart();
+    dqsProg->setUniformValueArray("dqTrNonDual", nonDualPart.data(), nonDualPart.size());
 
-    std::vector<DualQuaternion> dq = mesh.getDQuatTransformations();
+    const auto& dualPart = mesh.getDQuatTransformationsDualPart();
+    dqsProg->setUniformValueArray("dqTrDual", dualPart.data(), dualPart.size());
 
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, meshMode);
@@ -299,7 +323,7 @@ void OpenGLWidget::paintGL()
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
     ebo.release();
     vao.release();
-    prog->release();
+    dqsProg->release();
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)

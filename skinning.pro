@@ -56,7 +56,8 @@ DISTFILES += \
     shader.vert \
     shader.frag \
     boneshader.frag \
-    boneshader.vert
+    boneshader.vert \
+    dqshader.vert
 
 RESOURCES += \
     shaders.qrc

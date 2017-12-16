@@ -72,6 +72,7 @@ private:
     std::unique_ptr<QOpenGLShaderProgram> prog;
     std::unique_ptr<QOpenGLShaderProgram> boneProg;
     std::unique_ptr<QOpenGLShaderProgram> pointsProg;
+    std::unique_ptr<QOpenGLShaderProgram> dqsProg;
 
     QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
