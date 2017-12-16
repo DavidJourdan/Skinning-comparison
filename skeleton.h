@@ -5,6 +5,7 @@
 #include <vector>
 #include <QVector3D>
 #include <QMatrix4x4>
+#include <QQuaternion>
 #include <iostream>
 #include <fstream>
 
@@ -58,6 +59,7 @@ private:
     std::vector<QVector3D> articulations;
     std::vector<Bone> bones;
     std::vector<QMatrix4x4> transformations;
+    std::vector<QQuaternion> quaternions;
 };
 
 #endif // SKELETON_H

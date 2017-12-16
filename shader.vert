@@ -41,8 +41,6 @@ void main(void)
     }
 
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * tMat * vec4(aPos, 1.0);
-    // Debugging.
-//    gl_Position = vec4(gl_VertexID / 10000.0, size / 10.0, 0.0, 1.0);
 
-    normal = vec4(aNorm, 1.0);// projectionMatrix * viewMatrix * modelMatrix * vec4(aNorm, 1.0);
+    normal = vec4(aNorm, 1.0);
 }

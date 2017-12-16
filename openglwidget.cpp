@@ -325,8 +325,6 @@ void OpenGLWidget::paintGL()
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
 
-
-//    qDebug() << prevPos;
     if(leftButtonPressed)
     {
         auto pos = screenToViewport(event->localPos());
