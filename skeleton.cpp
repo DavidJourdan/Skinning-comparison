@@ -273,7 +273,7 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
     }
 }
 
-std::vector<DualQuaternion> Skeleton::getDQuatTransormations()
+const std::vector<DualQuaternion>& Skeleton::getDQuatTransormations() const
 {
     std::vector<DualQuaternion> res;
     for(QMatrix4x4 mat : transformations)
