@@ -41,7 +41,8 @@ void main(void)
         tMat += w * tArr[idx];
     }
 
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * tMat * vec4(aPos, 1.0);
+    mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+    gl_Position = MVP * tMat * vec4(aPos, 1.0);
 
-    normal = tMat * vec4(aNorm, 1.0);
+    normal = transpose(inverse(MVP)) * vec4(aNorm, 1.0);
 }
