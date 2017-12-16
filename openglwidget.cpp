@@ -19,7 +19,8 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
     pointColors(QOpenGLBuffer::VertexBuffer),
     leftButtonPressed(false),
     rightButtonPressed(false),
-    boneSelActiv(false)
+    boneSelActiv(false),
+    meshMode(GL_FILL)
 {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -66,6 +67,7 @@ void OpenGLWidget::initializeGL()
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // VERTICES
@@ -290,7 +292,7 @@ void OpenGLWidget::paintGL()
     prog->setUniformValueArray("tArr", transformations.data(), transformations.size());
 
     ebo.bind();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, meshMode);
 
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
     ebo.release();
@@ -313,18 +315,18 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
         auto movementX = QVector3D(movement.x(), 0.0, 0.0);
         auto movementY = QVector3D(0.0, movement.y(), 0.0);
 
-        const auto angle0 = rotFactor * movementY.length();
+        const auto angle0 = rotFactor * movementY.y();
         const auto angle1 = rotFactor * movementX.x();
 
-        QVector3D toCam { 0.0f, 0.0f, 1.0f };
+
 
         movementY = viewMatrix.inverted() * movementY;
         movementX = viewMatrix.inverted() * movementX;
 
-        toCam = viewMatrix.inverted() * toCam;
-        const auto yAxis = QVector3D { 0.0, 1.0, 0.0 };
+        const QVector3D toCam = viewDirection();
+        const QVector3D yAxis = upDirection();
 
-        const auto rotVec0 = QVector3D::crossProduct(toCam, movementY);
+        const auto rotVec0 = rightDirection();
         const auto rotVec1 = yAxis;
 
         viewMatrix.rotate(angle0, rotVec0);
@@ -433,6 +435,11 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
 
     case Qt::Key_C:
         computeCoRs();
+        break;
+
+    case Qt::Key_M:
+        meshMode = (meshMode == GL_FILL)? GL_LINE : GL_FILL;
+        update();
         break;
     default:
         break;

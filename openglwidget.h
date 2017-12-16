@@ -86,6 +86,8 @@ private:
 
     void updateSkeleton();
     void computeCoRs();
+
+    GLenum meshMode;
 };
 
 #endif // OPENGLWIDGET_H
