@@ -350,7 +350,7 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
         movementX = viewMatrix.inverted() * movementX;
 
         const QVector3D toCam = viewDirection();
-        const QVector3D yAxis = upDirection();
+        const auto yAxis = QVector3D { 0.0, 1.0, 0.0 };
 
         const auto rotVec0 = rightDirection();
         const auto rotVec1 = yAxis;
