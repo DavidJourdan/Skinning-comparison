@@ -16,9 +16,9 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
     lineIndices(QOpenGLBuffer::IndexBuffer),
     lineColors(QOpenGLBuffer::VertexBuffer),
     pointBuffer(QOpenGLBuffer::VertexBuffer),
-    corBoneDataBuffer(QOpenGLBuffer::VertexBuffer),
-    corBoneIndexBuffer(QOpenGLBuffer::VertexBuffer),
-    corBoneListSizeBuffer(QOpenGLBuffer::VertexBuffer),
+    pointBoneDataBuffer(QOpenGLBuffer::VertexBuffer),
+    pointBoneIndexBuffer(QOpenGLBuffer::VertexBuffer),
+    pointBoneListSizeBuffer(QOpenGLBuffer::VertexBuffer),
     leftButtonPressed(false),
     rightButtonPressed(false),
     boneSelActiv(false)
@@ -92,6 +92,14 @@ void OpenGLWidget::initializeGL()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
 
+    corBuffer.create();
+    corBuffer.bind();
+    std::vector<QVector3D> cors = std::vector<QVector3D>(vertices.size());
+    corBuffer.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(2);
+
     constexpr size_t MAX_BONE_COUNT = 12;
     auto boneData = std::vector<GLfloat>(MAX_BONE_COUNT * vertices.size());
     auto boneIndices = std::vector<GLuint>(MAX_BONE_COUNT * vertices.size());
@@ -116,8 +124,8 @@ void OpenGLWidget::initializeGL()
     boneDataBuffer.allocate(boneData.data(), sizeof(GLfloat) * vertices.size() * MAX_BONE_COUNT);
 
     for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
-        glVertexAttribPointer(2 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(2 + i);
+        glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(3 + i);
     }
 
     boneIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
@@ -127,8 +135,8 @@ void OpenGLWidget::initializeGL()
     boneIndexBuffer.allocate(boneIndices.data(), sizeof(GLuint) * vertices.size() * MAX_BONE_COUNT);
 
     for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
-        glVertexAttribIPointer(2 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
-        glEnableVertexAttribArray(2 + MAX_BONE_COUNT / 4 + i);
+        glVertexAttribIPointer(3 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
+        glEnableVertexAttribArray(3 + MAX_BONE_COUNT / 4 + i);
     }
 
     boneListSizeBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
@@ -137,8 +145,8 @@ void OpenGLWidget::initializeGL()
 
     boneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
 
-    glVertexAttribIPointer(2 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(2 + (2 * MAX_BONE_COUNT) / 4);
+    glVertexAttribIPointer(3 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(3 + (2 * MAX_BONE_COUNT) / 4);
 
     ebo.create();
     ebo.bind();
@@ -209,33 +217,33 @@ void OpenGLWidget::initializeGL()
     glEnableVertexAttribArray(0);
 
 
-    corBoneDataBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    corBoneDataBuffer.create();
-    corBoneDataBuffer.bind();
+    pointBoneDataBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    pointBoneDataBuffer.create();
+    pointBoneDataBuffer.bind();
 
-    corBoneDataBuffer.allocate(boneData.data(), sizeof(GLfloat) * vertices.size() * MAX_BONE_COUNT);
+    pointBoneDataBuffer.allocate(boneData.data(), sizeof(GLfloat) * vertices.size() * MAX_BONE_COUNT);
 
     for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
         glVertexAttribPointer(1 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
         glEnableVertexAttribArray(1 + i);
     }
 
-    corBoneIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    corBoneIndexBuffer.create();
-    corBoneIndexBuffer.bind();
+    pointBoneIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    pointBoneIndexBuffer.create();
+    pointBoneIndexBuffer.bind();
 
-    corBoneIndexBuffer.allocate(boneIndices.data(), sizeof(GLuint) * vertices.size() * MAX_BONE_COUNT);
+    pointBoneIndexBuffer.allocate(boneIndices.data(), sizeof(GLuint) * vertices.size() * MAX_BONE_COUNT);
 
     for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
         glVertexAttribIPointer(1 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
         glEnableVertexAttribArray(1 + MAX_BONE_COUNT / 4 + i);
     }
 
-    corBoneListSizeBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    corBoneListSizeBuffer.create();
-    corBoneListSizeBuffer.bind();
+    pointBoneListSizeBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    pointBoneListSizeBuffer.create();
+    pointBoneListSizeBuffer.bind();
 
-    corBoneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
+    pointBoneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
 
     glVertexAttribIPointer(1 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(1 + (2 * MAX_BONE_COUNT) / 4);
@@ -561,4 +569,8 @@ void OpenGLWidget::computeCoRs() {
     pointBuffer.bind();
     pointBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
     pointBuffer.release();
+
+    corBuffer.bind();
+    corBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
+    corBuffer.release();
 }

@@ -58,6 +58,7 @@ private:
     QOpenGLVertexArrayObject pointvao;
     QOpenGLBuffer vbo;
     QOpenGLBuffer normBuffer;
+    QOpenGLBuffer corBuffer;
     QOpenGLBuffer boneDataBuffer;
     QOpenGLBuffer boneIndexBuffer;
     QOpenGLBuffer boneListSizeBuffer;
@@ -66,9 +67,9 @@ private:
     QOpenGLBuffer lineIndices;
     QOpenGLBuffer lineColors;
     QOpenGLBuffer pointBuffer;
-    QOpenGLBuffer corBoneDataBuffer;
-    QOpenGLBuffer corBoneIndexBuffer;
-    QOpenGLBuffer corBoneListSizeBuffer;
+    QOpenGLBuffer pointBoneDataBuffer;
+    QOpenGLBuffer pointBoneIndexBuffer;
+    QOpenGLBuffer pointBoneListSizeBuffer;
 
     std::unique_ptr<QOpenGLShaderProgram> prog;
     std::unique_ptr<QOpenGLShaderProgram> boneProg;

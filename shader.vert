@@ -6,9 +6,10 @@ const uint MAX_TRANSFORMATION_COUNT = 50;
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
-layout (location = 2) in vec4 weights[MAX_BONE_COUNT / 4];
-layout (location = 5) in uvec4 indices[MAX_BONE_COUNT / 4];
-layout (location = 8) in uint size;
+layout (location = 2) in vec3 cor;
+layout (location = 3) in vec4 weights[MAX_BONE_COUNT / 4];
+layout (location = 6) in uvec4 indices[MAX_BONE_COUNT / 4];
+layout (location = 9) in uint size;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -37,9 +38,9 @@ vec4 addQuat(vec4 p, vec4 q) {
     else return p - q;
 }
 
-vec3 rotate(vec3 p, vec4 q) {
+vec4 rotate(vec3 p, vec4 q) {
 	vec4 p_q = vec4(dot(p, q.yzw), q.x*p - cross(p, q.yzw));
-	return q.x*p_q.yzw + p_q.x*q.yzw + cross(q.yzw, p_q.yzw);
+	return vec4(q.x*p_q.yzw + p_q.x*q.yzw + cross(q.yzw, p_q.yzw), 0.0);
 }
 
 void main(void)
@@ -56,10 +57,8 @@ void main(void)
     }
 
     quat = normalize(quat);
-    vec3 v = rotate(aPos, quat);
-
     mat4 MVP = projectionMatrix * viewMatrix * modelMatrix; 
-    gl_Position = MVP * tMat * vec4(aPos, 1.0); 
+    gl_Position = MVP * (rotate(aPos - cor, quat) + tMat * vec4(cor, 1.0));
 
     normal = vec4(aNorm, 1.0);
 }
