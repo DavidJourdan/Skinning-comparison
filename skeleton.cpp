@@ -142,7 +142,7 @@ bool Skeleton::parseSkelFile(const std::string &file)
     edgeNb = num;
 
     transformations = std::vector<QMatrix4x4>(num);
-    quaternions = std::vector<QVector4D>(num, QVector4D(1, 0, 0, 0));
+    quaternions = std::vector<QVector4D>(num, QVector4D(0, 0, 0, 1));
 
     for(unsigned int i = 0 ; i < num ; i++) // read edges
     {

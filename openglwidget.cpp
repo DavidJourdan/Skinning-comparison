@@ -95,7 +95,7 @@ void OpenGLWidget::initializeGL()
     corBuffer.create();
     corBuffer.bind();
     std::vector<QVector3D> cors = std::vector<QVector3D>(vertices.size());
-    corBuffer.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
+    corBuffer.allocate(cors.data(), cors.size() * sizeof(QVector3D));
 
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(2);

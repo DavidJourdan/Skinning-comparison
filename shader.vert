@@ -39,8 +39,22 @@ vec4 addQuat(vec4 p, vec4 q) {
 }
 
 vec4 rotate(vec3 p, vec4 q) {
-	vec4 p_q = vec4(dot(p, q.yzw), q.x*p - cross(p, q.yzw));
-	return vec4(q.x*p_q.yzw + p_q.x*q.yzw + cross(q.yzw, p_q.yzw), 0.0);
+	vec4 p_q = vec4(q.w*p - cross(p, q.xyz), dot(p, q.xyz));
+	return vec4(q.w*p_q.xyz + p_q.w*q.xyz + cross(q.xyz, p_q.xyz), 0.0);
+}
+
+mat3 quatToMat(vec4 q) {
+	float cos = q.w;
+	float sin = length(q.xyz);
+	vec3 u = normalize(q.xyz);
+	vec3 v = vec3(-u.y, u.x, 0);
+	v = normalize(v);
+	vec3 w = normalize(cross(u, v));
+	mat3 P = mat3(u, v, w);
+	mat3 R = mat3(1, 0,    0,
+                  0, cos,  sin,
+                  0, -sin, cos);
+	return P*R*R*transpose(P);
 }
 
 void main(void)
@@ -55,9 +69,10 @@ void main(void)
         tMat += w * tArr[idx];
         quat = addQuat(w * qArr[idx], quat);
     }
-
     quat = normalize(quat);
-    mat4 MVP = projectionMatrix * viewMatrix * modelMatrix; 
+
+    mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+    // vec4 res = vec4(quatToMat(quat)*(aPos - cor), 0.0); // alternative using matrices
     gl_Position = MVP * (rotate(aPos - cor, quat) + tMat * vec4(cor, 1.0));
 
     normal = vec4(aNorm, 1.0);
