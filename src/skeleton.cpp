@@ -143,9 +143,8 @@ bool Skeleton::parseSkelFile(const std::string &file)
 
     transformations = std::vector<QMatrix4x4>(num);
     quaternions = std::vector<QVector4D>(num, QVector4D(0, 0, 0, 1));
-
-    transformationsDQNonDualPart = std::vector<QVector4D>(num);
-    transformationsDQDualPart = std::vector<QVector4D>(num);
+    transformationsDQNonDualPart = std::vector<QVector4D>(num, QVector4D(0, 0, 0, 1));
+    transformationsDQDualPart = std::vector<QVector4D>(num, QVector4D(0, 0, 0, 0));
 
     for(unsigned int i = 0 ; i < num ; i++) // read edges
     {
@@ -258,6 +257,13 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
     transform.translate(-articulations[mIndex]);
 
     QQuaternion quaternion = QQuaternion::fromAxisAndAngle(axis, angle);
+    DualQuaternion trans(QQuaternion(1, 0, 0, 0), 0.5*QQuaternion(0, articulations[mIndex]));
+    DualQuaternion transInv(QQuaternion(1, 0, 0, 0), 0.5* QQuaternion(0, -articulations[mIndex]));
+    QQuaternion rot = QQuaternion::fromAxisAndAngle(axis, angle).normalized();
+
+    DualQuaternion transfoDQ = (trans * rot) * transInv;
+
+    trans.normalize();
  
     // depth-first search in the skeleton tree
     std::vector<uint> stack;
@@ -274,9 +280,9 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
             quaternions[bIdx] = quat.toVector4D();
         }
 
-            DualQuaternion tr = DualQuaternion::transformMatrixToDQuat(transformations[bIdx]);
-            transformationsDQNonDualPart[bIdx] = tr.getNonDualPart().toVector4D();
-            transformationsDQDualPart[bIdx] = tr.getDualPart().toVector4D();
+            DualQuaternion dq = transfoDQ * DualQuaternion(QQuaternion(transformationsDQNonDualPart[bIdx]), QQuaternion(transformationsDQDualPart[bIdx]));
+            transformationsDQNonDualPart[bIdx] = dq.getNonDualPart().toVector4D();
+            transformationsDQDualPart[bIdx] = dq.getDualPart().toVector4D();
         }
 
         uint cIdx = bones[bIdx].child;
