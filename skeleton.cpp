@@ -142,7 +142,7 @@ bool Skeleton::parseSkelFile(const std::string &file)
     edgeNb = num;
 
     transformations = std::vector<QMatrix4x4>(num);
-    quaternions = std::vector<QQuaternion>(num);
+    quaternions = std::vector<QVector4D>(num);
 
     for(unsigned int i = 0 ; i < num ; i++) // read edges
     {
@@ -267,12 +267,12 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
         if(bIdx < edgeNb) // only the edge type has a transformation attached
         {
             transformations[bIdx] = transform * transformations[bIdx];
-            quaternions[bIdx] =  quaternion * quaternions[bIdx];
+            QQuaternion quat = quaternion * QQuaternion(quaternions[bIdx]);
+            quaternions[bIdx] = quat.toVector4D();
         }
 
         uint cIdx = bones[bIdx].child;
-        articulations[cIdx] = quaternion.rotatedVector(articulations[cIdx] - articulations[mIndex])
-            + articulations[mIndex];
+        articulations[cIdx] = transform * articulations[cIdx]; 
 
         for (uint i = 0; i < bones[bIdx].successorNb; i++) {
             stack.push_back(bones[bIdx].successors[i]);

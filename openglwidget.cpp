@@ -293,7 +293,7 @@ void OpenGLWidget::paintGL()
     pointsProg->setUniformValue("projectionMatrix", projectionMatrix);
 
     const auto& transformations = mesh.getTransformations();
-    prog->setUniformValueArray("tArr", transformations.data(), transformations.size());
+    pointsProg->setUniformValueArray("tArr", transformations.data(), transformations.size());
 
     pointBuffer.bind();
     glPointSize((GLfloat)5);
@@ -311,7 +311,9 @@ void OpenGLWidget::paintGL()
     prog->setUniformValue("viewMatrix", viewMatrix);
     prog->setUniformValue("projectionMatrix", projectionMatrix);
 
+    const std::vector<QVector4D> &quaternions = mesh.getQuaternions();
     prog->setUniformValueArray("tArr", transformations.data(), transformations.size());
+    prog->setUniformValueArray("qArr", quaternions.data(), quaternions.size());
 
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

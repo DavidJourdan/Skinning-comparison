@@ -15,6 +15,7 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
 uniform mat4 tArr[MAX_TRANSFORMATION_COUNT];
+uniform vec4 qArr[MAX_TRANSFORMATION_COUNT];
 
 out vec4 normal;
 
@@ -30,17 +31,35 @@ uint getIndex(uint i) {
     return indices[q][r];
 }
 
+vec4 addQuat(vec4 p, vec4 q) {
+    if(dot(p, q) >= 0)
+        return p + q;
+    else return p - q;
+}
+
+vec3 rotate(vec3 p, vec4 q) {
+	vec4 p_q = vec4(dot(p, q.yzw), q.x*p - cross(p, q.yzw));
+	return q.x*p_q.yzw + p_q.x*q.yzw + cross(q.yzw, p_q.yzw);
+}
+
 void main(void)
 {
     mat4 tMat = mat4(0.0);
+
+    vec4 quat = vec4(0.0);
 
     for (uint i = 0; i < size; ++i) {
         float w = getWeight(i);
         uint idx = getIndex(i);
         tMat += w * tArr[idx];
+        quat = addQuat(w * qArr[idx], quat);
     }
 
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * tMat * vec4(aPos, 1.0);
+    quat = normalize(quat);
+    vec3 v = rotate(aPos, quat);
+
+    mat4 MVP = projectionMatrix * viewMatrix * modelMatrix; 
+    gl_Position = MVP * tMat * vec4(aPos, 1.0); 
 
     normal = vec4(aNorm, 1.0);
 }

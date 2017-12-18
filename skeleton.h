@@ -50,6 +50,7 @@ public:
     unsigned **getBoneIndices() const { return boneInd; }
 
     const std::vector<QMatrix4x4> &getTransformations() const { return transformations; }
+    const std::vector<QVector4D> &getQuaternions() const { return quaternions; }
 
 private:
     float **weights;
@@ -59,7 +60,7 @@ private:
     std::vector<QVector3D> articulations;
     std::vector<Bone> bones;
     std::vector<QMatrix4x4> transformations;
-    std::vector<QQuaternion> quaternions;
+    std::vector<QVector4D> quaternions;
 };
 
 #endif // SKELETON_H
