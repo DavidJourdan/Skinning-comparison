@@ -6,6 +6,7 @@
 #include <QMatrix3x3>
 #include <QGenericMatrix>
 #include <QQuaternion>
+#include <iostream>
 
 class DualQuaternion
 {
@@ -16,14 +17,20 @@ public:
 
     static DualQuaternion transformMatrixToDQuat(QMatrix4x4 mat);
 
-    static DualQuaternion transformDQFromRotAndTransl(DualQuaternion t, QQuaternion q);
-
     QQuaternion getNonDualPart() const;
     QQuaternion getDualPart() const;
+
+    DualQuaternion& operator *=(const QQuaternion& other);
+    DualQuaternion& operator *=(const DualQuaternion& other);
+
+    void normalize();
 
 private:
     QQuaternion nonDualPart;
     QQuaternion dualPart;
 };
+
+DualQuaternion operator *(DualQuaternion left, const QQuaternion& right);
+DualQuaternion operator *(DualQuaternion left, const DualQuaternion& right);
 
 #endif // DUALQUATERNION_HPP

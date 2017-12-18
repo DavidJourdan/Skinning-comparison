@@ -38,30 +38,34 @@ void main(void)
     vec4 b0 = vec4(0.0);
     vec4 bEps = vec4(0.0);
 
-    s[0] = 1;
+    uint idx0 = getIndex(0);
+    s[idx0] = 1;
 
     for (uint i = 1; i < size; ++i) {
-        if(dot(dqTrNonDual[0], dqTrNonDual[i]) >= 0)
-            s[i] = 1;
+        uint idx = getIndex(i);
+
+        if(dot(dqTrNonDual[0], dqTrNonDual[idx]) >= 0)
+            s[idx] = 1;
         else
-            s[i] = -1;
+            s[idx] = -1;
     }
 
     for (uint i = 0; i < size; ++i) {
         float w = getWeight(i);
         uint idx = getIndex(i);
 
-        b0 += w * s[i] * dqTrNonDual[idx];
-        bEps += w  * dqTrDual[idx];
+        b0 += w * s[idx] * dqTrNonDual[idx];
+        bEps += w * s[idx] * dqTrDual[idx];
     }
 
-    b0 = normalize(b0);
-    bEps = normalize(bEps);
+    float b0NormInv = 1.0/(length(b0));
+    b0 = b0NormInv * b0;
+    bEps = b0NormInv * bEps;
 
-    float a0 = b0.x;
-    vec3 d0 = b0.yzw;
-    float aEps = bEps.x;
-    vec3 dEps = bEps.yzw;
+    float a0 = b0.w;
+    vec3 d0 = b0.xyz;
+    float aEps = bEps.w;
+    vec3 dEps = bEps.xyz;
 
     vec3 vRes = aPos + 2.0 * cross(d0, cross(d0, aPos) + a0*aPos) + 2.0 *(a0*dEps - aEps*d0 + cross(d0, dEps));
     vec3 nRes = aNorm + 2.0 * cross(d0, cross(d0, aNorm) + a0*aNorm);
