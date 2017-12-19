@@ -39,23 +39,23 @@ void main(void)
     vec4 bEps = vec4(0.0);
 
     uint idx0 = getIndex(0);
-    s[idx0] = 1;
+    s[0] = 1;
 
     for (uint i = 1; i < size; ++i) {
         uint idx = getIndex(i);
 
-        if(dot(dqTrNonDual[0], dqTrNonDual[idx]) >= 0)
-            s[idx] = 1;
+        if(dot(dqTrNonDual[idx0], dqTrNonDual[idx]) >= 0)
+            s[i] = 0;
         else
-            s[idx] = -1;
+            s[i] = 1;
     }
 
     for (uint i = 0; i < size; ++i) {
         float w = getWeight(i);
         uint idx = getIndex(i);
 
-        b0 += w * s[idx] * dqTrNonDual[idx];
-        bEps += w * s[idx] * dqTrDual[idx];
+        b0 += w * pow(-1, s[i]) * dqTrNonDual[idx];
+        bEps += w * pow(-1, s[i]) * dqTrDual[idx];
     }
 
     float b0NormInv = 1.0/(length(b0));
