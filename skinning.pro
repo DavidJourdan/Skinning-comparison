@@ -43,10 +43,14 @@ macx: {
 }
 
 DISTFILES += \
-    shaders/shader.vert \
-    shaders/shader.frag \
+    shaders/lbs_shader.vert \
+    shaders/lbs_shader.frag \
     shaders/boneshader.frag \
-    shaders/boneshader.vert
+    shaders/boneshader.vert \
+    shaders/optimized_cors.frag \
+    shaders/optimized_cors.vert \
+    shaders/pointshader.frag \
+    shaders/pointshader.vert
 
 RESOURCES += \
     shaders/shaders.qrc

@@ -25,7 +25,8 @@ public:
     std::vector<QVector3D>& getNormals() {return normals;}
     std::vector<QVector3D> getSkelLines() { return skeleton.getSkelLines(); }
     size_t getEdgeNumber() {return skeleton.getEdgeNumber();}
-    std::vector<QVector3D> computeCoRs(void);
+    const std::vector<QVector3D> &computeCoRs(void);
+    const std::vector<QVector3D> &getCoRs(void) { return CoRs;};
     QVector3D computeCoR(uint i);
     uint getBoneSelected() const {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getEdgeNumber();}
@@ -45,6 +46,7 @@ public:
     float **getWeights() { return skeleton.getWeights(); }
     unsigned **getBoneIndices() { return skeleton.getBoneIndices(); }
     const std::vector<QMatrix4x4> &getTransformations() const { return skeleton.getTransformations(); }
+    const std::vector<QVector4D> &getQuaternions() const { return skeleton.getQuaternions(); }
 
 private:
     std::vector<QVector3D> vertices;

@@ -16,7 +16,9 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
     lineIndices(QOpenGLBuffer::IndexBuffer),
     lineColors(QOpenGLBuffer::VertexBuffer),
     pointBuffer(QOpenGLBuffer::VertexBuffer),
-    pointColors(QOpenGLBuffer::VertexBuffer),
+    pointBoneDataBuffer(QOpenGLBuffer::VertexBuffer),
+    pointBoneIndexBuffer(QOpenGLBuffer::VertexBuffer),
+    pointBoneListSizeBuffer(QOpenGLBuffer::VertexBuffer),
     leftButtonPressed(false),
     rightButtonPressed(false),
     boneSelActiv(false)
@@ -90,6 +92,14 @@ void OpenGLWidget::initializeGL()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
 
+    corBuffer.create();
+    corBuffer.bind();
+    std::vector<QVector3D> cors = std::vector<QVector3D>(vertices.size());
+    corBuffer.allocate(cors.data(), cors.size() * sizeof(QVector3D));
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(2);
+
     constexpr size_t MAX_BONE_COUNT = 12;
     auto boneData = std::vector<GLfloat>(MAX_BONE_COUNT * vertices.size());
     auto boneIndices = std::vector<GLuint>(MAX_BONE_COUNT * vertices.size());
@@ -99,7 +109,7 @@ void OpenGLWidget::initializeGL()
     const auto pBoneIndices = mesh.getBoneIndices();
 
     for (size_t i = 0; i < vertices.size(); ++i) {
-        for (size_t j = 0; weights[i][j] != -1.0f; ++j) {
+        for (size_t j = 0; weights[i][j] > 0; ++j) {
             const auto idx = i * MAX_BONE_COUNT + j;
             boneData[idx] = weights[i][j];
             boneIndices[idx] = pBoneIndices[i][j];
@@ -114,8 +124,8 @@ void OpenGLWidget::initializeGL()
     boneDataBuffer.allocate(boneData.data(), sizeof(GLfloat) * vertices.size() * MAX_BONE_COUNT);
 
     for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
-        glVertexAttribPointer(2 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(2 + i);
+        glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(3 + i);
     }
 
     boneIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
@@ -125,8 +135,8 @@ void OpenGLWidget::initializeGL()
     boneIndexBuffer.allocate(boneIndices.data(), sizeof(GLuint) * vertices.size() * MAX_BONE_COUNT);
 
     for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
-        glVertexAttribIPointer(2 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
-        glEnableVertexAttribArray(2 + MAX_BONE_COUNT / 4 + i);
+        glVertexAttribIPointer(3 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
+        glEnableVertexAttribArray(3 + MAX_BONE_COUNT / 4 + i);
     }
 
     boneListSizeBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
@@ -135,8 +145,8 @@ void OpenGLWidget::initializeGL()
 
     boneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
 
-    glVertexAttribIPointer(2 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(2 + (2 * MAX_BONE_COUNT) / 4);
+    glVertexAttribIPointer(3 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(3 + (2 * MAX_BONE_COUNT) / 4);
 
     ebo.create();
     ebo.bind();
@@ -200,27 +210,47 @@ void OpenGLWidget::initializeGL()
 
     pointBuffer.create();
     pointBuffer.bind();
-    std::vector<QVector3D> points(vertices.size(), QVector3D(-10, -10, -10));
+    std::vector<QVector3D> points(vertices.size(), QVector3D(0, 0, 10));
     pointBuffer.allocate(points.data(), points.size() * sizeof(QVector3D));
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
-    pointColors.create();
-    pointColors.bind();
-    std::vector<QVector4D> ptColors(points.size());
 
-    for(uint i = 0 ; i < points.size() ; i++) {
-        ptColors[i] = QVector4D(0.0, 0.0, 0.0, 0.0); // invisible for now
+    pointBoneDataBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    pointBoneDataBuffer.create();
+    pointBoneDataBuffer.bind();
+
+    pointBoneDataBuffer.allocate(boneData.data(), sizeof(GLfloat) * vertices.size() * MAX_BONE_COUNT);
+
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribPointer(1 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1 + i);
     }
 
-    pointColors.allocate(ptColors.data(), ptColors.size() * sizeof(QVector4D));
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(1);
+    pointBoneIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    pointBoneIndexBuffer.create();
+    pointBoneIndexBuffer.bind();
+
+    pointBoneIndexBuffer.allocate(boneIndices.data(), sizeof(GLuint) * vertices.size() * MAX_BONE_COUNT);
+
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribIPointer(1 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
+        glEnableVertexAttribArray(1 + MAX_BONE_COUNT / 4 + i);
+    }
+
+    pointBoneListSizeBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+    pointBoneListSizeBuffer.create();
+    pointBoneListSizeBuffer.bind();
+
+    pointBoneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
+
+    glVertexAttribIPointer(1 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(1 + (2 * MAX_BONE_COUNT) / 4);
     
     prog = std::make_unique<QOpenGLShaderProgram>(this);
-    prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/shader.vert");
-    prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
+    prog->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/optimized_cors.vert");
+    prog->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/optimized_cors.frag");
     prog->link();
 
     boneProg = std::make_unique<QOpenGLShaderProgram>(this);
@@ -229,8 +259,8 @@ void OpenGLWidget::initializeGL()
     boneProg->link();
 
     pointsProg = std::make_unique<QOpenGLShaderProgram>(this);
-    pointsProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");
-    pointsProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/boneshader.frag");
+    pointsProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/pointshader.vert");
+    pointsProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/pointshader.frag");
     pointsProg->link();
 
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
@@ -270,6 +300,9 @@ void OpenGLWidget::paintGL()
     pointsProg->setUniformValue("viewMatrix", viewMatrix);
     pointsProg->setUniformValue("projectionMatrix", projectionMatrix);
 
+    const auto& transformations = mesh.getTransformations();
+    pointsProg->setUniformValueArray("tArr", transformations.data(), transformations.size());
+
     pointBuffer.bind();
     glPointSize((GLfloat)5);
     glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
@@ -286,8 +319,9 @@ void OpenGLWidget::paintGL()
     prog->setUniformValue("viewMatrix", viewMatrix);
     prog->setUniformValue("projectionMatrix", projectionMatrix);
 
-    const auto& transformations = mesh.getTransformations();
+    const std::vector<QVector4D> &quaternions = mesh.getQuaternions();
     prog->setUniformValueArray("tArr", transformations.data(), transformations.size());
+    prog->setUniformValueArray("qArr", quaternions.data(), quaternions.size());
 
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -301,8 +335,6 @@ void OpenGLWidget::paintGL()
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
 
-
-//    qDebug() << prevPos;
     if(leftButtonPressed)
     {
         auto pos = screenToViewport(event->localPos());
@@ -538,8 +570,7 @@ void OpenGLWidget::computeCoRs() {
     pointBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
     pointBuffer.release();
 
-    std::vector<QVector4D> colors(centers.size(), QVector4D(1.0, 0.0, 0.0, 0.7));
-    pointColors.bind();
-    pointColors.write(0, colors.data(), colors.size()*sizeof(QVector4D));
-    pointColors.release();
+    corBuffer.bind();
+    corBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
+    corBuffer.release();
 }
