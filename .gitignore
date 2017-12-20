@@ -12,3 +12,6 @@ moc_*.h
 .DS_Store
 
 skinning
+
+models/*
+tmp/*
