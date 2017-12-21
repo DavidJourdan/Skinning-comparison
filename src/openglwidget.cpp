@@ -487,13 +487,6 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         }
         break;
 
-    case Qt::Key_A: // Move _a_rticulation.
-        if (boneSelActiv) {
-            editBone(mesh.getBoneSelected());
-
-        }
-        break;
-
     case Qt::Key_X: // Rotate counterclockwise.
         moveBone(30.0);
         break;
