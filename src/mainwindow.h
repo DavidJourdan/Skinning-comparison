@@ -18,6 +18,7 @@ private:
 
     void setupMiscellaneous();
     void setupView();
+    void setupSkeleton();
 };
 
 #endif // MAINWINDOW_H

@@ -446,26 +446,7 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         window->close();
         break;
 
-    case Qt::Key_R: //reset camera
-        break;
-
-    case Qt::Key_Space:
-        boneSelActiv = !boneSelActiv;
-        if(boneSelActiv)
-            showBoneActiv();
-        else
-            noBoneActiv();
-        update();
-        break;
-
     case Qt::Key_Left:
-        if(boneSelActiv)
-        {
-            mesh.setBoneSelected(mesh.getBoneSelected()-1);
-            noBoneActiv();
-            showBoneActiv();
-            update();
-        }
         break;
 
     case Qt::Key_Right:
@@ -616,4 +597,25 @@ void OpenGLWidget::resetCamera()
     viewMatrix.setToIdentity();
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
     update();
+}
+
+void OpenGLWidget::toggleBoneActiv()
+{
+    boneSelActiv = !boneSelActiv;
+    if(boneSelActiv)
+        showBoneActiv();
+    else
+        noBoneActiv();
+    update();
+}
+
+void OpenGLWidget::selectPreviousBone()
+{
+    if(boneSelActiv)
+    {
+        mesh.setBoneSelected(mesh.getBoneSelected()-1);
+        noBoneActiv();
+        showBoneActiv();
+        update();
+    }
 }

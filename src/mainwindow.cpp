@@ -46,6 +46,8 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 
     setupView();
 
+    setupSkeleton();
+
     setupMiscellaneous();
 }
 
@@ -70,10 +72,29 @@ void MainWindow::setupView()
 {
     auto viewMenu = menuBar()->addMenu(tr("&Affichage"));
 
-    auto resetCamAction = new QAction { tr("Vue initiale.") };
+    auto resetCamAction = new QAction { tr("Vue initiale") };
     resetCamAction->setShortcut(QKeySequence(tr("r")));
 
     connect(resetCamAction, &QAction::triggered, glWidget, &OpenGLWidget::resetCamera);
 
     viewMenu->addAction(resetCamAction);
+
+    auto toggleBoneAction = new QAction { tr("Afficher l'os sélectionné") };
+    toggleBoneAction->setShortcut(QKeySequence(tr(" ")));
+
+    connect(toggleBoneAction, &QAction::triggered, glWidget, &OpenGLWidget::toggleBoneActiv);
+
+    viewMenu->addAction(toggleBoneAction);
+}
+
+void MainWindow::setupSkeleton()
+{
+    auto menu = menuBar()->addMenu(tr("&Squelette"));
+
+    auto selPrevBone = new QAction { tr("Sélectionner l'os précédent") };
+    selPrevBone->setShortcut(Qt::Key_Left);
+
+    connect(selPrevBone, &QAction::triggered, glWidget, &OpenGLWidget::selectPreviousBone);
+
+    menu->addAction(selPrevBone);
 }

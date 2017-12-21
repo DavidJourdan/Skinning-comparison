@@ -33,6 +33,8 @@ public slots:
     void deformWithOptimizedCors();
     void computeCoRs();
     void resetCamera();
+    void toggleBoneActiv();
+    void selectPreviousBone();
 
 protected:
     void initializeGL();
