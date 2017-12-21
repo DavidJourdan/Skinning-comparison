@@ -27,6 +27,8 @@ public:
 public slots:
     void editBone(size_t i);
     void moveBone(float angle);
+    void deformWithLbs() { curProg = &lbsProg; }
+    void deformWithOptimizedCors() { curProg = &optimizedCorsProg; }
 
 protected:
     void initializeGL();
