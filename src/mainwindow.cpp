@@ -44,6 +44,8 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 
     statusBar()->addWidget(deformLabel);
 
+    setupView();
+
     setupMiscellaneous();
 }
 
@@ -62,4 +64,16 @@ void MainWindow::setupMiscellaneous()
     connect(corAction, &QAction::triggered, glWidget, &OpenGLWidget::computeCoRs);
 
     miscMenu->addAction(corAction);
+}
+
+void MainWindow::setupView()
+{
+    auto viewMenu = menuBar()->addMenu(tr("&Affichage"));
+
+    auto resetCamAction = new QAction { tr("Vue initiale.") };
+    resetCamAction->setShortcut(QKeySequence(tr("r")));
+
+    connect(resetCamAction, &QAction::triggered, glWidget, &OpenGLWidget::resetCamera);
+
+    viewMenu->addAction(resetCamAction);
 }

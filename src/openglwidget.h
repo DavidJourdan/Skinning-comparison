@@ -32,6 +32,7 @@ public slots:
     void deformWithDqs() { curProg = &dqsProg; }
     void deformWithOptimizedCors();
     void computeCoRs();
+    void resetCamera();
 
 protected:
     void initializeGL();

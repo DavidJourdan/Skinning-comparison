@@ -447,9 +447,6 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         break;
 
     case Qt::Key_R: //reset camera
-        viewMatrix.setToIdentity();
-        viewMatrix.translate(0.0f, 0.0f, -10.0f);
-        update();
         break;
 
     case Qt::Key_Space:
@@ -612,4 +609,11 @@ void OpenGLWidget::computeCoRs() {
     corBuffer.release();
 
     corsComputed = true;
+}
+
+void OpenGLWidget::resetCamera()
+{
+    viewMatrix.setToIdentity();
+    viewMatrix.translate(0.0f, 0.0f, -10.0f);
+    update();
 }
