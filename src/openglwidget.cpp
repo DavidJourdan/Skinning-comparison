@@ -2,6 +2,7 @@
 
 #include <QVector3D>
 #include <math.h>
+#include <QMessageBox>
 
 OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidget(parent),
     window(parent),
@@ -63,6 +64,18 @@ void OpenGLWidget::moveBone(float angle)
         updateSkeleton();
         update();
     }
+}
+
+void OpenGLWidget::deformWithOptimizedCors() {
+    auto ret = QMessageBox::question(this, "Calcul des centres de rotation",
+                                     "La méthode de l'article requiert un calcul "
+                                     "qui peut prendre un moment. Calculer maintenant ?"
+                                     );
+    if (ret == QMessageBox::Yes) {
+        computeCoRs();
+    }
+
+    curProg = &optimizedCorsProg;
 }
 
 void OpenGLWidget::initializeGL()
@@ -308,7 +321,7 @@ void OpenGLWidget::paintGL()
     linevao.release();
     boneProg.release();
 
-    if (curProg == &optimizedCorsProg) {
+    if (curProg == &optimizedCorsProg && corsComputed) {
         pointsProg.bind();
         pointvao.bind();
 
@@ -601,4 +614,6 @@ void OpenGLWidget::computeCoRs() {
     corBuffer.bind();
     corBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
     corBuffer.release();
+
+    corsComputed = true;
 }
