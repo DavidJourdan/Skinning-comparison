@@ -278,7 +278,6 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
             transformations[bIdx] = transform * transformations[bIdx];
             QQuaternion quat = quaternion * QQuaternion(quaternions[bIdx]);
             quaternions[bIdx] = quat.toVector4D();
-        }
 
             DualQuaternion dq = transfoDQ * DualQuaternion(QQuaternion(transformationsDQNonDualPart[bIdx]), QQuaternion(transformationsDQDualPart[bIdx]));
             transformationsDQNonDualPart[bIdx] = dq.getNonDualPart().toVector4D();

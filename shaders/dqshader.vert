@@ -6,9 +6,10 @@ const uint MAX_TRANSFORMATION_COUNT = 50;
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNorm;
-layout (location = 2) in vec4 weights[MAX_BONE_COUNT / 4];
-layout (location = 5) in uvec4 indices[MAX_BONE_COUNT / 4];
-layout (location = 8) in uint size;
+layout (location = 2) in vec3 cor;
+layout (location = 3) in vec4 weights[MAX_BONE_COUNT / 4];
+layout (location = 6) in uvec4 indices[MAX_BONE_COUNT / 4];
+layout (location = 9) in uint size;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;

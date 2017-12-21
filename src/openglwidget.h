@@ -30,6 +30,7 @@ public slots:
     void moveBone(float angle);
     void deformWithLbs() { curProg = &lbsProg; }
     void deformWithOptimizedCors() { curProg = &optimizedCorsProg; }
+    void deformWithDqs() { curProg = &dqsProg; }
 
 protected:
     void initializeGL();

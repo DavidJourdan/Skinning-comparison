@@ -22,6 +22,7 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
     curProg { nullptr },
     lbsProg { this },
     optimizedCorsProg { this },
+    dqsProg { this },
     boneProg { this },
     pointsProg { this },
     leftButtonPressed(false),
@@ -259,6 +260,10 @@ void OpenGLWidget::initializeGL()
     lbsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/lbs_shader.frag");
     lbsProg.link();
 
+    dqsProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/dqshader.vert");
+    dqsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/lbs_shader.frag");
+    dqsProg.link();
+
     optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/optimized_cors.vert");
     optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/optimized_cors.frag");
     optimizedCorsProg.link();
@@ -272,11 +277,6 @@ void OpenGLWidget::initializeGL()
     pointsProg.link();
 
     curProg = &lbsProg;
-
-    dqsProg = std::make_unique<QOpenGLShaderProgram>(this);
-    dqsProg->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/dqshader.vert");
-    dqsProg->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
-    dqsProg->link();
 
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
 }
@@ -336,12 +336,13 @@ void OpenGLWidget::paintGL()
     curProg->setUniformValue("viewMatrix", viewMatrix);
     curProg->setUniformValue("projectionMatrix", projectionMatrix);
 
+    const auto &transformations = mesh.getTransformations();
     const std::vector<QVector4D> &quaternions = mesh.getQuaternions();
     curProg->setUniformValueArray("tArr", transformations.data(), transformations.size());
     curProg->setUniformValueArray("qArr", quaternions.data(), quaternions.size());
 
     const auto& dualPart = mesh.getDQuatTransformationsDualPart();
-    dqsProg->setUniformValueArray("dqTrDual", dualPart.data(), dualPart.size());
+    dqsProg.setUniformValueArray("dqTrDual", dualPart.data(), dualPart.size());
 
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, meshMode);
