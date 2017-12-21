@@ -342,7 +342,9 @@ void OpenGLWidget::paintGL()
     curProg->setUniformValueArray("qArr", quaternions.data(), quaternions.size());
 
     const auto& dualPart = mesh.getDQuatTransformationsDualPart();
-    dqsProg.setUniformValueArray("dqTrDual", dualPart.data(), dualPart.size());
+    const auto &nonDualPart = mesh.getDQuatTransformationsNonDualPart();
+    curProg->setUniformValueArray("dqTrDual", dualPart.data(), dualPart.size());
+    curProg->setUniformValueArray("dqTrNonDual", nonDualPart.data(), nonDualPart.size());
 
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, meshMode);
