@@ -495,10 +495,6 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         moveBone(-30.0);
         break;
 
-    case Qt::Key_C:
-        computeCoRs();
-        break;
-
     case Qt::Key_M:
         meshMode = (meshMode == GL_FILL)? GL_LINE : GL_FILL;
         update();

@@ -31,6 +31,7 @@ public slots:
     void deformWithLbs() { curProg = &lbsProg; }
     void deformWithDqs() { curProg = &dqsProg; }
     void deformWithOptimizedCors();
+    void computeCoRs();
 
 protected:
     void initializeGL();
@@ -96,7 +97,6 @@ private:
     QPointF screenToViewport(QPointF screenPos);
 
     void updateSkeleton();
-    void computeCoRs();
     bool corsComputed { false };
 
     GLenum meshMode;

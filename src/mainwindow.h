@@ -15,6 +15,8 @@ public:
 
 private:
     OpenGLWidget *glWidget;
+
+    void setupMiscellaneous();
 };
 
 #endif // MAINWINDOW_H

@@ -43,9 +43,23 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
     });
 
     statusBar()->addWidget(deformLabel);
+
+    setupMiscellaneous();
 }
 
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::setupMiscellaneous()
+{
+    auto miscMenu = menuBar()->addMenu(tr("&Divers"));
+
+    auto corAction = new QAction { tr("&Calculer les centres de rotation") };
+    corAction->setShortcut(QKeySequence(tr("c")));
+
+    connect(corAction, &QAction::triggered, glWidget, &OpenGLWidget::computeCoRs);
+
+    miscMenu->addAction(corAction);
 }
