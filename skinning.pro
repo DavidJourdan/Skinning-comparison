@@ -25,13 +25,15 @@ SOURCES += src/main.cpp\
         src/mainwindow.cpp \
     src/openglwidget.cpp \
     src/mesh.cpp \
-    src/skeleton.cpp
+    src/skeleton.cpp \
+    src/dualquaternion.cpp
 
 HEADERS  += src/mainwindow.h \
     src/openglwidget.h \
     src/mesh.h \
     src/skeleton.h \
-    src/config.h
+    src/config.h \
+    src/dualquaternion.hpp
 
 unix:!macx {
     LIBS += -lassimp
@@ -51,6 +53,7 @@ DISTFILES += \
     shaders/optimized_cors.vert \
     shaders/pointshader.frag \
     shaders/pointshader.vert \
+    shaders/dqshader.vert \
     shaders/dqshader.vert
 
 RESOURCES += \

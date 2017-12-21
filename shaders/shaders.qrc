@@ -8,5 +8,6 @@
         <file>pointshader.vert</file>
         <file>optimized_cors.frag</file>
         <file>optimized_cors.vert</file>
+        <file>dqshader.vert</file>
     </qresource>
 </RCC>
