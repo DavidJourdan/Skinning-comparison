@@ -67,12 +67,15 @@ void OpenGLWidget::moveBone(float angle)
 }
 
 void OpenGLWidget::deformWithOptimizedCors() {
-    auto ret = QMessageBox::question(this, "Calcul des centres de rotation",
-                                     "La méthode de l'article requiert un calcul "
-                                     "qui peut prendre un moment. Calculer maintenant ?"
-                                     );
-    if (ret == QMessageBox::Yes) {
-        computeCoRs();
+
+    if (!corsComputed) {
+        auto ret = QMessageBox::question(this, "Calcul des centres de rotation",
+                                         "La méthode de l'article requiert un calcul "
+                                         "qui peut prendre un moment. Calculer maintenant ?"
+                                         );
+        if (ret == QMessageBox::Yes) {
+            computeCoRs();
+        }
     }
 
     curProg = &optimizedCorsProg;
