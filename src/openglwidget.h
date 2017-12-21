@@ -71,7 +71,10 @@ private:
     QOpenGLBuffer pointBoneIndexBuffer;
     QOpenGLBuffer pointBoneListSizeBuffer;
 
-    QOpenGLShaderProgram prog;
+    QOpenGLShaderProgram *curProg;
+
+    QOpenGLShaderProgram lbsProg;
+    QOpenGLShaderProgram optimizedCorsProg;
     QOpenGLShaderProgram boneProg;
     QOpenGLShaderProgram pointsProg;
 

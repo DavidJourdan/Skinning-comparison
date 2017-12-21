@@ -19,7 +19,9 @@ OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidge
     pointBoneDataBuffer(QOpenGLBuffer::VertexBuffer),
     pointBoneIndexBuffer(QOpenGLBuffer::VertexBuffer),
     pointBoneListSizeBuffer(QOpenGLBuffer::VertexBuffer),
-    prog { this },
+    curProg { nullptr },
+    lbsProg { this },
+    optimizedCorsProg { this },
     boneProg { this },
     pointsProg { this },
     leftButtonPressed(false),
@@ -250,10 +252,14 @@ void OpenGLWidget::initializeGL()
 
     glVertexAttribIPointer(1 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(1 + (2 * MAX_BONE_COUNT) / 4);
-    
-    prog.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/optimized_cors.vert");
-    prog.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/optimized_cors.frag");
-    prog.link();
+
+    lbsProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/lbs_shader.vert");
+    lbsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/lbs_shader.frag");
+    lbsProg.link();
+
+    optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/optimized_cors.vert");
+    optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/optimized_cors.frag");
+    optimizedCorsProg.link();
 
     boneProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");
     boneProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/boneshader.frag");
@@ -262,6 +268,8 @@ void OpenGLWidget::initializeGL()
     pointsProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/pointshader.vert");
     pointsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/pointshader.frag");
     pointsProg.link();
+
+    curProg = &lbsProg;
 
     viewMatrix.translate(0.0f, 0.0f, -10.0f);
 }
@@ -312,16 +320,16 @@ void OpenGLWidget::paintGL()
     boneProg.release();
 
 
-    prog.bind();
+    curProg->bind();
     vao.bind();
 
-    prog.setUniformValue("modelMatrix", modelMatrix);
-    prog.setUniformValue("viewMatrix", viewMatrix);
-    prog.setUniformValue("projectionMatrix", projectionMatrix);
+    curProg->setUniformValue("modelMatrix", modelMatrix);
+    curProg->setUniformValue("viewMatrix", viewMatrix);
+    curProg->setUniformValue("projectionMatrix", projectionMatrix);
 
     const std::vector<QVector4D> &quaternions = mesh.getQuaternions();
-    prog.setUniformValueArray("tArr", transformations.data(), transformations.size());
-    prog.setUniformValueArray("qArr", quaternions.data(), quaternions.size());
+    curProg->setUniformValueArray("tArr", transformations.data(), transformations.size());
+    curProg->setUniformValueArray("qArr", quaternions.data(), quaternions.size());
 
     ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -329,7 +337,7 @@ void OpenGLWidget::paintGL()
     glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
     ebo.release();
     vao.release();
-    prog.release();
+    curProg->release();
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
