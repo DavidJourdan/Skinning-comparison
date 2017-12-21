@@ -257,6 +257,7 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
     transform.translate(-articulations[mIndex]);
 
     QQuaternion quaternion = QQuaternion::fromAxisAndAngle(axis, angle);
+
     DualQuaternion trans(QQuaternion(1, 0, 0, 0), 0.5*QQuaternion(0, articulations[mIndex]));
     DualQuaternion transInv(QQuaternion(1, 0, 0, 0), 0.5* QQuaternion(0, -articulations[mIndex]));
     QQuaternion rot = QQuaternion::fromAxisAndAngle(axis, angle).normalized();

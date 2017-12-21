@@ -606,6 +606,10 @@ void OpenGLWidget::noBoneActiv()
 }
 
 void OpenGLWidget::computeCoRs() {
+    if (corsComputed) {
+        return;
+    }
+
     std::vector<QVector3D> centers = mesh.computeCoRs();
     pointBuffer.bind();
     pointBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
