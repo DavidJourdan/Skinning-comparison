@@ -71,9 +71,9 @@ private:
     QOpenGLBuffer pointBoneIndexBuffer;
     QOpenGLBuffer pointBoneListSizeBuffer;
 
-    std::unique_ptr<QOpenGLShaderProgram> prog;
-    std::unique_ptr<QOpenGLShaderProgram> boneProg;
-    std::unique_ptr<QOpenGLShaderProgram> pointsProg;
+    QOpenGLShaderProgram prog;
+    QOpenGLShaderProgram boneProg;
+    QOpenGLShaderProgram pointsProg;
 
     QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
