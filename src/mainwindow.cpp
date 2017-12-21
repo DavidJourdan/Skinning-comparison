@@ -4,6 +4,8 @@
 #include <QDir>
 #include <QAction>
 #include <QMenuBar>
+#include <QStatusBar>
+#include <QLabel>
 
 MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { parent }
 {
@@ -24,6 +26,23 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
     deformMenu->addAction(lbsAction);
     deformMenu->addAction(dqsAction);
     deformMenu->addAction(optimizedCorsAction);
+
+    auto deformLabel = new QLabel { this };
+    deformLabel->setText("Linear blend skinning");
+
+    connect(lbsAction, &QAction::triggered, [=] {
+        deformLabel->setText("Linear blend skinning");
+    });
+
+    connect(dqsAction, &QAction::triggered, [=] {
+        deformLabel->setText("Dual quaternion skinning");
+    });
+
+    connect(optimizedCorsAction, &QAction::triggered, [=] {
+        deformLabel->setText("Méthode de l'article");
+    });
+
+    statusBar()->addWidget(deformLabel);
 }
 
 MainWindow::~MainWindow()
