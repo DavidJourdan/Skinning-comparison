@@ -54,8 +54,8 @@ public:
     const std::vector<QMatrix4x4> &getTransformations() const { return transformations; }
     const std::vector<QVector4D> &getQuaternions() const { return quaternions; }
 
-    const std::vector<QVector4D> &getDQuatTransormationsNonDualPart() const {return transformationsDQNonDualPart;}
-    const std::vector<QVector4D> &getDQuatTransormationsDualPart() const {return transformationsDQDualPart;}
+    const std::vector<QVector4D> &getDQuatTransformationsNonDualPart() const {return transformationsDQNonDualPart;}
+    const std::vector<QVector4D> &getDQuatTransformationsDualPart() const {return transformationsDQDualPart;}
 
 private:
     float **weights;
