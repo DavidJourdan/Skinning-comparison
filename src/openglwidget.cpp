@@ -301,23 +301,25 @@ void OpenGLWidget::paintGL()
     linevao.release();
     boneProg.release();
 
-    pointsProg.bind();
-    pointvao.bind();
+    if (curProg == &optimizedCorsProg) {
+        pointsProg.bind();
+        pointvao.bind();
 
-    pointsProg.setUniformValue("modelMatrix", modelMatrix);
-    pointsProg.setUniformValue("viewMatrix", viewMatrix);
-    pointsProg.setUniformValue("projectionMatrix", projectionMatrix);
+        pointsProg.setUniformValue("modelMatrix", modelMatrix);
+        pointsProg.setUniformValue("viewMatrix", viewMatrix);
+        pointsProg.setUniformValue("projectionMatrix", projectionMatrix);
 
-    const auto& transformations = mesh.getTransformations();
-    pointsProg.setUniformValueArray("tArr", transformations.data(), transformations.size());
+        const auto& transformations = mesh.getTransformations();
+        pointsProg.setUniformValueArray("tArr", transformations.data(), transformations.size());
 
-    pointBuffer.bind();
-    glPointSize((GLfloat)5);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-    glDrawArrays(GL_POINTS, 0, mesh.getVertices().size());
-    pointBuffer.release();
-    pointvao.release();
-    boneProg.release();
+        pointBuffer.bind();
+        glPointSize((GLfloat)5);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        glDrawArrays(GL_POINTS, 0, mesh.getVertices().size());
+        pointBuffer.release();
+        pointvao.release();
+        boneProg.release();
+    }
 
 
     curProg->bind();
