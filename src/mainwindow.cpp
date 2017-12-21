@@ -70,21 +70,26 @@ void MainWindow::setupMiscellaneous()
 
 void MainWindow::setupView()
 {
-    auto viewMenu = menuBar()->addMenu(tr("&Affichage"));
+    auto menu = menuBar()->addMenu(tr("&Affichage"));
 
     auto resetCamAction = new QAction { tr("Vue initiale") };
     resetCamAction->setShortcut(QKeySequence(tr("r")));
 
     connect(resetCamAction, &QAction::triggered, glWidget, &OpenGLWidget::resetCamera);
 
-    viewMenu->addAction(resetCamAction);
+    menu->addAction(resetCamAction);
 
     auto toggleBoneAction = new QAction { tr("Afficher l'os sélectionné") };
     toggleBoneAction->setShortcut(QKeySequence(tr(" ")));
 
     connect(toggleBoneAction, &QAction::triggered, glWidget, &OpenGLWidget::toggleBoneActiv);
 
-    viewMenu->addAction(toggleBoneAction);
+    menu->addAction(toggleBoneAction);
+
+    auto focusBone = new QAction { tr("&Zoomer sur l'os sélectionné") };
+    focusBone->setShortcut(QKeySequence(tr("z")));
+
+    connect(focusBone, &QAction::triggered, glWidget, &OpenGLWidget::focusSelectedBone);
 }
 
 void MainWindow::setupSkeleton()
@@ -97,4 +102,11 @@ void MainWindow::setupSkeleton()
     connect(selPrevBone, &QAction::triggered, glWidget, &OpenGLWidget::selectPreviousBone);
 
     menu->addAction(selPrevBone);
+
+    auto selNextBone = new QAction { tr("Sélectionner l'os suivant") };
+    selNextBone->setShortcut(Qt::Key_Right);
+
+    connect(selNextBone, &QAction::triggered, glWidget, &OpenGLWidget::selectNextBone);
+
+    menu->addAction(selNextBone);
 }

@@ -446,25 +446,6 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         window->close();
         break;
 
-    case Qt::Key_Left:
-        break;
-
-    case Qt::Key_Right:
-        if(boneSelActiv)
-        {
-            mesh.setBoneSelected(mesh.getBoneSelected()+1);
-            noBoneActiv();
-            showBoneActiv();
-            update();
-        }
-        break;
-
-    case Qt::Key_E:
-        if (boneSelActiv) {
-            editBone(mesh.getBoneSelected());
-        }
-        break;
-
     case Qt::Key_X: // Rotate counterclockwise.
         moveBone(30.0);
         break;
@@ -611,11 +592,27 @@ void OpenGLWidget::toggleBoneActiv()
 
 void OpenGLWidget::selectPreviousBone()
 {
-    if(boneSelActiv)
-    {
+    if (boneSelActiv) {
         mesh.setBoneSelected(mesh.getBoneSelected()-1);
         noBoneActiv();
         showBoneActiv();
         update();
+    }
+}
+
+void OpenGLWidget::selectNextBone()
+{
+    if (boneSelActiv) {
+        mesh.setBoneSelected(mesh.getBoneSelected()+1);
+        noBoneActiv();
+        showBoneActiv();
+        update();
+    }
+}
+
+void OpenGLWidget::focusSelectedBone()
+{
+    if (boneSelActiv) {
+        editBone(mesh.getBoneSelected());
     }
 }

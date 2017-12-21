@@ -35,6 +35,8 @@ public slots:
     void resetCamera();
     void toggleBoneActiv();
     void selectPreviousBone();
+    void selectNextBone();
+    void focusSelectedBone();
 
 protected:
     void initializeGL();
