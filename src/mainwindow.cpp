@@ -90,6 +90,8 @@ void MainWindow::setupView()
     focusBone->setShortcut(QKeySequence(tr("z")));
 
     connect(focusBone, &QAction::triggered, glWidget, &OpenGLWidget::focusSelectedBone);
+
+    menu->addAction(focusBone);
 }
 
 void MainWindow::setupSkeleton()

@@ -93,13 +93,13 @@ private:
     QMatrix4x4 viewMatrix;
     QMatrix4x4 projectionMatrix;
 
-    QPointF prevPos;
+    QVector3D prevPos;
 
     bool leftButtonPressed;
     bool rightButtonPressed;
     bool boneSelActiv;
 
-    QPointF screenToViewport(QPointF screenPos);
+    QVector3D screenToViewport(QPointF screenPos);
 
     void updateSkeleton();
     bool corsComputed { false };

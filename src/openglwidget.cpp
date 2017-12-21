@@ -3,6 +3,7 @@
 #include <QVector3D>
 #include <math.h>
 #include <QMessageBox>
+#include <QtMath>
 
 OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidget(parent),
     window(parent),
@@ -373,8 +374,9 @@ void OpenGLWidget::paintGL()
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    const auto mod = event->modifiers();
 
-    if(leftButtonPressed)
+    if(leftButtonPressed && !(mod & Qt::ControlModifier))
     {
         auto pos = screenToViewport(event->localPos());
         QVector3D movement{ pos - prevPos };
@@ -387,12 +389,9 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
         const auto angle0 = rotFactor * movementY.y();
         const auto angle1 = rotFactor * movementX.x();
 
-
-
         movementY = viewMatrix.inverted() * movementY;
         movementX = viewMatrix.inverted() * movementX;
 
-        const QVector3D toCam = viewDirection();
         const auto yAxis = QVector3D { 0.0, 1.0, 0.0 };
 
         const auto rotVec0 = rightDirection();
@@ -400,6 +399,18 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 
         viewMatrix.rotate(angle0, rotVec0);
         viewMatrix.rotate(angle1, rotVec1);
+
+        prevPos = pos;
+    } else if (leftButtonPressed) {
+        const auto pos = screenToViewport(event->localPos());
+        const auto movement = pos - prevPos;
+        const auto x = prevPos;
+
+        const auto t0 = QVector3D::crossProduct(QVector3D { 0.0, 0.0, 1.0 }, x);
+
+        const auto angle = qRadiansToDegrees(QVector3D::dotProduct(t0, movement) / t0.lengthSquared());
+
+        moveBone(angle);
 
         prevPos = pos;
     }
@@ -491,15 +502,15 @@ QMatrix4x4 OpenGLWidget::perspective(GLdouble fovy, GLdouble aspect, GLdouble zN
     return m;
 }
 
-QPointF OpenGLWidget::screenToViewport(QPointF screenPos)
+QVector3D OpenGLWidget::screenToViewport(QPointF screenPos)
 {
     auto widthF = static_cast<float>(width());
     auto heightF = static_cast<float>(height());
 
-    auto x = -1.0f + static_cast<float>(screenPos.x()) / widthF;
-    auto y = 1.0f - static_cast<float>(screenPos.y()) / heightF;
+    auto x = -1.0f + 2.0 * static_cast<float>(screenPos.x()) / widthF;
+    auto y = 1.0f - 2.0 * static_cast<float>(screenPos.y()) / heightF;
 
-    return QPointF(x, y);
+    return QVector3D { QPointF { x, y } };
 }
 
 void OpenGLWidget::updateSkeleton()
