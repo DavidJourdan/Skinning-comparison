@@ -295,14 +295,14 @@ void OpenGLWidget::initializeGL()
 
     curProg = &lbsProg;
 
-    viewMatrix.translate(0.0f, 0.0f, -10.0f);
+    viewMatrix.translate(0.0f, 0.0f, -15.0f);
 }
 
 void OpenGLWidget::resizeGL(int w, int h)
 {
-    GLdouble aspect = w / (h ? h : 1);
-    const GLdouble zNear = 1.0, zFar = 30.0, fov = 30.0;
-    projectionMatrix = perspective(fov, aspect, zNear, zFar);
+    QMatrix4x4 mat { };
+    mat.perspective(30.0f, w / static_cast<float>(h), 1.0f, 30.0f);
+    projectionMatrix = mat;
 }
 
 void OpenGLWidget::paintGL()
@@ -587,7 +587,7 @@ void OpenGLWidget::computeCoRs() {
 void OpenGLWidget::resetCamera()
 {
     viewMatrix.setToIdentity();
-    viewMatrix.translate(0.0f, 0.0f, -10.0f);
+    viewMatrix.translate(0.0f, 0.0f, -15.0f);
     update();
 }
 
