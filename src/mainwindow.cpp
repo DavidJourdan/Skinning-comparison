@@ -92,6 +92,13 @@ void MainWindow::setupView()
     connect(focusBone, &QAction::triggered, glWidget, &OpenGLWidget::focusSelectedBone);
 
     menu->addAction(focusBone);
+
+    auto toggleMeshMode = new QAction { tr("&Alterner mode plein/creux") };
+    toggleMeshMode->setShortcut(tr("m"));
+
+    connect(toggleMeshMode, &QAction::triggered, glWidget, &OpenGLWidget::toggleMeshMode);
+
+    menu->addAction(toggleMeshMode);
 }
 
 void MainWindow::setupSkeleton()

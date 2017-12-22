@@ -37,6 +37,7 @@ public slots:
     void selectPreviousBone();
     void selectNextBone();
     void focusSelectedBone();
+    void toggleMeshMode();
 
 protected:
     void initializeGL();

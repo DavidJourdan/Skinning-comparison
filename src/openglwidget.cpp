@@ -468,10 +468,6 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         moveBone(-30.0);
         break;
 
-    case Qt::Key_M:
-        meshMode = (meshMode == GL_FILL)? GL_LINE : GL_FILL;
-        update();
-        break;
     default:
         break;
     }
@@ -629,4 +625,10 @@ void OpenGLWidget::focusSelectedBone()
     if (boneSelActiv) {
         editBone(mesh.getBoneSelected());
     }
+}
+
+void OpenGLWidget::toggleMeshMode()
+{
+    meshMode = (meshMode == GL_FILL)? GL_LINE : GL_FILL;
+    update();
 }
