@@ -134,7 +134,7 @@ void OpenGLWidget::initializeGL()
     const auto pBoneIndices = mesh.getBoneIndices();
 
     for (size_t i = 0; i < vertices.size(); ++i) {
-        for (size_t j = 0; weights[i][j] > 0; ++j) {
+        for (size_t j = 0; weights[i][j] > -0.5f; ++j) {
             const auto idx = i * MAX_BONE_COUNT + j;
             boneData[idx] = weights[i][j];
             boneIndices[idx] = pBoneIndices[i][j];
@@ -344,7 +344,6 @@ void OpenGLWidget::paintGL()
         pointvao.release();
         boneProg.release();
     }
-
 
     curProg->bind();
     vao.bind();
