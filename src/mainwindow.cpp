@@ -58,14 +58,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupMiscellaneous()
 {
-    auto miscMenu = menuBar()->addMenu(tr("&Divers"));
+    auto menu = menuBar()->addMenu(tr("&Divers"));
 
-    auto corAction = new QAction { tr("&Calculer les centres de rotation") };
-    corAction->setShortcut(QKeySequence(tr("c")));
+    auto computeCors = new QAction { tr("&Calculer les centres de rotation") };
+    computeCors->setShortcut(QKeySequence(tr("c")));
 
-    connect(corAction, &QAction::triggered, glWidget, &OpenGLWidget::computeCoRs);
+    connect(computeCors, &QAction::triggered, glWidget, &OpenGLWidget::computeCoRs);
 
-    miscMenu->addAction(corAction);
+    menu->addAction(computeCors);
+
+    auto quit = new QAction { tr("&Quitter l'application") };
+    quit->setShortcuts({ QKeySequence::Quit, Qt::Key_Escape });
+
+    connect(quit, &QAction::triggered, this, &MainWindow::close);
+
+    menu->addAction(quit);
 }
 
 void MainWindow::setupView()

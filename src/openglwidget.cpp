@@ -452,27 +452,6 @@ void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
     rightButtonPressed = false;
 }
 
-void OpenGLWidget::keyPressEvent(QKeyEvent *event)
-{
-    switch(event->key())
-    {
-    case Qt::Key_Escape:
-        window->close();
-        break;
-
-    case Qt::Key_X: // Rotate counterclockwise.
-        moveBone(30.0);
-        break;
-
-    case Qt::Key_W: // Rotate clock_w_ise.
-        moveBone(-30.0);
-        break;
-
-    default:
-        break;
-    }
-}
-
 void OpenGLWidget::wheelEvent(QWheelEvent *event)
 {
     QPoint numDegrees = event->angleDelta();
