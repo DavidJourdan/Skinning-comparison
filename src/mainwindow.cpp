@@ -86,12 +86,12 @@ void MainWindow::setupView()
 
     menu->addAction(resetCamAction);
 
-    auto toggleBoneAction = new QAction { tr("Afficher l'os sélectionné") };
-    toggleBoneAction->setShortcut(QKeySequence(tr(" ")));
+    auto toggleBoneSelection = new QAction { tr("Afficher l'os sélectionné") };
+    toggleBoneSelection->setShortcut(QKeySequence(tr(" ")));
 
-    connect(toggleBoneAction, &QAction::triggered, glWidget, &OpenGLWidget::toggleBoneActiv);
+    connect(toggleBoneSelection, &QAction::triggered, glWidget, &OpenGLWidget::toggleBoneActiv);
 
-    menu->addAction(toggleBoneAction);
+    menu->addAction(toggleBoneSelection);
 
     auto focusBone = new QAction { tr("&Zoomer sur l'os sélectionné") };
     focusBone->setShortcut(QKeySequence(tr("z")));
@@ -106,6 +106,20 @@ void MainWindow::setupView()
     connect(toggleMeshMode, &QAction::triggered, glWidget, &OpenGLWidget::toggleMeshMode);
 
     menu->addAction(toggleMeshMode);
+
+    auto toggleBoneDisplay = new QAction { tr("Afficher/cacher les &os") };
+    toggleBoneDisplay->setShortcut(tr("o"));
+
+    connect(toggleBoneDisplay, &QAction::triggered, glWidget, &OpenGLWidget::toggleBoneDisplay);
+
+    menu->addAction(toggleBoneDisplay);
+
+    auto toggleCorDisplay = new QAction { tr("Afficher/cacher les centres de ro&tation") };
+    toggleCorDisplay->setShortcut(tr("t"));
+
+    connect(toggleCorDisplay, &QAction::triggered, glWidget, &OpenGLWidget::toggleCorDisplay);
+
+    menu->addAction(toggleCorDisplay);
 }
 
 void MainWindow::setupSkeleton()

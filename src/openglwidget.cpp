@@ -339,22 +339,24 @@ void OpenGLWidget::paintGL()
 
     glDisable(GL_DEPTH_TEST);
 
-    boneProg.bind();
-    linevao.bind();
+    if (showBones) {
+        boneProg.bind();
+        linevao.bind();
 
-    boneProg.setUniformValue("modelMatrix", modelMatrix);
-    boneProg.setUniformValue("viewMatrix", viewMatrix);
-    boneProg.setUniformValue("projectionMatrix", projectionMatrix);
+        boneProg.setUniformValue("modelMatrix", modelMatrix);
+        boneProg.setUniformValue("viewMatrix", viewMatrix);
+        boneProg.setUniformValue("projectionMatrix", projectionMatrix);
 
-    lineIndices.bind();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glLineWidth((GLfloat)5);
-    glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
-    lineIndices.release();
-    linevao.release();
-    boneProg.release();
+        lineIndices.bind();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glLineWidth((GLfloat)5);
+        glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
+        lineIndices.release();
+        linevao.release();
+        boneProg.release();
+    }
 
-    if (curProg == &optimizedCorsProg && corsComputed) {
+    if (curProg == &optimizedCorsProg && corsComputed && showCors) {
         pointsProg.bind();
         pointvao.bind();
 
@@ -565,6 +567,7 @@ void OpenGLWidget::computeCoRs() {
 
 void OpenGLWidget::resetCamera()
 {
+    modelMatrix.setToIdentity();
     viewMatrix.setToIdentity();
     viewMatrix.translate(0.0f, 0.0f, -15.0f);
     update();
@@ -610,5 +613,17 @@ void OpenGLWidget::focusSelectedBone()
 void OpenGLWidget::toggleMeshMode()
 {
     meshMode = (meshMode == GL_FILL)? GL_LINE : GL_FILL;
+    update();
+}
+
+void OpenGLWidget::toggleBoneDisplay()
+{
+    showBones = !showBones;
+    update();
+}
+
+void OpenGLWidget::toggleCorDisplay()
+{
+    showCors = !showCors;
     update();
 }

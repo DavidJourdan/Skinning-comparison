@@ -38,6 +38,8 @@ public slots:
     void selectNextBone();
     void focusSelectedBone();
     void toggleMeshMode();
+    void toggleBoneDisplay();
+    void toggleCorDisplay();
 
 protected:
     void initializeGL();
@@ -105,6 +107,8 @@ private:
     bool corsComputed { false };
 
     GLenum meshMode;
+    bool showBones { true };
+    bool showCors { true };
 };
 
 #endif // OPENGLWIDGET_H
