@@ -310,6 +310,35 @@ void OpenGLWidget::paintGL()
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    glEnable(GL_DEPTH_TEST);
+
+    curProg->bind();
+    vao.bind();
+
+    curProg->setUniformValue("modelMatrix", modelMatrix);
+    curProg->setUniformValue("viewMatrix", viewMatrix);
+    curProg->setUniformValue("projectionMatrix", projectionMatrix);
+
+    const auto &transformations = mesh.getTransformations();
+    const std::vector<QVector4D> &quaternions = mesh.getQuaternions();
+    curProg->setUniformValueArray("tArr", transformations.data(), transformations.size());
+    curProg->setUniformValueArray("qArr", quaternions.data(), quaternions.size());
+
+    const auto& dualPart = mesh.getDQuatTransformationsDualPart();
+    const auto &nonDualPart = mesh.getDQuatTransformationsNonDualPart();
+    curProg->setUniformValueArray("dqTrDual", dualPart.data(), dualPart.size());
+    curProg->setUniformValueArray("dqTrNonDual", nonDualPart.data(), nonDualPart.size());
+
+    ebo.bind();
+    glPolygonMode(GL_FRONT_AND_BACK, meshMode);
+
+    glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
+    ebo.release();
+    vao.release();
+    curProg->release();
+
+    glDisable(GL_DEPTH_TEST);
+
     boneProg.bind();
     linevao.bind();
 
@@ -344,31 +373,6 @@ void OpenGLWidget::paintGL()
         pointvao.release();
         boneProg.release();
     }
-
-    curProg->bind();
-    vao.bind();
-
-    curProg->setUniformValue("modelMatrix", modelMatrix);
-    curProg->setUniformValue("viewMatrix", viewMatrix);
-    curProg->setUniformValue("projectionMatrix", projectionMatrix);
-
-    const auto &transformations = mesh.getTransformations();
-    const std::vector<QVector4D> &quaternions = mesh.getQuaternions();
-    curProg->setUniformValueArray("tArr", transformations.data(), transformations.size());
-    curProg->setUniformValueArray("qArr", quaternions.data(), quaternions.size());
-
-    const auto& dualPart = mesh.getDQuatTransformationsDualPart();
-    const auto &nonDualPart = mesh.getDQuatTransformationsNonDualPart();
-    curProg->setUniformValueArray("dqTrDual", dualPart.data(), dualPart.size());
-    curProg->setUniformValueArray("dqTrNonDual", nonDualPart.data(), nonDualPart.size());
-
-    ebo.bind();
-    glPolygonMode(GL_FRONT_AND_BACK, meshMode);
-
-    glDrawElements(GL_TRIANGLES, mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
-    ebo.release();
-    vao.release();
-    curProg->release();
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
