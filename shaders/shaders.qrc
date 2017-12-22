@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/shaders">
-        <file>lbs_shader.frag</file>
         <file>lbs_shader.vert</file>
         <file>boneshader.frag</file>
         <file>boneshader.vert</file>
@@ -9,5 +8,6 @@
         <file>optimized_cors.frag</file>
         <file>optimized_cors.vert</file>
         <file>dqshader.vert</file>
+        <file>shader.frag</file>
     </qresource>
 </RCC>

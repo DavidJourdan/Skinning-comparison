@@ -274,15 +274,15 @@ void OpenGLWidget::initializeGL()
     glEnableVertexAttribArray(1 + (2 * MAX_BONE_COUNT) / 4);
 
     lbsProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/lbs_shader.vert");
-    lbsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/lbs_shader.frag");
+    lbsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
     lbsProg.link();
 
     dqsProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/dqshader.vert");
-    dqsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/lbs_shader.frag");
+    dqsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
     dqsProg.link();
 
     optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/optimized_cors.vert");
-    optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/lbs_shader.frag");
+    optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
     optimizedCorsProg.link();
 
     boneProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");

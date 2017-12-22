@@ -46,7 +46,6 @@ macx: {
 
 DISTFILES += \
     shaders/lbs_shader.vert \
-    shaders/lbs_shader.frag \
     shaders/boneshader.frag \
     shaders/boneshader.vert \
     shaders/optimized_cors.frag \
@@ -54,7 +53,8 @@ DISTFILES += \
     shaders/pointshader.frag \
     shaders/pointshader.vert \
     shaders/dqshader.vert \
-    shaders/dqshader.vert
+    shaders/dqshader.vert \
+    shaders/shader.frag
 
 RESOURCES += \
     shaders/shaders.qrc
