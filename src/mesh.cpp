@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -73,6 +74,10 @@ Mesh Mesh::fromGenericFile(const std::string &fileName)
 Mesh Mesh::fromCustomFile(const Config &config)
 {
     std::ifstream meshFile { config.inputFile };
+
+    if (!meshFile.is_open()) {
+        throw std::runtime_error { "Failed to open mesh file." };
+    }
 
     std::vector<QVector3D> vertices;
     std::vector<unsigned> indices;

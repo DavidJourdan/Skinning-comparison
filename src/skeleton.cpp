@@ -216,6 +216,11 @@ std::vector<QVector3D> Skeleton::getSkelLines() {
 void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
 {
     ifstream file { fileName };
+
+    if (!file.is_open()) {
+        throw runtime_error { "Failed to open weight file." };
+    }
+
     size_t vertexCount;
     std::string magic;
     file >> magic >> vertexCount;
