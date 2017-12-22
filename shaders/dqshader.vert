@@ -19,6 +19,7 @@ uniform vec4 dqTrNonDual[MAX_TRANSFORMATION_COUNT];
 uniform vec4 dqTrDual[MAX_TRANSFORMATION_COUNT];
 
 out vec4 normal;
+out vec4 worldSpacePos;
 
 float getWeight(uint i) {
     uint q = i / 4;
@@ -74,5 +75,6 @@ void main(void)
     mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
     gl_Position = MVP * vec4(vRes, 1.0);
 
-    normal = transpose(inverse(MVP)) * vec4(nRes, 1.0);
+    normal = modelMatrix * vec4(aNorm, 0.0);
+    worldSpacePos = modelMatrix * vec4(aPos, 1.0);
 }

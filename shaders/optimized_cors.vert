@@ -19,6 +19,7 @@ uniform mat4 tArr[MAX_TRANSFORMATION_COUNT];
 uniform vec4 qArr[MAX_TRANSFORMATION_COUNT];
 
 out vec4 normal;
+out vec4 worldSpacePos;
 
 float getWeight(uint i) {
     uint q = i / 4;
@@ -75,5 +76,6 @@ void main(void)
     // vec4 res = vec4(quatToMat(quat)*(aPos - cor), 0.0); // alternative using matrices
     gl_Position = MVP * (rotate(aPos - cor, quat) + tMat * vec4(cor, 1.0));
 
-    normal = vec4(aNorm, 1.0);
+    normal = modelMatrix * vec4(aNorm, 0.0);
+    worldSpacePos = modelMatrix * vec4(aPos, 1.0);
 }

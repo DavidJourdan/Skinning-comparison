@@ -282,7 +282,7 @@ void OpenGLWidget::initializeGL()
     dqsProg.link();
 
     optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/optimized_cors.vert");
-    optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/optimized_cors.frag");
+    optimizedCorsProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/lbs_shader.frag");
     optimizedCorsProg.link();
 
     boneProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");

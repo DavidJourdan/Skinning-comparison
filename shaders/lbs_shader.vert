@@ -18,6 +18,7 @@ uniform mat4 projectionMatrix;
 uniform mat4 tArr[MAX_TRANSFORMATION_COUNT];
 
 out vec4 normal;
+out vec4 worldSpacePos;
 
 float getWeight(uint i) {
     uint q = i / 4;
@@ -45,4 +46,5 @@ void main(void)
     gl_Position = MVP * tMat * vec4(aPos, 1.0);
 
     normal = tMat * vec4(aNorm, 0.0);
+    worldSpacePos = modelMatrix * tMat * vec4(aPos, 1.0);
 }
