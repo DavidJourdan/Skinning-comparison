@@ -49,7 +49,7 @@ void OpenGLWidget::editBone(size_t i)
     modelMatrix.setToIdentity();
     modelMatrix.translate(-center);
 
-    const auto col = QVector4D { 0.0, 0.0, -3.0f * length, 1.0 };
+    const auto col = QVector4D { 0.0, 0.0, -5.0f * length, 1.0 };
     viewMatrix.setColumn(3, col);
 
     update();
@@ -407,7 +407,8 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
     } else if (leftButtonPressed) {
         const auto pos = screenToViewport(event->localPos());
         const auto movement = pos - prevPos;
-        const auto x = prevPos;
+        const auto center = mesh.getArticulations()[mesh.getBones()[mesh.getBoneSelected()].parent];
+        const auto x = prevPos - projectionMatrix * viewMatrix * modelMatrix * center;
 
         const auto t0 = QVector3D::crossProduct(QVector3D { 0.0, 0.0, 1.0 }, x);
 

@@ -49,7 +49,6 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
-    virtual void keyPressEvent(QKeyEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
     QMatrix4x4 perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
     QVector3D viewDirection();
