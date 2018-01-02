@@ -8,42 +8,29 @@
 #include <QLabel>
 #include <QHBoxLayout>
 
-MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { parent }
+MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { parent },
+    core { config }
 {
     auto cen = new QWidget { this };
 
     auto layout = new QHBoxLayout;
 
-    glWidget = new OpenGLWidget(config, this);
+    glWidget = new OpenGLWidget(&core, ":/shaders/lbs_shader.vert", false, this);
 
-    const auto bogus = new QLabel("Place holder", this);
-
-    const auto bogus0 = new QLabel("Place holder, again", this);
-
-    auto bogusA = new QAction(this);
-    bogusA->setShortcut(tr("h"));
-    connect(bogusA, &QAction::triggered, bogus0, [=] {
-        const auto v = bogus0->isVisible();
-        bogus0->setVisible(!v);
-        std::cerr << "OK\n";
-    });
+    auto dqs = new OpenGLWidget(&core, ":shaders/lbs_shader.vert", false, this);
 
     layout->addWidget(glWidget);
-    layout->addWidget(bogus);
-    layout->addWidget(bogus0);
+    layout->addWidget(dqs);
 
     cen->setLayout(layout);
 
     setCentralWidget(cen);
 
     QAction *lbsAction = new QAction { tr("&LBS"), this };
-    connect(lbsAction, &QAction::triggered, glWidget, &OpenGLWidget::deformWithLbs);
 
     QAction *dqsAction = new QAction { tr("&DQS"), this };
-    connect(dqsAction, &QAction::triggered, glWidget, &OpenGLWidget::deformWithDqs);
 
     QAction *optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
-    connect(optimizedCorsAction, &QAction::triggered, glWidget, &OpenGLWidget::deformWithOptimizedCors);
 
     auto deformMenu = menuBar()->addMenu(tr("&Méthode de déformation"));
     deformMenu->addAction(lbsAction);

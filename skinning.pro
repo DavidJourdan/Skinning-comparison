@@ -26,14 +26,16 @@ SOURCES += src/main.cpp\
     src/openglwidget.cpp \
     src/mesh.cpp \
     src/skeleton.cpp \
-    src/dualquaternion.cpp
+    src/dualquaternion.cpp \
+    src/core.cpp
 
 HEADERS  += src/mainwindow.h \
     src/openglwidget.h \
     src/mesh.h \
     src/skeleton.h \
     src/config.h \
-    src/dualquaternion.hpp
+    src/dualquaternion.hpp \
+    src/core.h
 
 unix:!macx {
     LIBS += -lassimp

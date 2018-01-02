@@ -1,10 +1,7 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
-#include <memory>
-
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_4_1_Core>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
@@ -17,20 +14,17 @@
 #include "mesh.h"
 #include "config.h"
 #include "dualquaternion.hpp"
+#include "core.h"
 
 class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 {
     Q_OBJECT
 
 public:
-    OpenGLWidget(const Config &config, QWidget *parent);
+    OpenGLWidget(Core *core, const QString &shaderName, const bool isCorView, QWidget *parent);
 
 public slots:
     void editBone(size_t i);
-    void moveBone(float angle);
-    void deformWithLbs() { curProg = &lbsProg; }
-    void deformWithDqs() { curProg = &dqsProg; }
-    void deformWithOptimizedCors();
     void computeCoRs();
     void resetCamera();
     void toggleBoneActiv();
@@ -61,57 +55,28 @@ protected:
     void showBoneActiv();
     void noBoneActiv();
 
-
 private:
     QWidget * window;
+    Core *core;
+    const bool isCorView;
 
-    Mesh mesh;
-    QOpenGLVertexArrayObject vao;
-    QOpenGLVertexArrayObject linevao;
-    QOpenGLVertexArrayObject pointvao;
-    QOpenGLBuffer vbo;
-    QOpenGLBuffer normBuffer;
-    QOpenGLBuffer corBuffer;
-    QOpenGLBuffer boneDataBuffer;
-    QOpenGLBuffer boneIndexBuffer;
-    QOpenGLBuffer boneListSizeBuffer;
-    QOpenGLBuffer ebo;
-    QOpenGLBuffer lineBuffer;
-    QOpenGLBuffer lineIndices;
-    QOpenGLBuffer lineColors;
-    QOpenGLBuffer pointBuffer;
-    QOpenGLBuffer pointBoneDataBuffer;
-    QOpenGLBuffer pointBoneIndexBuffer;
-    QOpenGLBuffer pointBoneListSizeBuffer;
+    QOpenGLShaderProgram prog;
+    const QString shaderName;
 
-    QOpenGLShaderProgram *curProg;
-
-    QOpenGLShaderProgram lbsProg;
-    QOpenGLShaderProgram optimizedCorsProg;
-    QOpenGLShaderProgram dqsProg;
     QOpenGLShaderProgram boneProg;
     QOpenGLShaderProgram pointsProg;
 
-    QMatrix4x4 modelMatrix;
-    QMatrix4x4 viewMatrix;
     QMatrix4x4 projectionMatrix;
-
-    QVector3D prevPos;
 
     bool leftButtonPressed;
     bool rightButtonPressed;
-    bool boneSelActiv;
-    bool isPickingBone { false };
+
+    QVector3D prevPos;
+
     void endPickBone();
 
     QVector3D screenToViewport(QPointF screenPos);
-
-    void updateSkeleton();
-    bool corsComputed { false };
-
-    GLenum meshMode;
-    bool showBones { true };
-    bool showCors { true };
+    void upd();
 };
 
 #endif // OPENGLWIDGET_H
