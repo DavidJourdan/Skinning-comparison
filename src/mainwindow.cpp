@@ -16,7 +16,7 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
     QAction *lbsAction = new QAction { tr("&LBS"), this };
     connect(lbsAction, &QAction::triggered, glWidget, &OpenGLWidget::deformWithLbs);
 
-    QAction *dqsAction = new QAction { tr("&DQS") };
+    QAction *dqsAction = new QAction { tr("&DQS"), this };
     connect(dqsAction, &QAction::triggered, glWidget, &OpenGLWidget::deformWithDqs);
 
     QAction *optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
@@ -60,14 +60,14 @@ void MainWindow::setupMiscellaneous()
 {
     auto menu = menuBar()->addMenu(tr("&Divers"));
 
-    auto computeCors = new QAction { tr("&Calculer les centres de rotation") };
+    auto computeCors = new QAction { tr("&Calculer les centres de rotation"), this };
     computeCors->setShortcut(QKeySequence(tr("c")));
 
     connect(computeCors, &QAction::triggered, glWidget, &OpenGLWidget::computeCoRs);
 
     menu->addAction(computeCors);
 
-    auto quit = new QAction { tr("&Quitter l'application") };
+    auto quit = new QAction { tr("&Quitter l'application"), this };
     quit->setShortcuts({ QKeySequence::Quit, Qt::Key_Escape });
 
     connect(quit, &QAction::triggered, this, &MainWindow::close);
@@ -79,42 +79,42 @@ void MainWindow::setupView()
 {
     auto menu = menuBar()->addMenu(tr("&Affichage"));
 
-    auto resetCamAction = new QAction { tr("Vue initiale") };
+    auto resetCamAction = new QAction { tr("Vue initiale"), this };
     resetCamAction->setShortcut(QKeySequence(tr("r")));
 
     connect(resetCamAction, &QAction::triggered, glWidget, &OpenGLWidget::resetCamera);
 
     menu->addAction(resetCamAction);
 
-    auto toggleBoneSelection = new QAction { tr("Afficher l'os sélectionné") };
+    auto toggleBoneSelection = new QAction { tr("Afficher l'os sélectionné"), this };
     toggleBoneSelection->setShortcut(QKeySequence(tr(" ")));
 
     connect(toggleBoneSelection, &QAction::triggered, glWidget, &OpenGLWidget::toggleBoneActiv);
 
     menu->addAction(toggleBoneSelection);
 
-    auto focusBone = new QAction { tr("&Zoomer sur l'os sélectionné") };
+    auto focusBone = new QAction { tr("&Zoomer sur l'os sélectionné"), this };
     focusBone->setShortcut(QKeySequence(tr("z")));
 
     connect(focusBone, &QAction::triggered, glWidget, &OpenGLWidget::focusSelectedBone);
 
     menu->addAction(focusBone);
 
-    auto toggleMeshMode = new QAction { tr("&Alterner mode plein/creux") };
+    auto toggleMeshMode = new QAction { tr("&Alterner mode plein/creux"), this };
     toggleMeshMode->setShortcut(tr("m"));
 
     connect(toggleMeshMode, &QAction::triggered, glWidget, &OpenGLWidget::toggleMeshMode);
 
     menu->addAction(toggleMeshMode);
 
-    auto toggleBoneDisplay = new QAction { tr("Afficher/cacher les &os") };
+    auto toggleBoneDisplay = new QAction { tr("Afficher/cacher les &os"), this };
     toggleBoneDisplay->setShortcut(tr("o"));
 
     connect(toggleBoneDisplay, &QAction::triggered, glWidget, &OpenGLWidget::toggleBoneDisplay);
 
     menu->addAction(toggleBoneDisplay);
 
-    auto toggleCorDisplay = new QAction { tr("Afficher/cacher les centres de ro&tation") };
+    auto toggleCorDisplay = new QAction { tr("Afficher/cacher les centres de ro&tation"), this };
     toggleCorDisplay->setShortcut(tr("t"));
 
     connect(toggleCorDisplay, &QAction::triggered, glWidget, &OpenGLWidget::toggleCorDisplay);
@@ -126,14 +126,14 @@ void MainWindow::setupSkeleton()
 {
     auto menu = menuBar()->addMenu(tr("&Squelette"));
 
-    auto selPrevBone = new QAction { tr("Sélectionner l'os précédent") };
+    auto selPrevBone = new QAction { tr("Sélectionner l'os précédent"), this };
     selPrevBone->setShortcut(Qt::Key_Left);
 
     connect(selPrevBone, &QAction::triggered, glWidget, &OpenGLWidget::selectPreviousBone);
 
     menu->addAction(selPrevBone);
 
-    auto selNextBone = new QAction { tr("Sélectionner l'os suivant") };
+    auto selNextBone = new QAction { tr("Sélectionner l'os suivant"), this };
     selNextBone->setShortcut(Qt::Key_Right);
 
     connect(selNextBone, &QAction::triggered, glWidget, &OpenGLWidget::selectNextBone);
