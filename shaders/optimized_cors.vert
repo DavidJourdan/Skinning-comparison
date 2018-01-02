@@ -76,6 +76,8 @@ void main(void)
     // vec4 res = vec4(quatToMat(quat)*(aPos - cor), 0.0); // alternative using matrices
     gl_Position = MVP * (rotate(aPos - cor, quat) + tMat * vec4(cor, 1.0));
 
-    normal = modelMatrix * vec4(aNorm, 0.0);
+    vec4 nRes = rotate(aNorm, quat);
+
+    normal = modelMatrix * nRes;
     worldSpacePos = modelMatrix * vec4(aPos, 1.0);
 }

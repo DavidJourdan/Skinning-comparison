@@ -75,6 +75,6 @@ void main(void)
     mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
     gl_Position = MVP * vec4(vRes, 1.0);
 
-    normal = modelMatrix * vec4(aNorm, 0.0);
+    normal = modelMatrix * vec4(nRes, 0.0);
     worldSpacePos = modelMatrix * vec4(aPos, 1.0);
 }
