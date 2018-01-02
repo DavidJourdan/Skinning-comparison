@@ -6,12 +6,35 @@
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QLabel>
+#include <QHBoxLayout>
 
 MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { parent }
 {
+    auto cen = new QWidget { this };
+
+    auto layout = new QHBoxLayout;
+
     glWidget = new OpenGLWidget(config, this);
 
-    setCentralWidget(glWidget);
+    const auto bogus = new QLabel("Place holder", this);
+
+    const auto bogus0 = new QLabel("Place holder, again", this);
+
+    auto bogusA = new QAction(this);
+    bogusA->setShortcut(tr("h"));
+    connect(bogusA, &QAction::triggered, bogus0, [=] {
+        const auto v = bogus0->isVisible();
+        bogus0->setVisible(!v);
+        std::cerr << "OK\n";
+    });
+
+    layout->addWidget(glWidget);
+    layout->addWidget(bogus);
+    layout->addWidget(bogus0);
+
+    cen->setLayout(layout);
+
+    setCentralWidget(cen);
 
     QAction *lbsAction = new QAction { tr("&LBS"), this };
     connect(lbsAction, &QAction::triggered, glWidget, &OpenGLWidget::deformWithLbs);
