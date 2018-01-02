@@ -621,6 +621,10 @@ void OpenGLWidget::computeCoRs() {
     if (corsComputed) {
         return;
     }
+    {
+        const auto cursor = QCursor { Qt::CursorShape::WaitCursor };
+        QGuiApplication::setOverrideCursor(cursor);
+    }
 
     std::vector<QVector3D> centers = mesh.computeCoRs();
     pointBuffer.bind();
@@ -632,6 +636,9 @@ void OpenGLWidget::computeCoRs() {
     corBuffer.release();
 
     corsComputed = true;
+
+    const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
+    QGuiApplication::setOverrideCursor(cursor);
 }
 
 void OpenGLWidget::resetCamera()
