@@ -446,16 +446,24 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void OpenGLWidget::mousePressEvent(QMouseEvent *event)
 {
-    if(event->button() == Qt::LeftButton && !rightButtonPressed)
+    if(event->button() == Qt::LeftButton && !rightButtonPressed) {
         leftButtonPressed = true;
 
-    if(event->button() == Qt::RightButton && !leftButtonPressed)
+        const auto cursor = QCursor { Qt::CursorShape::ClosedHandCursor };
+        QGuiApplication::setOverrideCursor(cursor);
+    }
+
+    if(event->button() == Qt::RightButton && !leftButtonPressed) {
         rightButtonPressed = true;
+
+        const auto cursor = QCursor { Qt::CursorShape::ClosedHandCursor };
+        QGuiApplication::setOverrideCursor(cursor);
+    }
 
     prevPos = screenToViewport(event->localPos());
 
     if (isPickingBone && event->button() == Qt::LeftButton && boneSelActiv) {
-        endPickBone(prevPos);
+        endPickBone();
     }
 }
 
@@ -463,6 +471,9 @@ void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     leftButtonPressed = false;
     rightButtonPressed = false;
+
+    const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
+    QGuiApplication::setOverrideCursor(cursor);
 }
 
 void OpenGLWidget::wheelEvent(QWheelEvent *event)
@@ -558,7 +569,7 @@ void OpenGLWidget::noBoneActiv()
     lineColors.release();
 }
 
-void OpenGLWidget::endPickBone(const QVector3D &pos)
+void OpenGLWidget::endPickBone()
 {
     isPickingBone = false;
     const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
