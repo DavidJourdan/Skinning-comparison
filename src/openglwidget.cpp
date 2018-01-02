@@ -4,6 +4,8 @@
 #include <math.h>
 #include <QMessageBox>
 #include <QtMath>
+#include <QGuiApplication>
+#include <QCursor>
 
 OpenGLWidget::OpenGLWidget(const Config &config, QWidget *parent) : QOpenGLWidget(parent),
     window(parent),
@@ -453,48 +455,7 @@ void OpenGLWidget::mousePressEvent(QMouseEvent *event)
     prevPos = screenToViewport(event->localPos());
 
     if (isPickingBone && event->button() == Qt::LeftButton && boneSelActiv) {
-        isPickingBone = false;
-
-        const auto &bones = mesh.getBones();
-        const auto &art = mesh.getArticulations();
-
-        size_t bone;
-        auto min = std::numeric_limits<float>::max();
-
-        const auto sqDst = [&](const Bone &bone) {
-            auto p0 = projectionMatrix * viewMatrix * modelMatrix * art[bone.parent];
-            auto p1 = projectionMatrix * viewMatrix * modelMatrix * art[bone.child];
-
-            p0.setZ(0.0f);
-            p1.setZ(0.0f);
-
-            const auto d = p1 - p0;
-
-            const auto v0 = prevPos - p0;
-            const auto v1 = prevPos - p1;
-
-            if (QVector3D::dotProduct(v0, d) < 0.0f) {
-                return v0.lengthSquared();
-            } else if (QVector3D::dotProduct(v1, d) > 0.0f) {
-                return v1.lengthSquared();
-            }
-
-            const auto proj = QVector3D::dotProduct(v0, d) / d.lengthSquared() * d;
-            return v0.lengthSquared() - proj.lengthSquared();
-        };
-
-        for (size_t i = 0; i < mesh.getEdgeNumber(); ++i) {
-            const auto d = sqDst(bones[i]);
-            if (d < min) {
-                min = d;
-                bone = i;
-            }
-        }
-
-        mesh.setBoneSelected(bone);
-        noBoneActiv();
-        showBoneActiv();
-        update();
+        endPickBone(prevPos);
     }
 }
 
@@ -597,6 +558,54 @@ void OpenGLWidget::noBoneActiv()
     lineColors.release();
 }
 
+void OpenGLWidget::endPickBone(const QVector3D &pos)
+{
+    isPickingBone = false;
+    const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
+    QGuiApplication::setOverrideCursor(cursor);
+
+    const auto &bones = mesh.getBones();
+    const auto &art = mesh.getArticulations();
+
+    size_t bone;
+    auto min = std::numeric_limits<float>::max();
+
+    const auto sqDst = [&](const Bone &bone) {
+        auto p0 = projectionMatrix * viewMatrix * modelMatrix * art[bone.parent];
+        auto p1 = projectionMatrix * viewMatrix * modelMatrix * art[bone.child];
+
+        p0.setZ(0.0f);
+        p1.setZ(0.0f);
+
+        const auto d = p1 - p0;
+
+        const auto v0 = prevPos - p0;
+        const auto v1 = prevPos - p1;
+
+        if (QVector3D::dotProduct(v0, d) < 0.0f) {
+            return v0.lengthSquared();
+        } else if (QVector3D::dotProduct(v1, d) > 0.0f) {
+            return v1.lengthSquared();
+        }
+
+        const auto proj = QVector3D::dotProduct(v0, d) / d.lengthSquared() * d;
+        return v0.lengthSquared() - proj.lengthSquared();
+    };
+
+    for (size_t i = 0; i < mesh.getEdgeNumber(); ++i) {
+        const auto d = sqDst(bones[i]);
+        if (d < min) {
+            min = d;
+            bone = i;
+        }
+    }
+
+    mesh.setBoneSelected(bone);
+    noBoneActiv();
+    showBoneActiv();
+    update();
+}
+
 void OpenGLWidget::computeCoRs() {
     if (corsComputed) {
         return;
@@ -681,5 +690,9 @@ void OpenGLWidget::pickBone()
 {
     if (boneSelActiv) {
         isPickingBone = true;
+
+        const auto cursor = QCursor { Qt::CursorShape::CrossCursor };
+
+        QGuiApplication::setOverrideCursor(cursor);
     }
 }

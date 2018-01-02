@@ -102,6 +102,7 @@ private:
     bool rightButtonPressed;
     bool boneSelActiv;
     bool isPickingBone { false };
+    void endPickBone(const QVector3D &pos);
 
     QVector3D screenToViewport(QPointF screenPos);
 
