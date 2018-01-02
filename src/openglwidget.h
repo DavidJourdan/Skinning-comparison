@@ -40,6 +40,7 @@ public slots:
     void toggleMeshMode();
     void toggleBoneDisplay();
     void toggleCorDisplay();
+    void pickBone();
 
 protected:
     void initializeGL();
@@ -100,6 +101,7 @@ private:
     bool leftButtonPressed;
     bool rightButtonPressed;
     bool boneSelActiv;
+    bool isPickingBone { false };
 
     QVector3D screenToViewport(QPointF screenPos);
 

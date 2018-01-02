@@ -139,4 +139,11 @@ void MainWindow::setupSkeleton()
     connect(selNextBone, &QAction::triggered, glWidget, &OpenGLWidget::selectNextBone);
 
     menu->addAction(selNextBone);
+
+    auto pickBone = new QAction { tr("Sélectionner un os à la souris"), this };
+    pickBone->setShortcut(tr("s"));
+
+    connect(pickBone, &QAction::triggered, glWidget, &OpenGLWidget::pickBone);
+
+    menu->addAction(pickBone);
 }

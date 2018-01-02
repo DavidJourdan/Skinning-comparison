@@ -379,6 +379,10 @@ void OpenGLWidget::paintGL()
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    if (isPickingBone) {
+        return;
+    }
+
     const auto mod = event->modifiers();
 
     if(leftButtonPressed && !(mod & Qt::ControlModifier))
@@ -447,6 +451,51 @@ void OpenGLWidget::mousePressEvent(QMouseEvent *event)
         rightButtonPressed = true;
 
     prevPos = screenToViewport(event->localPos());
+
+    if (isPickingBone && event->button() == Qt::LeftButton && boneSelActiv) {
+        isPickingBone = false;
+
+        const auto &bones = mesh.getBones();
+        const auto &art = mesh.getArticulations();
+
+        size_t bone;
+        auto min = std::numeric_limits<float>::max();
+
+        const auto sqDst = [&](const Bone &bone) {
+            auto p0 = projectionMatrix * viewMatrix * modelMatrix * art[bone.parent];
+            auto p1 = projectionMatrix * viewMatrix * modelMatrix * art[bone.child];
+
+            p0.setZ(0.0f);
+            p1.setZ(0.0f);
+
+            const auto d = p1 - p0;
+
+            const auto v0 = prevPos - p0;
+            const auto v1 = prevPos - p1;
+
+            if (QVector3D::dotProduct(v0, d) < 0.0f) {
+                return v0.lengthSquared();
+            } else if (QVector3D::dotProduct(v1, d) > 0.0f) {
+                return v1.lengthSquared();
+            }
+
+            const auto proj = QVector3D::dotProduct(v0, d) / d.lengthSquared() * d;
+            return v0.lengthSquared() - proj.lengthSquared();
+        };
+
+        for (size_t i = 0; i < mesh.getEdgeNumber(); ++i) {
+            const auto d = sqDst(bones[i]);
+            if (d < min) {
+                min = d;
+                bone = i;
+            }
+        }
+
+        mesh.setBoneSelected(bone);
+        noBoneActiv();
+        showBoneActiv();
+        update();
+    }
 }
 
 void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -626,4 +675,11 @@ void OpenGLWidget::toggleCorDisplay()
 {
     showCors = !showCors;
     update();
+}
+
+void OpenGLWidget::pickBone()
+{
+    if (boneSelActiv) {
+        isPickingBone = true;
+    }
 }
