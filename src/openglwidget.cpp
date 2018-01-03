@@ -41,6 +41,92 @@ void OpenGLWidget::initializeGL()
     glEnable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    // VERTICES
+    vao.create();
+    if (vao.isCreated()) {
+        vao.bind();
+    }
+
+    core->vbo.bind();
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    core->normBuffer.bind();
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
+
+    core->corBuffer.bind();
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(2);
+
+    core->boneDataBuffer.bind();
+
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(3 + i);
+    }
+
+    core->boneIndexBuffer.bind();
+
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribIPointer(3 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
+        glEnableVertexAttribArray(3 + MAX_BONE_COUNT / 4 + i);
+    }
+
+    core->boneListSizeBuffer.bind();
+
+    glVertexAttribIPointer(3 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(3 + (2 * MAX_BONE_COUNT) / 4);
+
+    // SKELETON
+    linevao.create();
+    if (linevao.isCreated()) {
+        linevao.bind();
+    }
+
+    core->lineBuffer.bind();
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    core->lineColors.bind();
+
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
+
+    // CENTERS OF ROTATION
+    pointvao.create();
+    if (pointvao.isCreated()) {
+        pointvao.bind();
+    }
+
+    core->pointBuffer.bind();
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    core->pointBoneDataBuffer.bind();
+
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribPointer(1 + i, 4, GL_FLOAT, GL_FALSE, MAX_BONE_COUNT * sizeof(GLfloat), reinterpret_cast<void*>(i * 4 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1 + i);
+    }
+
+    core->pointBoneIndexBuffer.bind();
+
+    for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
+        glVertexAttribIPointer(1 + MAX_BONE_COUNT / 4 + i, 4, GL_UNSIGNED_INT, MAX_BONE_COUNT * sizeof(GLuint), reinterpret_cast<void*>(i * 4 * sizeof(GLuint)));
+        glEnableVertexAttribArray(1 + MAX_BONE_COUNT / 4 + i);
+    }
+
+    core->pointBoneListSizeBuffer.bind();
+
+    glVertexAttribIPointer(1 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(1 + (2 * MAX_BONE_COUNT) / 4);
+
     prog.addShaderFromSourceFile(QOpenGLShader::Vertex, shaderName);
     prog.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/shader.frag");
     prog.link();
@@ -69,7 +155,7 @@ void OpenGLWidget::paintGL()
     glEnable(GL_DEPTH_TEST);
 
     prog.bind();
-    core->vao.bind();
+    vao.bind();
 
     prog.setUniformValue("modelMatrix", core->modelMatrix);
     prog.setUniformValue("viewMatrix", core->viewMatrix);
@@ -90,7 +176,7 @@ void OpenGLWidget::paintGL()
 
     glDrawElements(GL_TRIANGLES, core->mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
     core->ebo.release();
-    core->vao.release();
+    vao.release();
     prog.release();
 
     glDisable(GL_DEPTH_TEST);
@@ -99,7 +185,7 @@ void OpenGLWidget::paintGL()
 
     if (core->showBones) {
         boneProg.bind();
-        core->linevao.bind();
+        linevao.bind();
 
         boneProg.setUniformValue("modelMatrix", core->modelMatrix);
         boneProg.setUniformValue("viewMatrix", core->viewMatrix);
@@ -110,13 +196,13 @@ void OpenGLWidget::paintGL()
         glLineWidth((GLfloat)5);
         glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
         core->lineIndices.release();
-        core->linevao.release();
+        linevao.release();
         boneProg.release();
     }
 
     if (core->corsComputed && core->showCors && isCorView) {
         pointsProg.bind();
-        core->pointvao.bind();
+        pointvao.bind();
 
         pointsProg.setUniformValue("modelMatrix", core->modelMatrix);
         pointsProg.setUniformValue("viewMatrix", core->viewMatrix);
@@ -130,7 +216,7 @@ void OpenGLWidget::paintGL()
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDrawArrays(GL_POINTS, 0, mesh.getVertices().size());
         core->pointBuffer.release();
-        core->pointvao.release();
+        pointvao.release();
         boneProg.release();
     }
 }

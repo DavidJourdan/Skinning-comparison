@@ -17,10 +17,16 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 
     glWidget = new OpenGLWidget(&core, ":/shaders/lbs_shader.vert", false, this);
 
-    auto dqs = new OpenGLWidget(&core, ":shaders/lbs_shader.vert", false, this);
+    auto dqs = new OpenGLWidget(&core, ":/shaders/dqshader.vert", false, this);
+
+    auto cor = new OpenGLWidget(&core, ":/shaders/optimized_cors.vert", true, this);
 
     layout->addWidget(glWidget);
     layout->addWidget(dqs);
+    layout->addWidget(cor);
+
+    dqs->setVisible(false);
+    cor->setVisible(false);
 
     cen->setLayout(layout);
 
@@ -28,9 +34,24 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 
     QAction *lbsAction = new QAction { tr("&LBS"), this };
 
+    connect(lbsAction, &QAction::triggered, [=] {
+        const auto p = glWidget->isVisible();
+        glWidget->setVisible(!p);
+    });
+
     QAction *dqsAction = new QAction { tr("&DQS"), this };
 
+    connect(dqsAction, &QAction::triggered, [=] {
+        const auto p = dqs->isVisible();
+        dqs->setVisible(!p);
+    });
+
     QAction *optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
+
+    connect(optimizedCorsAction, &QAction::triggered, [=] {
+        const auto p = cor->isVisible();
+        cor->setVisible(!p);
+    });
 
     auto deformMenu = menuBar()->addMenu(tr("&Méthode de déformation"));
     deformMenu->addAction(lbsAction);

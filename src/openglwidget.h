@@ -60,6 +60,10 @@ private:
     Core *core;
     const bool isCorView;
 
+    QOpenGLVertexArrayObject vao;
+    QOpenGLVertexArrayObject linevao;
+    QOpenGLVertexArrayObject pointvao;
+
     QOpenGLShaderProgram prog;
     const QString shaderName;
 

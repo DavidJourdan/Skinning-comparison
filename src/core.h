@@ -17,6 +17,8 @@
 
 class OpenGLWidget;
 
+const size_t MAX_BONE_COUNT = 12;
+
 class Core : public QOpenGLFunctions_4_1_Core
 {
 public:
@@ -33,9 +35,6 @@ public:
     void showBoneActiv();
     void noBoneActiv();
     Mesh mesh;
-    QOpenGLVertexArrayObject vao;
-    QOpenGLVertexArrayObject linevao;
-    QOpenGLVertexArrayObject pointvao;
     QOpenGLBuffer vbo;
     QOpenGLBuffer normBuffer;
     QOpenGLBuffer corBuffer;
@@ -61,7 +60,7 @@ public:
     bool isPickingBone { false };
     bool boneSelActiv { false };
 
-    bool initialized;
+    bool initialized { false };
 
     void updateSkeleton();
 
