@@ -15,7 +15,9 @@
 #include "config.h"
 #include "mesh.h"
 
-class OpenGLWidget;
+namespace view {
+class Base;
+}
 
 const size_t MAX_BONE_COUNT = 12;
 
@@ -45,18 +47,23 @@ public:
     QOpenGLBuffer pointBoneIndexBuffer;
     QOpenGLBuffer pointBoneListSizeBuffer;
 
-    // The model and view matrices are shared across views, as views as meant
+    // The model and view matrices are shared across views, as views are meant
     // to allow comparing different deforming methods in the same pose.
     QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
+
+    // Every view applies a specific deformation method on the model.
+    view::Base *lbsView;
+
+    // Update views.
+    void update();
 
     void moveBone(float angle);
     void editBone(size_t i);
     void computeCoRs();
     void toggleBoneActiv();
     void resetCamera();
-    void selectPreviousBone();
-    void selectNextBone();
+    void focusSelectedBone();
     void showBoneActiv();
     void noBoneActiv();
 
@@ -66,12 +73,11 @@ public:
 
     void updateSkeleton();
 
-    bool initialized { false };
-    bool boneSelActiv { false };
     bool isPickingBone { false };
-    bool corsComputed { false };
 
-    std::vector<OpenGLWidget*> views;
+private:
+    bool initialized { false };
+    bool corsComputed { false };
 };
 
 #endif // CORE_H

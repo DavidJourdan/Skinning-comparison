@@ -1,4 +1,5 @@
 #include "core.h"
+#include "view/base.h"
 
 Core::Core(const Config &config) :
     mesh { Mesh::fromCustomFile(config) },
@@ -15,7 +16,6 @@ Core::Core(const Config &config) :
     pointBoneDataBuffer(QOpenGLBuffer::VertexBuffer),
     pointBoneIndexBuffer(QOpenGLBuffer::VertexBuffer),
     pointBoneListSizeBuffer(QOpenGLBuffer::VertexBuffer),
-    boneSelActiv(false),
     meshMode(GL_FILL)
 {
 
@@ -47,38 +47,18 @@ void Core::showBoneActiv()
     lineColors.release();
 }
 
-void Core::selectNextBone()
-{
-    if (boneSelActiv) {
-        mesh.setBoneSelected(mesh.getBoneSelected()+1);
-        noBoneActiv();
-        showBoneActiv();
-    }
-}
-
-void Core::selectPreviousBone()
-{
-    if (boneSelActiv) {
-        mesh.setBoneSelected(mesh.getBoneSelected()-1);
-        noBoneActiv();
-        showBoneActiv();
-    }
-}
-
 void Core::resetCamera()
 {
     modelMatrix.setToIdentity();
     viewMatrix.setToIdentity();
     viewMatrix.translate(0.0f, 0.0f, -15.0f);
+    update();
 }
 
-void Core::toggleBoneActiv()
+void Core::focusSelectedBone()
 {
-    boneSelActiv = !boneSelActiv;
-    if(boneSelActiv)
-        showBoneActiv();
-    else
-        noBoneActiv();
+    editBone(mesh.getBoneSelected());
+    update();
 }
 
 void Core::computeCoRs() {
@@ -132,13 +112,11 @@ void Core::updateSkeleton()
 
 void Core::moveBone(float angle)
 {
-    if (boneSelActiv) {
-        QVector3D toCam(0.0, 0.0, 1.0);
-        toCam = viewMatrix.inverted() * toCam;
+    QVector3D toCam(0.0, 0.0, 1.0);
+    toCam = viewMatrix.inverted() * toCam;
 
-        mesh.rotateBone(angle, toCam);
-        updateSkeleton();
-    }
+    mesh.rotateBone(angle, toCam);
+    updateSkeleton();
 }
 
 void Core::initialize()
@@ -262,4 +240,9 @@ void Core::initialize()
     pointBoneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
 
     viewMatrix.translate(0.0f, 0.0f, -15.0f);
+}
+
+void Core::update()
+{
+    lbsView->update();
 }

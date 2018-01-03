@@ -7,6 +7,7 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <QHBoxLayout>
+#include "view/lbs.h"
 
 MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { parent },
     core { config }
@@ -15,18 +16,11 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 
     auto layout = new QHBoxLayout;
 
-    glWidget = new OpenGLWidget(&core, ":/shaders/lbs_shader.vert", false, this);
+    auto lbsView = new view::Lbs { &core, this };
 
-    auto dqs = new OpenGLWidget(&core, ":/shaders/dqshader.vert", false, this);
+    core.lbsView = lbsView;
 
-    auto cor = new OpenGLWidget(&core, ":/shaders/optimized_cors.vert", true, this);
-
-    layout->addWidget(glWidget);
-    layout->addWidget(dqs);
-    layout->addWidget(cor);
-
-    dqs->setVisible(false);
-    cor->setVisible(false);
+    layout->addWidget(lbsView);
 
     cen->setLayout(layout);
 
@@ -34,24 +28,9 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 
     QAction *lbsAction = new QAction { tr("&LBS"), this };
 
-    connect(lbsAction, &QAction::triggered, [=] {
-        const auto p = glWidget->isVisible();
-        glWidget->setVisible(!p);
-    });
-
     QAction *dqsAction = new QAction { tr("&DQS"), this };
 
-    connect(dqsAction, &QAction::triggered, [=] {
-        const auto p = dqs->isVisible();
-        dqs->setVisible(!p);
-    });
-
     QAction *optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
-
-    connect(optimizedCorsAction, &QAction::triggered, [=] {
-        const auto p = cor->isVisible();
-        cor->setVisible(!p);
-    });
 
     auto deformMenu = menuBar()->addMenu(tr("&Méthode de déformation"));
     deformMenu->addAction(lbsAction);
@@ -77,7 +56,9 @@ void MainWindow::setupMiscellaneous()
     auto computeCors = new QAction { tr("&Calculer les centres de rotation"), this };
     computeCors->setShortcut(QKeySequence(tr("c")));
 
-    connect(computeCors, &QAction::triggered, glWidget, &OpenGLWidget::computeCoRs);
+    connect(computeCors, &QAction::triggered, [=] {
+        core.computeCoRs();
+    });
 
     menu->addAction(computeCors);
 
@@ -96,42 +77,53 @@ void MainWindow::setupView()
     auto resetCamAction = new QAction { tr("Vue initiale"), this };
     resetCamAction->setShortcut(QKeySequence(tr("r")));
 
-    connect(resetCamAction, &QAction::triggered, glWidget, &OpenGLWidget::resetCamera);
+    connect(resetCamAction, &QAction::triggered, [=] {
+        core.resetCamera();
+    });
 
     menu->addAction(resetCamAction);
-
-    auto toggleBoneSelection = new QAction { tr("Afficher l'os sélectionné"), this };
-    toggleBoneSelection->setShortcut(QKeySequence(tr(" ")));
-
-    connect(toggleBoneSelection, &QAction::triggered, glWidget, &OpenGLWidget::toggleBoneActiv);
-
-    menu->addAction(toggleBoneSelection);
 
     auto focusBone = new QAction { tr("&Zoomer sur l'os sélectionné"), this };
     focusBone->setShortcut(QKeySequence(tr("z")));
 
-    connect(focusBone, &QAction::triggered, glWidget, &OpenGLWidget::focusSelectedBone);
+    connect(focusBone, &QAction::triggered, [=] {
+        core.focusSelectedBone();
+    });
 
     menu->addAction(focusBone);
 
-    auto toggleMeshMode = new QAction { tr("&Alterner mode plein/creux"), this };
+    auto toggleMeshMode = new QAction { tr("&Mode creux"), this };
     toggleMeshMode->setShortcut(tr("m"));
+    toggleMeshMode->setCheckable(true);
 
-    connect(toggleMeshMode, &QAction::triggered, glWidget, &OpenGLWidget::toggleMeshMode);
+    connect(toggleMeshMode, &QAction::toggled, [=](bool p) {
+        core.meshMode = p ? GL_LINE : GL_FILL;
+        core.update();
+    });
 
     menu->addAction(toggleMeshMode);
 
-    auto toggleBoneDisplay = new QAction { tr("Afficher/cacher les &os"), this };
+    auto toggleBoneDisplay = new QAction { tr("Afficher les &os"), this };
     toggleBoneDisplay->setShortcut(tr("o"));
+    toggleBoneDisplay->setCheckable(true);
+    toggleBoneDisplay->setChecked(true);
 
-    connect(toggleBoneDisplay, &QAction::triggered, glWidget, &OpenGLWidget::toggleBoneDisplay);
+    connect(toggleBoneDisplay, &QAction::toggled, [=](bool p) {
+        core.showBones = p;
+        core.update();
+    });
 
     menu->addAction(toggleBoneDisplay);
 
     auto toggleCorDisplay = new QAction { tr("Afficher/cacher les centres de ro&tation"), this };
     toggleCorDisplay->setShortcut(tr("t"));
+    toggleCorDisplay->setCheckable(true);
+    toggleCorDisplay->setChecked(true);
 
-    connect(toggleCorDisplay, &QAction::triggered, glWidget, &OpenGLWidget::toggleCorDisplay);
+    connect(toggleCorDisplay, &QAction::toggled, [=](bool p) {
+        core.showCors = p;
+        core.update();
+    });
 
     menu->addAction(toggleCorDisplay);
 }
@@ -140,24 +132,15 @@ void MainWindow::setupSkeleton()
 {
     auto menu = menuBar()->addMenu(tr("&Squelette"));
 
-    auto selPrevBone = new QAction { tr("Sélectionner l'os précédent"), this };
-    selPrevBone->setShortcut(Qt::Key_Left);
-
-    connect(selPrevBone, &QAction::triggered, glWidget, &OpenGLWidget::selectPreviousBone);
-
-    menu->addAction(selPrevBone);
-
-    auto selNextBone = new QAction { tr("Sélectionner l'os suivant"), this };
-    selNextBone->setShortcut(Qt::Key_Right);
-
-    connect(selNextBone, &QAction::triggered, glWidget, &OpenGLWidget::selectNextBone);
-
-    menu->addAction(selNextBone);
-
     auto pickBone = new QAction { tr("Sélectionner un os à la souris"), this };
     pickBone->setShortcut(tr("s"));
 
-    connect(pickBone, &QAction::triggered, glWidget, &OpenGLWidget::pickBone);
+    connect(pickBone, &QAction::triggered, [=] {
+        core.isPickingBone = true;
+
+        const auto cursor = QCursor { Qt::CursorShape::CrossCursor };
+        QGuiApplication::setOverrideCursor(cursor);
+    });
 
     menu->addAction(pickBone);
 }

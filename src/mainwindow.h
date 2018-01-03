@@ -4,7 +4,6 @@
 #include <memory>
 
 #include <QMainWindow>
-#include "openglwidget.h"
 #include "config.h"
 #include "core.h"
 
@@ -17,7 +16,6 @@ public:
     ~MainWindow();
 
 private:
-    OpenGLWidget *glWidget;
     Core core;
 
     void setupMiscellaneous();

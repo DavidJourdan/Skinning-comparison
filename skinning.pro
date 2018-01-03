@@ -23,19 +23,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += src/main.cpp\
         src/mainwindow.cpp \
-    src/openglwidget.cpp \
+    src/view/base.cpp \
     src/mesh.cpp \
     src/skeleton.cpp \
     src/dualquaternion.cpp \
-    src/core.cpp
+    src/core.cpp \
+    src/view/lbs.cpp
 
 HEADERS  += src/mainwindow.h \
-    src/openglwidget.h \
+    src/view/base.h \
     src/mesh.h \
     src/skeleton.h \
     src/config.h \
     src/dualquaternion.hpp \
-    src/core.h
+    src/core.h \
+    src/view/lbs.h
 
 unix:!macx {
     LIBS += -lassimp
