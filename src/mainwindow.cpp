@@ -53,18 +53,18 @@ MainWindow::~MainWindow()
 void MainWindow::setUpDeform()
 {
 
-    QAction *lbsAction = new QAction { tr("&LBS"), this };
+    auto lbsAction = new QAction { tr("&LBS"), this };
     lbsAction->setCheckable(true);
     lbsAction->setChecked(true);
 
     connect(lbsAction, &QAction::toggled, core.lbsView, &QWidget::setVisible);
 
-    QAction *dqsAction = new QAction { tr("&DQS"), this };
+    auto dqsAction = new QAction { tr("&DQS"), this };
     dqsAction->setCheckable(true);
 
     connect(dqsAction, &QAction::toggled, core.dqsView, &QWidget::setVisible);
 
-    QAction *optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
+    auto optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
     optimizedCorsAction->setCheckable(true);
 
     auto group = new QActionGroup { this };
@@ -78,6 +78,17 @@ void MainWindow::setUpDeform()
     deformMenu->addAction(lbsAction);
     deformMenu->addAction(dqsAction);
     deformMenu->addAction(optimizedCorsAction);
+
+    deformMenu->addSeparator();
+
+    auto exclusive = new QAction { tr("Vues simultanées"), this };
+    exclusive->setCheckable(true);
+
+    connect(exclusive, &QAction::toggled, [=](bool p) {
+        group->setExclusive(!p);
+    });
+
+    deformMenu->addAction(exclusive);
 }
 
 void MainWindow::setupMiscellaneous()
