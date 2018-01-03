@@ -23,18 +23,13 @@ class Core : public QOpenGLFunctions_4_1_Core
 {
 public:
     Core(const Config &config);
-    void initialize();
-    void moveBone(float angle);
-    void editBone(size_t i);
 
-    void computeCoRs();
-    void toggleBoneActiv();
-    void resetCamera();
-    void selectPreviousBone();
-    void selectNextBone();
-    void showBoneActiv();
-    void noBoneActiv();
     Mesh mesh;
+
+    // Set up OpenGL resources.
+    void initialize();
+
+    // OpenGL resources meant to be shared across multiple rendering widgets.
     QOpenGLBuffer vbo;
     QOpenGLBuffer normBuffer;
     QOpenGLBuffer corBuffer;
@@ -50,19 +45,31 @@ public:
     QOpenGLBuffer pointBoneIndexBuffer;
     QOpenGLBuffer pointBoneListSizeBuffer;
 
+    // The model and view matrices are shared across views, as views as meant
+    // to allow comparing different deforming methods in the same pose.
     QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
 
-    bool corsComputed { false };
+    void moveBone(float angle);
+    void editBone(size_t i);
+    void computeCoRs();
+    void toggleBoneActiv();
+    void resetCamera();
+    void selectPreviousBone();
+    void selectNextBone();
+    void showBoneActiv();
+    void noBoneActiv();
+
     GLenum meshMode;
     bool showBones { true };
     bool showCors { true };
-    bool isPickingBone { false };
-    bool boneSelActiv { false };
-
-    bool initialized { false };
 
     void updateSkeleton();
+
+    bool initialized { false };
+    bool boneSelActiv { false };
+    bool isPickingBone { false };
+    bool corsComputed { false };
 
     std::vector<OpenGLWidget*> views;
 };
