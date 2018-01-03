@@ -58,23 +58,6 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
     deformMenu->addAction(dqsAction);
     deformMenu->addAction(optimizedCorsAction);
 
-    auto deformLabel = new QLabel { this };
-    deformLabel->setText("Linear blend skinning");
-
-    connect(lbsAction, &QAction::triggered, [=] {
-        deformLabel->setText("Linear blend skinning");
-    });
-
-    connect(dqsAction, &QAction::triggered, [=] {
-        deformLabel->setText("Dual quaternion skinning");
-    });
-
-    connect(optimizedCorsAction, &QAction::triggered, [=] {
-        deformLabel->setText("Méthode de l'article");
-    });
-
-    statusBar()->addWidget(deformLabel);
-
     setupView();
 
     setupSkeleton();

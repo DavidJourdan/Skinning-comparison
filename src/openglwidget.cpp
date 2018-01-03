@@ -482,7 +482,7 @@ void OpenGLWidget::selectNextBone()
 void OpenGLWidget::focusSelectedBone()
 {
     if (core->boneSelActiv) {
-        core->editBone(core->mesh.getBoneSelected());
+        editBone(core->mesh.getBoneSelected());
     }
 }
 
