@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QAction>
+#include <QActionGroup>
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QLabel>
@@ -25,6 +26,7 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
     layout->addWidget(lbsView);
 
     auto dqsView = new view::Dqs { &core, this };
+    dqsView->setVisible(false);
 
     core.dqsView = dqsView;
 
@@ -34,16 +36,7 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 
     setCentralWidget(cen);
 
-    QAction *lbsAction = new QAction { tr("&LBS"), this };
-
-    QAction *dqsAction = new QAction { tr("&DQS"), this };
-
-    QAction *optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
-
-    auto deformMenu = menuBar()->addMenu(tr("&Méthode de déformation"));
-    deformMenu->addAction(lbsAction);
-    deformMenu->addAction(dqsAction);
-    deformMenu->addAction(optimizedCorsAction);
+    setUpDeform();
 
     setupView();
 
@@ -55,6 +48,36 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::setUpDeform()
+{
+
+    QAction *lbsAction = new QAction { tr("&LBS"), this };
+    lbsAction->setCheckable(true);
+    lbsAction->setChecked(true);
+
+    connect(lbsAction, &QAction::toggled, core.lbsView, &QWidget::setVisible);
+
+    QAction *dqsAction = new QAction { tr("&DQS"), this };
+    dqsAction->setCheckable(true);
+
+    connect(dqsAction, &QAction::toggled, core.dqsView, &QWidget::setVisible);
+
+    QAction *optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
+    optimizedCorsAction->setCheckable(true);
+
+    auto group = new QActionGroup { this };
+
+    group->addAction(lbsAction);
+    group->addAction(dqsAction);
+    group->addAction(optimizedCorsAction);
+
+    auto deformMenu = menuBar()->addMenu(tr("&Méthode de déformation"));
+
+    deformMenu->addAction(lbsAction);
+    deformMenu->addAction(dqsAction);
+    deformMenu->addAction(optimizedCorsAction);
 }
 
 void MainWindow::setupMiscellaneous()

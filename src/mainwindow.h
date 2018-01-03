@@ -18,6 +18,7 @@ public:
 private:
     Core core;
 
+    void setUpDeform();
     void setupMiscellaneous();
     void setupView();
     void setupSkeleton();
