@@ -29,7 +29,8 @@ SOURCES += src/main.cpp\
     src/dualquaternion.cpp \
     src/core.cpp \
     src/view/lbs.cpp \
-    src/view/dqs.cpp
+    src/view/dqs.cpp \
+    src/view/cor.cpp
 
 HEADERS  += src/mainwindow.h \
     src/view/base.h \
@@ -39,7 +40,8 @@ HEADERS  += src/mainwindow.h \
     src/dualquaternion.hpp \
     src/core.h \
     src/view/lbs.h \
-    src/view/dqs.h
+    src/view/dqs.h \
+    src/view/cor.h
 
 unix:!macx {
     LIBS += -lassimp

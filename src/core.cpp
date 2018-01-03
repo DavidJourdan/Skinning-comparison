@@ -62,7 +62,7 @@ void Core::focusSelectedBone()
 }
 
 void Core::computeCoRs() {
-    if (corsComputed) {
+    if (corsComputed_) {
         return;
     }
     {
@@ -79,7 +79,7 @@ void Core::computeCoRs() {
     corBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
     corBuffer.release();
 
-    corsComputed = true;
+    corsComputed_ = true;
 
     const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
     QGuiApplication::setOverrideCursor(cursor);
@@ -216,29 +216,6 @@ void Core::initialize()
     lineIndices.allocate(ind.data(), ind.size() * sizeof(uint));
     lineIndices.release();
 
-    pointBuffer.create();
-    pointBuffer.bind();
-    std::vector<QVector3D> points(vertices.size(), QVector3D(0, 0, 10));
-    pointBuffer.allocate(points.data(), points.size() * sizeof(QVector3D));
-
-    pointBoneDataBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    pointBoneDataBuffer.create();
-    pointBoneDataBuffer.bind();
-
-    pointBoneDataBuffer.allocate(boneData.data(), sizeof(GLfloat) * vertices.size() * MAX_BONE_COUNT);
-
-    pointBoneIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    pointBoneIndexBuffer.create();
-    pointBoneIndexBuffer.bind();
-
-    pointBoneIndexBuffer.allocate(boneIndices.data(), sizeof(GLuint) * vertices.size() * MAX_BONE_COUNT);
-
-    pointBoneListSizeBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    pointBoneListSizeBuffer.create();
-    pointBoneListSizeBuffer.bind();
-
-    pointBoneListSizeBuffer.allocate(boneListSizes.data(), sizeof(GLuint) * vertices.size());
-
     viewMatrix.translate(0.0f, 0.0f, -15.0f);
 }
 
@@ -246,4 +223,5 @@ void Core::update()
 {
     lbsView->update();
     dqsView->update();
+    corView->update();
 }

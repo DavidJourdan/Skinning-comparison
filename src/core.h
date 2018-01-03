@@ -55,6 +55,7 @@ public:
     // Every view applies a specific deformation method on the model.
     view::Base *lbsView;
     view::Base *dqsView;
+    view::Base *corView;
 
     // Update views.
     void update();
@@ -75,10 +76,11 @@ public:
     void updateSkeleton();
 
     bool isPickingBone { false };
+    bool corsComputed() { return corsComputed_; }
 
 private:
     bool initialized { false };
-    bool corsComputed { false };
+    bool corsComputed_ { false };
 };
 
 #endif // CORE_H

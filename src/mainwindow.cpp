@@ -11,6 +11,7 @@
 
 #include "view/lbs.h"
 #include "view/dqs.h"
+#include "view/cor.h"
 
 MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { parent },
     core { config }
@@ -31,6 +32,11 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
     core.dqsView = dqsView;
 
     layout->addWidget(dqsView);
+
+    auto corView = new view::Cor { &core, this };
+    corView->setVisible(false);
+
+    core.corView = corView;
 
     cen->setLayout(layout);
 
@@ -74,6 +80,12 @@ void MainWindow::setUpDeform()
 
     auto optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
     optimizedCorsAction->setCheckable(true);
+
+    connect(optimizedCorsAction, &QAction::toggled, [=](bool p) {
+        core.corView->setVisible(p);
+        core.corView->repaint();
+        core.update();
+    });
 
     auto group = new QActionGroup { this };
 
