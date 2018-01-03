@@ -245,4 +245,5 @@ void Core::initialize()
 void Core::update()
 {
     lbsView->update();
+    dqsView->update();
 }

@@ -54,6 +54,7 @@ public:
 
     // Every view applies a specific deformation method on the model.
     view::Base *lbsView;
+    view::Base *dqsView;
 
     // Update views.
     void update();

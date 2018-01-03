@@ -7,7 +7,9 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <QHBoxLayout>
+
 #include "view/lbs.h"
+#include "view/dqs.h"
 
 MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { parent },
     core { config }
@@ -21,6 +23,12 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
     core.lbsView = lbsView;
 
     layout->addWidget(lbsView);
+
+    auto dqsView = new view::Dqs { &core, this };
+
+    core.dqsView = dqsView;
+
+    layout->addWidget(dqsView);
 
     cen->setLayout(layout);
 
