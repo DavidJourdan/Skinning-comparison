@@ -57,12 +57,20 @@ void MainWindow::setUpDeform()
     lbsAction->setCheckable(true);
     lbsAction->setChecked(true);
 
-    connect(lbsAction, &QAction::toggled, core.lbsView, &QWidget::setVisible);
+    connect(lbsAction, &QAction::toggled, [=](bool p) {
+        core.lbsView->setVisible(p);
+        core.lbsView->repaint();
+        core.update();
+    });
 
     auto dqsAction = new QAction { tr("&DQS"), this };
     dqsAction->setCheckable(true);
 
-    connect(dqsAction, &QAction::toggled, core.dqsView, &QWidget::setVisible);
+    connect(dqsAction, &QAction::toggled, [=](bool p) {
+        core.dqsView->setVisible(p);
+        core.dqsView->repaint();
+        core.update();
+    });
 
     auto optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
     optimizedCorsAction->setCheckable(true);
