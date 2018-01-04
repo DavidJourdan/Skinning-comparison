@@ -221,6 +221,10 @@ void Core::initialize()
 
 void Core::update()
 {
+    lbsView->repaint();
+    dqsView->repaint();
+    corView->repaint();
+
     lbsView->update();
     dqsView->update();
     corView->update();

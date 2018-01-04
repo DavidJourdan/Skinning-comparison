@@ -19,25 +19,18 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 {
     auto cen = new QWidget { this };
 
+    setUpViews();
+
     setUpViewWidgets();
 
     auto layout = new QHBoxLayout;
+    layout->setContentsMargins(0, 0, 0, 0);
 
     layout->addWidget(lbsWidget);
 
-    auto dqsView = new view::Dqs { &core, this };
-    dqsView->setVisible(false);
+    layout->addWidget(dqsWidget);
 
-    core.dqsView = dqsView;
-
-    layout->addWidget(dqsView);
-
-    auto corView = new view::Cor { &core, this };
-    corView->setVisible(false);
-
-    core.corView = corView;
-
-    layout->addWidget(corView);
+    layout->addWidget(corWidget);
 
     cen->setLayout(layout);
 
@@ -57,28 +50,47 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::setUpViewWidgets()
+void MainWindow::setUpViews()
 {
-    lbsWidget = new QWidget { this };
-
-    auto lbsLayout = new QVBoxLayout;
-
-    auto lbsTitle = new QLabel { "bjr tlm" };
-
-    lbsLayout->addWidget(lbsTitle);
-
     auto lbsView = new view::Lbs { &core, this };
-
-    {
-        QSizePolicy policy { QSizePolicy::Expanding, QSizePolicy::Expanding };
-        lbsView->setSizePolicy(policy);
-    }
 
     core.lbsView = lbsView;
 
-    lbsLayout->addWidget(lbsView);
+    auto dqsView = new view::Dqs { &core, this };
 
-    lbsWidget->setLayout(lbsLayout);
+    core.dqsView = dqsView;
+
+    auto corView = new view::Cor { &core, this };
+
+    core.corView = corView;
+}
+
+void MainWindow::setUpViewWidgets()
+{
+    const auto setUpWidget = [=](QWidget *&widget, view::Base *view, QString name) {
+        widget = new QWidget { this };
+
+        QSizePolicy policy { QSizePolicy::Preferred, QSizePolicy::Expanding };
+        view->setSizePolicy(policy);
+
+        auto layout = new QVBoxLayout;
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(0);
+
+        auto title = new QLabel { name };
+        title->setAlignment(Qt::AlignHCenter);
+        title->setMargin(5);
+
+        layout->addWidget(title);
+
+        layout->addWidget(view);
+
+        widget->setLayout(layout);
+    };
+
+    setUpWidget(lbsWidget, core.lbsView, "Linear blend skinning");
+    setUpWidget(dqsWidget, core.dqsView, "Dual quaternion skinning");
+    setUpWidget(corWidget, core.corView, "Méthode de l'article");
 }
 
 void MainWindow::setUpDeform()
@@ -86,31 +98,33 @@ void MainWindow::setUpDeform()
 
     auto lbsAction = new QAction { tr("&LBS"), this };
     lbsAction->setCheckable(true);
-    lbsAction->setChecked(true);
 
     connect(lbsAction, &QAction::toggled, [=](bool p) {
         lbsWidget->setVisible(p);
-        core.lbsView->repaint();
         core.update();
     });
+
+    lbsAction->setChecked(true);
 
     auto dqsAction = new QAction { tr("&DQS"), this };
     dqsAction->setCheckable(true);
 
     connect(dqsAction, &QAction::toggled, [=](bool p) {
-        core.dqsView->setVisible(p);
-        core.dqsView->repaint();
+        dqsWidget->setVisible(p);
         core.update();
     });
+
+    dqsWidget->setVisible(false);
 
     auto optimizedCorsAction = new QAction { tr("&Méthode de l'article"), this };
     optimizedCorsAction->setCheckable(true);
 
     connect(optimizedCorsAction, &QAction::toggled, [=](bool p) {
-        core.corView->setVisible(p);
-        core.corView->repaint();
+        corWidget->setVisible(p);
         core.update();
     });
+
+    corWidget->setVisible(false);
 
     auto group = new QActionGroup { this };
 

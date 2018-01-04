@@ -19,7 +19,10 @@ private:
     Core core;
 
     QWidget *lbsWidget;
+    QWidget *dqsWidget;
+    QWidget *corWidget;
 
+    void setUpViews();
     void setUpViewWidgets();
 
     void setUpDeform();
