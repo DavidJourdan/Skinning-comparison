@@ -38,6 +38,8 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 
     core.corView = corView;
 
+    layout->addWidget(corView);
+
     cen->setLayout(layout);
 
     setCentralWidget(cen);
