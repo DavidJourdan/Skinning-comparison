@@ -39,10 +39,14 @@ void view::Lbs::setUpShader()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
+    core->vbo.release();
+
     core->normBuffer.bind();
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
+
+    core->normBuffer.release();
 
     core->boneDataBuffer.bind();
 
@@ -51,6 +55,8 @@ void view::Lbs::setUpShader()
         glEnableVertexAttribArray(2 + i);
     }
 
+    core->boneDataBuffer.release();
+
     core->boneIndexBuffer.bind();
 
     for (size_t i = 0; i < MAX_BONE_COUNT / 4; ++i) {
@@ -58,10 +64,14 @@ void view::Lbs::setUpShader()
         glEnableVertexAttribArray(2 + MAX_BONE_COUNT / 4 + i);
     }
 
+    core->boneIndexBuffer.release();
+
     core->boneListSizeBuffer.bind();
 
     glVertexAttribIPointer(2 + (2 * MAX_BONE_COUNT) / 4, 1, GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(2 + (2 * MAX_BONE_COUNT) / 4);
+
+    core->boneListSizeBuffer.release();
 
     vao.release();
 

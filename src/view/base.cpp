@@ -157,10 +157,14 @@ void Base::setUpBones()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(0);
 
+    core->lineBuffer.release();
+
     core->lineColors.bind();
 
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
     glEnableVertexAttribArray(1);
+
+    core->lineColors.release();
 
     boneProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/boneshader.vert");
     boneProg.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/boneshader.frag");
@@ -224,7 +228,7 @@ void Base::endPickBone()
     const auto &bones = core->mesh.getBones();
     const auto &art = core->mesh.getArticulations();
 
-    size_t bone;
+    size_t bone = 0;
     auto min = std::numeric_limits<float>::max();
 
     const auto sqDst = [&](const Bone &bone) {
