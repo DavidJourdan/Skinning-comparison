@@ -1,5 +1,7 @@
 #include "lbs.h"
 
+#include <QStatusBar>
+
 view::Lbs::Lbs(Core *core, QWidget *parent) : Base(core, parent)
 {
 

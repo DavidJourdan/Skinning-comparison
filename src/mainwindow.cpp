@@ -8,6 +8,7 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 
 #include "view/lbs.h"
 #include "view/dqs.h"
@@ -18,13 +19,11 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 {
     auto cen = new QWidget { this };
 
+    setUpViewWidgets();
+
     auto layout = new QHBoxLayout;
 
-    auto lbsView = new view::Lbs { &core, this };
-
-    core.lbsView = lbsView;
-
-    layout->addWidget(lbsView);
+    layout->addWidget(lbsWidget);
 
     auto dqsView = new view::Dqs { &core, this };
     dqsView->setVisible(false);
@@ -58,6 +57,30 @@ MainWindow::~MainWindow()
 
 }
 
+void MainWindow::setUpViewWidgets()
+{
+    lbsWidget = new QWidget { this };
+
+    auto lbsLayout = new QVBoxLayout;
+
+    auto lbsTitle = new QLabel { "bjr tlm" };
+
+    lbsLayout->addWidget(lbsTitle);
+
+    auto lbsView = new view::Lbs { &core, this };
+
+    {
+        QSizePolicy policy { QSizePolicy::Expanding, QSizePolicy::Expanding };
+        lbsView->setSizePolicy(policy);
+    }
+
+    core.lbsView = lbsView;
+
+    lbsLayout->addWidget(lbsView);
+
+    lbsWidget->setLayout(lbsLayout);
+}
+
 void MainWindow::setUpDeform()
 {
 
@@ -66,7 +89,7 @@ void MainWindow::setUpDeform()
     lbsAction->setChecked(true);
 
     connect(lbsAction, &QAction::toggled, [=](bool p) {
-        core.lbsView->setVisible(p);
+        lbsWidget->setVisible(p);
         core.lbsView->repaint();
         core.update();
     });

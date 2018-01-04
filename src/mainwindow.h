@@ -18,6 +18,10 @@ public:
 private:
     Core core;
 
+    QWidget *lbsWidget;
+
+    void setUpViewWidgets();
+
     void setUpDeform();
     void setupMiscellaneous();
     void setupView();
