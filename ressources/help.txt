@@ -1,0 +1,7 @@
+Liste de commandes
+
+Sélectionner un os : Touche 'S' puis cliquer sur l'os à sélectionner
+Zoomer sur l'os sélectionné : Touche 'Z'
+Déplacer l'os : Touche ctrl puis cliquer-glisser
+
+Attention : Pour la méthode 'optimized cors' il faut au préalable calculer les centres de rotation associés à chaque sommet en appuyant sur 'C'

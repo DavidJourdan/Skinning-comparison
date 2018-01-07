@@ -29,6 +29,8 @@ private:
     void setupMiscellaneous();
     void setupView();
     void setupSkeleton();
+
+    void openHelpWindow();
 };
 
 #endif // MAINWINDOW_H

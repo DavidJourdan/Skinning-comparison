@@ -41,7 +41,8 @@ HEADERS  += src/mainwindow.h \
     src/core.h \
     src/view/lbs.h \
     src/view/dqs.h \
-    src/view/cor.h
+    src/view/cor.h \
+    src/helpwindow.h
 
 unix:!macx {
     LIBS += -lassimp

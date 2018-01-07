@@ -14,6 +14,8 @@
 #include "view/dqs.h"
 #include "view/cor.h"
 
+#include "helpwindow.h"
+
 MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { parent },
     core { config }
 {
@@ -90,7 +92,7 @@ void MainWindow::setUpViewWidgets()
 
     setUpWidget(lbsWidget, core.lbsView, "Linear blend skinning");
     setUpWidget(dqsWidget, core.dqsView, "Dual quaternion skinning");
-    setUpWidget(corWidget, core.corView, "Méthode de l'article");
+    setUpWidget(corWidget, core.corView, "Optimized centers of rotation");
 }
 
 void MainWindow::setUpDeform()
@@ -162,6 +164,15 @@ void MainWindow::setupMiscellaneous()
     });
 
     menu->addAction(computeCors);
+
+    auto help = new QAction { tr("&Aide"), this };
+    help->setShortcut(QKeySequence(tr("h")));
+
+    connect(help, &QAction::triggered, [=] {
+        openHelpWindow();
+    });
+
+    menu->addAction(help);
 
     auto quit = new QAction { tr("&Quitter l'application"), this };
     quit->setShortcuts({ QKeySequence::Quit, Qt::Key_Escape });
@@ -244,4 +255,9 @@ void MainWindow::setupSkeleton()
     });
 
     menu->addAction(pickBone);
+}
+
+void MainWindow::openHelpWindow() {
+    HelpWindow *help = new HelpWindow();
+    help->show();
 }
