@@ -40,7 +40,7 @@ void main(void)
     vec4 bEps = vec4(0.0);
 
     uint idx0 = getIndex(0);
-    s[0] = 1;
+    s[0] = 0;
 
     for (uint i = 1; i < size; ++i) {
         uint idx = getIndex(i);
@@ -55,8 +55,8 @@ void main(void)
         float w = getWeight(i);
         uint idx = getIndex(i);
 
-        b0 += w * pow(-1, s[i]) * dqTrNonDual[idx];
-        bEps += w * pow(-1, s[i]) * dqTrDual[idx];
+        b0 += w * (s[i] == 0 ? 1.0 : -1.0) * dqTrNonDual[idx];
+        bEps += w * (s[i] == 0 ? 1.0 : -1.0) * dqTrDual[idx];
     }
 
     float b0NormInv = 1.0/(length(b0));
