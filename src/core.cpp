@@ -221,11 +221,17 @@ void Core::initialize()
 
 void Core::update()
 {
-    lbsView->repaint();
-    dqsView->repaint();
-    corView->repaint();
+    QCoreApplication::processEvents();
 
     lbsView->update();
     dqsView->update();
     corView->update();
+
+    QCoreApplication::processEvents();
+
+    lbsView->update();
+    dqsView->update();
+    corView->update();
+
+    QCoreApplication::processEvents();
 }
