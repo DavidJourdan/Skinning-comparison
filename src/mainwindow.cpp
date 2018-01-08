@@ -147,6 +147,15 @@ void MainWindow::setUpDeform()
 
     connect(exclusive, &QAction::toggled, [=](bool p) {
         group->setExclusive(!p);
+        if (!p) {
+            const auto checked = group->checkedAction();
+
+            lbsAction->setChecked(false);
+            dqsAction->setChecked(false);
+            optimizedCorsAction->setChecked(false);
+
+            checked->setChecked(true);
+        }
     });
 
     deformMenu->addAction(exclusive);
