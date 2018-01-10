@@ -221,17 +221,7 @@ void Core::initialize()
 
 void Core::update()
 {
-    QCoreApplication::processEvents();
-
     lbsView->update();
     dqsView->update();
     corView->update();
-
-    QCoreApplication::processEvents();
-
-    lbsView->update();
-    dqsView->update();
-    corView->update();
-
-    QCoreApplication::processEvents();
 }

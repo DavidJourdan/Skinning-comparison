@@ -97,13 +97,18 @@ void MainWindow::setUpViewWidgets()
 
 void MainWindow::setUpDeform()
 {
+    const auto forceUpdate = [&] {
+        core.update();
+        QCoreApplication::processEvents();
+        core.update();
+    };
 
     auto lbsAction = new QAction { tr("&LBS"), this };
     lbsAction->setCheckable(true);
 
     connect(lbsAction, &QAction::toggled, [=](bool p) {
         lbsWidget->setVisible(p);
-        core.update();
+        forceUpdate();
     });
 
     lbsAction->setChecked(true);
@@ -113,7 +118,7 @@ void MainWindow::setUpDeform()
 
     connect(dqsAction, &QAction::toggled, [=](bool p) {
         dqsWidget->setVisible(p);
-        core.update();
+        forceUpdate();
     });
 
     dqsWidget->setVisible(false);
@@ -123,7 +128,7 @@ void MainWindow::setUpDeform()
 
     connect(optimizedCorsAction, &QAction::toggled, [=](bool p) {
         corWidget->setVisible(p);
-        core.update();
+        forceUpdate();
     });
 
     corWidget->setVisible(false);
