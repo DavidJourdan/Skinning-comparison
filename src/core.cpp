@@ -1,6 +1,8 @@
 #include "core.h"
 #include "view/base.h"
 
+using namespace std;
+
 Core::Core(const Config &config) :
     mesh { Mesh::fromCustomFile(config) },
     vbo(QOpenGLBuffer::VertexBuffer),
@@ -16,7 +18,8 @@ Core::Core(const Config &config) :
     pointBoneDataBuffer(QOpenGLBuffer::VertexBuffer),
     pointBoneIndexBuffer(QOpenGLBuffer::VertexBuffer),
     pointBoneListSizeBuffer(QOpenGLBuffer::VertexBuffer),
-    meshMode(GL_FILL)
+    meshMode(GL_FILL),
+    fileName(config.inputFile)
 {
 
 }
@@ -65,12 +68,47 @@ void Core::computeCoRs() {
     if (corsComputed_) {
         return;
     }
-    {
-        const auto cursor = QCursor { Qt::CursorShape::WaitCursor };
+    std::vector<QVector3D> centers;
+
+    QString name = QString(fileName.data());
+    name = name.split("/").last();
+    name = "ressources/" + name;
+    int size = name.size();
+
+    name.truncate(size - 4); // remove the '.obj'
+    name += ".cor";
+
+    QFile file(name);
+
+    if(file.exists()) {
+        if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+
+            QTextStream in(&file);
+            while (!in.atEnd()) {
+                QString line = in.readLine();
+                QStringList list = line.split(" ");
+                centers.push_back(QVector3D(list.at(0).toFloat(), list.at(1).toFloat(), list.at(2).toFloat()));
+            }
+        }
+    } else {
+        {        
+            const auto cursor = QCursor { Qt::CursorShape::WaitCursor };
+            QGuiApplication::setOverrideCursor(cursor);
+        }
+
+        centers = mesh.computeCoRs();
+
+        const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
         QGuiApplication::setOverrideCursor(cursor);
+
+        if (file.open(QFile::WriteOnly | QFile::Truncate)) {
+            QTextStream out(&file);
+            for(QVector3D v : centers) {
+                out << v.x() << " " << v.y() << " " << v.z() << "\n";
+            }
+        }
     }
 
-    std::vector<QVector3D> centers = mesh.computeCoRs();
     pointBuffer.bind();
     pointBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
     pointBuffer.release();
@@ -80,9 +118,6 @@ void Core::computeCoRs() {
     corBuffer.release();
 
     corsComputed_ = true;
-
-    const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
-    QGuiApplication::setOverrideCursor(cursor);
 }
 
 void Core::editBone(size_t i)

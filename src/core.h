@@ -2,6 +2,7 @@
 #define CORE_H
 
 #include <vector>
+#include <string>
 
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
@@ -11,6 +12,9 @@
 #include <QOpenGLFunctions_4_1_Core>
 #include <QGuiApplication>
 #include <QCursor>
+#include <QString>
+#include <QTextStream>
+#include <QStringList>
 
 #include "config.h"
 #include "mesh.h"
@@ -27,6 +31,7 @@ public:
     Core(const Config &config);
 
     Mesh mesh;
+    std::string fileName;
 
     // Set up OpenGL resources.
     void initialize();
