@@ -81,6 +81,7 @@ public:
     void updateSkeleton();
 
     bool isPickingBone { false };
+    bool isPickingCor { false };
     bool corsComputed() { return corsComputed_; }
 
 private:

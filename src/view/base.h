@@ -55,6 +55,7 @@ protected:
     QVector3D prevPos;
 
     void endPickBone();
+    void endPickCor();
 
     QVector3D screenToViewport(QPointF screenPos);
 

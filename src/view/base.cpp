@@ -225,23 +225,22 @@ void Base::endPickBone()
     const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
     QGuiApplication::setOverrideCursor(cursor);
 
-    const auto &bones = core->mesh.getBones();
-    const auto &art = core->mesh.getArticulations();
-
-    size_t bone = 0;
-    auto min = std::numeric_limits<float>::max();
+    const std::vector<Bone>    &bones = core->mesh.getBones();
+    const std::vector<QVector3D> &art = core->mesh.getArticulations();
 
     const auto sqDst = [&](const Bone &bone) {
         auto &viewMatrix = core->viewMatrix;
         auto &modelMatrix = core->modelMatrix;
 
-        auto p0 = projectionMatrix * viewMatrix * modelMatrix * art[bone.parent];
-        auto p1 = projectionMatrix * viewMatrix * modelMatrix * art[bone.child];
+        // get on-screen position of bone vertices
+        QVector3D p0 = projectionMatrix * viewMatrix * modelMatrix * art[bone.parent];
+        QVector3D p1 = projectionMatrix * viewMatrix * modelMatrix * art[bone.child];
 
         p0.setZ(0.0f);
         p1.setZ(0.0f);
 
-        const auto d = p1 - p0;
+        QVector3D d = p1 - p0;
+        d.normalize();
 
         const auto v0 = prevPos - p0;
         const auto v1 = prevPos - p1;
@@ -252,10 +251,14 @@ void Base::endPickBone()
             return v1.lengthSquared();
         }
 
-        const auto proj = QVector3D::dotProduct(v0, d) / d.lengthSquared() * d;
+        // cursor is between the two bone endpoints
+        const auto proj = QVector3D::dotProduct(v0, d) * d;
         return v0.lengthSquared() - proj.lengthSquared();
     };
 
+    // find closest bone
+    size_t bone = 0;
+    auto min = std::numeric_limits<float>::max();
     for (size_t i = 0; i < core->mesh.getEdgeNumber(); ++i) {
         const auto d = sqDst(bones[i]);
         if (d < min) {
@@ -267,6 +270,43 @@ void Base::endPickBone()
     core->mesh.setBoneSelected(bone);
     core->noBoneActiv();
     core->showBoneActiv();
+    core->update();
+}
+
+void Base::endPickCor()
+{
+    core->isPickingCor = false;
+    const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
+    QGuiApplication::setOverrideCursor(cursor);
+
+    std::vector<QVector3D> cors = core->mesh.getCoRs();
+
+    const auto sqDst = [&](QVector3D cor) {
+        auto &viewMatrix = core->viewMatrix;
+        auto &modelMatrix = core->modelMatrix;
+
+        // get on-screen position of the center of rotation
+        QVector3D corProj = projectionMatrix * viewMatrix * modelMatrix * cor;
+
+        corProj.setZ(0.0f);
+
+        return ( corProj - prevPos ).lengthSquared();
+    };
+
+    // find closest vertex
+    auto min = std::numeric_limits<float>::max();
+    uint corIdx = 0;
+    for (size_t i = 0; i < cors.size(); ++i) {
+        const auto d = sqDst(cors[i]);
+        if (d < min) {
+            min = d;
+            corIdx = i;
+        }
+    }
+
+    core->mesh.setCorSelected(corIdx);
+    core->noCorActiv();
+    core->showCorActiv();
     core->update();
 }
 
