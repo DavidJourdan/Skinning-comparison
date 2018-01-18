@@ -47,10 +47,6 @@ public:
     QOpenGLBuffer lineBuffer;
     QOpenGLBuffer lineIndices;
     QOpenGLBuffer lineColors;
-    QOpenGLBuffer pointBuffer;
-    QOpenGLBuffer pointBoneDataBuffer;
-    QOpenGLBuffer pointBoneIndexBuffer;
-    QOpenGLBuffer pointBoneListSizeBuffer;
 
     // The model and view matrices are shared across views, as views are meant
     // to allow comparing different deforming methods in the same pose.

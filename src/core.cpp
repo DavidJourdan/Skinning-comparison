@@ -14,10 +14,6 @@ Core::Core(const Config &config) :
     lineBuffer(QOpenGLBuffer::VertexBuffer),
     lineIndices(QOpenGLBuffer::IndexBuffer),
     lineColors(QOpenGLBuffer::VertexBuffer),
-    pointBuffer(QOpenGLBuffer::VertexBuffer),
-    pointBoneDataBuffer(QOpenGLBuffer::VertexBuffer),
-    pointBoneIndexBuffer(QOpenGLBuffer::VertexBuffer),
-    pointBoneListSizeBuffer(QOpenGLBuffer::VertexBuffer),
     meshMode(GL_FILL),
     fileName(config.inputFile)
 {
@@ -108,10 +104,6 @@ void Core::computeCoRs() {
             }
         }
     }
-
-    pointBuffer.bind();
-    pointBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
-    pointBuffer.release();
 
     corBuffer.bind();
     corBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
