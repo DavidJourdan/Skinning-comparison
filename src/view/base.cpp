@@ -31,7 +31,7 @@ void Base::mouseMoveEvent(QMouseEvent *event)
     const auto mod = event->modifiers();
 
     if(leftButtonPressed) {
-        if(mod & Qt::ControlModifier) {
+        if(mod & Qt::ControlModifier && core->mesh.getBoneSelected() >= 0) {
             auto &mesh = core->mesh;
             
             const auto pos = screenToViewport(event->localPos());
@@ -47,7 +47,7 @@ void Base::mouseMoveEvent(QMouseEvent *event)
             
             prevPos = pos;
 
-        } else if(mod & Qt::ShiftModifier) {
+        } else if(mod & Qt::ShiftModifier && core->mesh.getCorSelected() >= 0) {
             // move selected CoR
 
         } else {

@@ -34,8 +34,11 @@ public:
     const std::vector<QVector3D> &computeCoRs(void);
     QVector3D computeCoR(uint i);
     
-    uint getBoneSelected() const {return boneSelected;}
+    int getBoneSelected() const {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getEdgeNumber();}
+
+    int getCorSelected() const {return corSelected;}
+    void setCorSelected(uint i) {corSelected = i;}
 
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);
@@ -55,7 +58,8 @@ private:
     std::vector<QVector3D> normals;
     std::vector<QVector3D> CoRs;
     Skeleton skeleton;
-    uint boneSelected { 0 };
+    int boneSelected { - 1 };
+    int corSelected {  - 1 };
     float area(Triangle t);
 };
 
