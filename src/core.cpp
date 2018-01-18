@@ -14,10 +14,7 @@ Core::Core(const Config &config) :
     lineBuffer(QOpenGLBuffer::VertexBuffer),
     lineIndices(QOpenGLBuffer::IndexBuffer),
     lineColors(QOpenGLBuffer::VertexBuffer),
-    pointBuffer(QOpenGLBuffer::VertexBuffer),
-    pointBoneDataBuffer(QOpenGLBuffer::VertexBuffer),
-    pointBoneIndexBuffer(QOpenGLBuffer::VertexBuffer),
-    pointBoneListSizeBuffer(QOpenGLBuffer::VertexBuffer),
+    corColors(QOpenGLBuffer::VertexBuffer),
     meshMode(GL_FILL),
     fileName(config.inputFile)
 {
@@ -29,8 +26,8 @@ void Core::noBoneActiv()
     uint n = mesh.getEdgeNumber();
     std::vector<QVector4D> colors(2*n);
     for(uint i = 0; i < n ; i++) {
-        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
-        QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
+        QVector4D parentColor(1.0, 0.0, 0.0, 1.0); //red
+        QVector4D childColor(1.0, 1.0, 1.0, 1.0); // black
         colors[2*i] = parentColor;
         colors[2*i + 1] = childColor;
     }
@@ -108,10 +105,6 @@ void Core::computeCoRs() {
             }
         }
     }
-
-    pointBuffer.bind();
-    pointBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
-    pointBuffer.release();
 
     corBuffer.bind();
     corBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
@@ -194,6 +187,11 @@ void Core::initialize()
             ++boneListSizes[i];
         }
     }
+
+    corColors.create();
+    corColors.bind();
+    std::vector<QVector4D> colorCors(vertices.size(), QVector4D(1., 0., 0., 1.));
+    corColors.allocate(colorCors.data(), 4*sizeof(GLfloat) * colorCors.size());
 
     boneDataBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
     boneDataBuffer.create();

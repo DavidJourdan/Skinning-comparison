@@ -8,12 +8,15 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec4 weights[MAX_BONE_COUNT / 4];
 layout (location = 4) in uvec4 indices[MAX_BONE_COUNT / 4];
 layout (location = 7) in uint size;
+layout (location = 8) in vec4 col;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 
 uniform mat4 tArr[MAX_TRANSFORMATION_COUNT];
+
+out vec4 color;
 
 float getWeight(uint i) {
     uint q = i / 4;
@@ -37,5 +40,6 @@ void main(void)
         tMat += w * tArr[idx];
     }
 
+    color = col;
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * tMat * vec4(aPos, 1.0);
 }
