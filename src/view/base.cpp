@@ -30,46 +30,51 @@ void Base::mouseMoveEvent(QMouseEvent *event)
 
     const auto mod = event->modifiers();
 
-    if(leftButtonPressed && !(mod & Qt::ControlModifier))
-    {
-        auto pos = screenToViewport(event->localPos());
-        QVector3D movement{ pos - prevPos };
+    if(leftButtonPressed) {
+        if(mod & Qt::ControlModifier) {
+            auto &mesh = core->mesh;
+            
+            const auto pos = screenToViewport(event->localPos());
+            const auto movement = pos - prevPos;
+            const auto center = mesh.getArticulations()[mesh.getBones()[mesh.getBoneSelected()].parent];
+            const auto x = prevPos - projectionMatrix * core->viewMatrix * core->modelMatrix * center;
+            
+            const auto t0 = QVector3D::crossProduct(QVector3D { 0.0, 0.0, 1.0 }, x);
+            
+            const auto angle = qRadiansToDegrees(QVector3D::dotProduct(t0, movement) / t0.lengthSquared());
+            
+            core->moveBone(angle);
+            
+            prevPos = pos;
 
-        constexpr float rotFactor = 1e2;
+        } else if(mod & Qt::ShiftModifier) {
+            // move selected CoR
 
-        auto movementX = QVector3D(movement.x(), 0.0, 0.0);
-        auto movementY = QVector3D(0.0, movement.y(), 0.0);
+        } else {
+            auto pos = screenToViewport(event->localPos());
+            QVector3D movement{ pos - prevPos };
 
-        const auto angle0 = rotFactor * movementY.y();
-        const auto angle1 = rotFactor * movementX.x();
+            constexpr float rotFactor = 1e2;
 
-        movementY = core->viewMatrix.inverted() * movementY;
-        movementX = core->viewMatrix.inverted() * movementX;
+            auto movementX = QVector3D(movement.x(), 0.0, 0.0);
+            auto movementY = QVector3D(0.0, movement.y(), 0.0);
 
-        const auto yAxis = QVector3D { 0.0, 1.0, 0.0 };
+            const auto angle0 = rotFactor * movementY.y();
+            const auto angle1 = rotFactor * movementX.x();
 
-        const auto rotVec0 = rightDirection();
-        const auto rotVec1 = yAxis;
+            movementY = core->viewMatrix.inverted() * movementY;
+            movementX = core->viewMatrix.inverted() * movementX;
 
-        core->viewMatrix.rotate(angle0, rotVec0);
-        core->viewMatrix.rotate(angle1, rotVec1);
+            const auto yAxis = QVector3D { 0.0, 1.0, 0.0 };
 
-        prevPos = pos;
-    } else if (leftButtonPressed) {
-        auto &mesh = core->mesh;
+            const auto rotVec0 = rightDirection();
+            const auto rotVec1 = yAxis;
 
-        const auto pos = screenToViewport(event->localPos());
-        const auto movement = pos - prevPos;
-        const auto center = mesh.getArticulations()[mesh.getBones()[mesh.getBoneSelected()].parent];
-        const auto x = prevPos - projectionMatrix * core->viewMatrix * core->modelMatrix * center;
+            core->viewMatrix.rotate(angle0, rotVec0);
+            core->viewMatrix.rotate(angle1, rotVec1);
 
-        const auto t0 = QVector3D::crossProduct(QVector3D { 0.0, 0.0, 1.0 }, x);
-
-        const auto angle = qRadiansToDegrees(QVector3D::dotProduct(t0, movement) / t0.lengthSquared());
-
-        core->moveBone(angle);
-
-        prevPos = pos;
+            prevPos = pos;
+        }
     }
 
     else if(rightButtonPressed)
@@ -109,6 +114,10 @@ void Base::mousePressEvent(QMouseEvent *event)
 
     if (core->isPickingBone && event->button() == Qt::LeftButton) {
         endPickBone();
+    }
+
+    if (core->isPickingCor && event->button() == Qt::LeftButton) {
+        endPickCor();
     }
 }
 
@@ -305,8 +314,8 @@ void Base::endPickCor()
     }
 
     core->mesh.setCorSelected(corIdx);
-    core->noCorActiv();
-    core->showCorActiv();
+    // core->noCorActiv();
+    // core->showCorActiv();
     core->update();
 }
 
