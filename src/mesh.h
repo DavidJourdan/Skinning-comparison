@@ -38,7 +38,7 @@ public:
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getEdgeNumber();}
 
     int getCorSelected() const {return corSelected;}
-    void setCorSelected(uint i) {corSelected = i;}
+    void setCorSelected(int i) {corSelected = i;}
 
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);

@@ -1,5 +1,6 @@
 #include "core.h"
 #include "view/base.h"
+#include <iostream>
 
 using namespace std;
 
@@ -46,6 +47,28 @@ void Core::showBoneActiv()
     lineColors.write(2*i * sizeof(QVector4D), d.data(), 2*sizeof(QVector4D));
     lineColors.release();
 }
+
+void Core::noCorActiv()
+{
+    int i = mesh.getCorSelected();
+    if(i>=0) {
+        QVector4D data[1] = { QVector4D(1.0, 0.0, 0.0, 1.0) };
+        corColors.bind();
+        corColors.write(i * sizeof(QVector4D), data, sizeof(QVector4D));
+        corColors.release();
+    }
+}
+
+void Core::showCorActiv()
+{
+    uint i = mesh.getCorSelected();
+    std::cout << i << std::endl;
+    QVector4D data[1] = { QVector4D(0.0, 0.8, 0.8, 1.0) };
+    corColors.bind();
+    corColors.write(i * sizeof(QVector4D), data, sizeof(QVector4D));
+    corColors.release();
+}
+
 
 void Core::resetCamera()
 {
@@ -191,7 +214,7 @@ void Core::initialize()
     corColors.create();
     corColors.bind();
     std::vector<QVector4D> colorCors(vertices.size(), QVector4D(1., 0., 0., 1.));
-    corColors.allocate(colorCors.data(), 4*sizeof(GLfloat) * colorCors.size());
+    corColors.allocate(colorCors.data(), 4 * sizeof(GLfloat) * colorCors.size());
 
     boneDataBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
     boneDataBuffer.create();

@@ -71,6 +71,9 @@ public:
     void showBoneActiv();
     void noBoneActiv();
 
+    void showCorActiv();
+    void noCorActiv();
+
     GLenum meshMode;
     bool showBones { true };
     bool showCors { true };
