@@ -18,13 +18,15 @@ void precomputeRun(const QCommandLineParser &parser) {
         auto weightFile = parser.value("w").toStdString();
 
         Config config { inputFile, skelFile, weightFile };
+
+        auto mesh = Mesh::fromCustomFile(config);
+        mesh.computeCoRs();
+        const auto outputFile = parser.value("o").toStdString();
+        mesh.writeToFile(outputFile);
     } else {
         std::cerr << "No skeleton file specified\n";
         std::exit(EXIT_FAILURE);
     }
-
-    auto mesh = Mesh::fromCustomFile(config);
-    mesh.computeCoRs();
 }
 
 int main(int argc, char *argv[])
@@ -38,14 +40,14 @@ int main(int argc, char *argv[])
 
     QCommandLineParser parser;
 
-    QCommandLineOption precomputeOption { QStringList << "p" << "precompute",
+    QCommandLineOption precomputeOption { QStringList() << "p" << "precompute",
                 "GUI mode or compute mode",
                 "precompute"};
 
-    QCommandLineOption inputFileOption(QStringList << "i" << "input", "File to read from", "inputFile");
+    QCommandLineOption inputFileOption(QStringList() << "i" << "input", "File to read from", "inputFile");
     parser.addOption(inputFileOption);
 
-    QCommandLineOption outputFileOption(QStringList << "o" << "output", "File to write to", "outputFile");
+    QCommandLineOption outputFileOption(QStringList() << "o" << "output", "File to write to", "outputFile");
 
     QCommandLineOption skelFileOption { "s", "File to read skeleton from",
                                         "skelFile" };
@@ -58,6 +60,11 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     const auto precomputeMode = parser.isSet(precomputeOption);
+
+    if (precomputeMode) {
+        precomputeRun(parser);
+        return EXIT_SUCCESS;
+    }
 
     auto inputFile = parser.value(inputFileOption).toStdString();
     auto skelFile = parser.value(skelFileOption).toStdString();

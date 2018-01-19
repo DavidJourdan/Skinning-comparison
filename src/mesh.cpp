@@ -255,29 +255,29 @@ void Mesh::writeToFile(const string &fileName)
 
     // Assuming little-endianness for now
     const uint32_t endianness = 0;
-    file.write(reinterpret_cast<char *>(&endianness), 4);
+    file.write(reinterpret_cast<const char *>(&endianness), 4);
 
     const uint32_t vertexCount = vertices.size();
-    file.write(reinterpret_cast<char *>(&vertexCount), 4);
+    file.write(reinterpret_cast<const char *>(&vertexCount), 4);
 
-    file.write(reinterpret_cast<char *>(vertices.data()), vertexCount * sizeof(QVector3D));
+    file.write(reinterpret_cast<const char *>(vertices.data()), vertexCount * sizeof(QVector3D));
 
-    file.write(reinterpret_cast<char *>(normals.data()), vertexCount * sizeof(QVector3D));
+    file.write(reinterpret_cast<const char *>(normals.data()), vertexCount * sizeof(QVector3D));
 
     const uint32_t triangleCount = indices.size() / 3;
-    file.write(reinterpret_cast<char *>(&triangleCount), 4);
+    file.write(reinterpret_cast<const char *>(&triangleCount), 4);
 
-    file.write(reinterpret_cast<char *>(indices.data()), 3 * triangleCount * sizeof(uint32_t));
+    file.write(reinterpret_cast<const char *>(indices.data()), 3 * triangleCount * sizeof(uint32_t));
 
     const auto &articulations = skeleton.getArticulations();
 
     uint32_t articulationCount = articulations.size();
-    file.write(reinterpret_cast<char *>(&articulationCount), 4);
+    file.write(reinterpret_cast<const char *>(&articulationCount), 4);
 
-    file.write(reinterpret_cast<char *>(articulations.data()), articulationCount * sizeof(QVector3D));
+    file.write(reinterpret_cast<const char *>(articulations.data()), articulationCount * sizeof(QVector3D));
 
-    uint32_t edgeCount = skeleton.edgeNb;
-    file.write(reinterpret_cast<char *>(&edgeCount), 4);
+    uint32_t edgeCount = skeleton.getEdgeNumber();
+    file.write(reinterpret_cast<const char *>(&edgeCount), 4);
 
     const auto &bones = skeleton.getBones();
 
@@ -287,16 +287,16 @@ void Mesh::writeToFile(const string &fileName)
     for (uint32_t i = 0; i < edgeCount; ++i) {
         array<uint32_t, 2> outBone;
 
-        outBone[i][0] = bones[i].parent;
-        outBone[i][1] = bones[i].child;
+        outBone[0] = bones[i].parent;
+        outBone[1] = bones[i].child;
 
         outBones.push_back(outBone);
     }
 
-    file.write(reinterpret_cast<char *>(outBones.data()), edgeCount * sizeof(array<uint32_t, 2>>));
+    file.write(reinterpret_cast<const char *>(outBones.data()), edgeCount * sizeof(array<uint32_t, 2>));
 
     uint32_t relationCount = bones.size() - edgeCount;
-    file.write(reinterpret_cast<char *>(&relationCount), 4);
+    file.write(reinterpret_cast<const char *>(&relationCount), 4);
 
     vector<array<uint32_t, 2>> relations;
     relations.reserve(relationCount);
@@ -307,7 +307,25 @@ void Mesh::writeToFile(const string &fileName)
         relations.push_back(relation);
     }
 
-    file.write(reinterpret_cast<char *>(relations.data()), relationCount * sizeof(array<uint32_t, 2>>));
+    file.write(reinterpret_cast<const char *>(relations.data()), relationCount * sizeof(array<uint32_t, 2>));
+
+    const auto weights = skeleton.getWeights();
+    const auto boneIndices = skeleton.getBoneIndices();
+
+    for (uint32_t i = 0; i < vertexCount; ++i) {
+        uint32_t weightCount = 0;
+
+        while(weights[i][weightCount] > -0.5f) {
+            ++weightCount;
+        }
+
+        for (uint32_t j = 0; j < weightCount; ++j) {
+            file.write(reinterpret_cast<const char *>(boneIndices[i] + j), sizeof(uint32_t));
+            file.write(reinterpret_cast<const char *>(weights[i] + j), sizeof(float));
+        }
+    }
+
+    file.write(reinterpret_cast<const char *>(CoRs.data()), vertexCount * sizeof(QVector3D));
 }
 
 void Mesh::rotateBone(float angle, QVector3D axis)
