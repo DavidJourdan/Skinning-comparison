@@ -149,25 +149,28 @@ Mesh Mesh::fromCustomFile(const Config &config)
     return Mesh(vertices, indices, normals, skeleton);
 }
 
+using std::array;
+using std::pair;
+
 Mesh Mesh::fromOcorFile(const string &fileName)
 {
-    ifstream file { fileName, std::ios::binary | std::io::in };
+    ifstream file { fileName, std::ios::binary | std::ios::in };
 
     if (!file.is_open()) {
         std::cerr << "Could not open file.\n";
         std::exit(EXIT_FAILURE);
     }
 
-    char id[4];
-    file.read(id, 4);
+    array<char, 4> id;
+    file.read(id.data(), 4);
     const auto ok = id[0] == 'O' && id[1] == 'C' && id[2] == 'O' && id[3] == 'R';
     if (!ok) {
         std::cerr << "File identifier does not match.\n";
         std::exit(EXIT_FAILURE);
     }
 
-    char endianness[4];
-    file.read(endianness, 4);
+    uint32_t endianness;
+    file.read(reinterpret_cast<char *>(&endianness), 4);
     if (endianness != 0) {
         std::cerr << "Big-endian files unsupported for now\n";
     }
@@ -178,6 +181,9 @@ Mesh Mesh::fromOcorFile(const string &fileName)
     using std::vector;
     vector<QVector3D> vertices(vertexCount);
     file.read(reinterpret_cast<char *>(vertices.data()), vertices.size() * sizeof(QVector3D));
+
+    vector<QVector3D> normals(vertexCount);
+    file.read(reinterpret_cast<char *>(normals.data()), normals.size() * sizeof(QVector3D));
 
     uint32_t triangleCount;
     file.read(reinterpret_cast<char *>(&triangleCount), 4);
@@ -194,16 +200,45 @@ Mesh Mesh::fromOcorFile(const string &fileName)
     uint32_t edgeCount;
     file.read(reinterpret_cast<char *>(&edgeCount), 4);
 
-    vector<uint32_t[2]> edges(edgeCount);
-    file.read(reinterpret_cast<char *>(edges.data()), edgeCount * sizeof(uint32_t[2]));
+    vector<array<uint32_t, 2>> bones(edgeCount);
+    file.read(reinterpret_cast<char *>(bones.data()), edgeCount * sizeof(array<uint32_t, 2>));
 
     uint32_t relationCount;
     file.read(reinterpret_cast<char *>(&relationCount), 4);
 
-    vector<uint32_t[2]> relations(relationCount);
-    file.read(reinterpret_cast<char *>(relations.data()), relationCount * sizeof(uint32_t[2]));
+    bones.resize(edgeCount + relationCount);
+    file.read(reinterpret_cast<char *>(bones.data() + edgeCount), relationCount * sizeof(array<uint32_t, 2>));
 
+    vector<vector<pair<uint32_t, float>>> weightLists;
+    weightLists.reserve(vertexCount);
 
+    for (uint32_t i = 0; i < vertexCount; ++i) {
+        uint32_t weightCount;
+        file.read(reinterpret_cast<char *>(&weightCount), 4);
+
+        vector<pair<uint32_t, float>> list(weightCount);
+        file.read(reinterpret_cast<char *>(list.data()), weightCount * sizeof(pair<uint32_t, float>));
+
+        weightLists.push_back(std::move(list));
+    }
+
+    const Skeleton skeleton(std::move(articulations),
+                      std::move(bones),
+                      edgeCount,
+                      std::move(weightLists));
+
+    vector<QVector3D> cors(vertexCount);
+    file.read(reinterpret_cast<char *>(cors.data()), cors.size() * sizeof(QVector3D));
+
+    using std::move;
+
+    const Mesh retVal(move(vertices),
+                      move(indices),
+                      move(normals),
+                      move(skeleton),
+                      move(cors));
+
+    return retVal;
 }
 
 void Mesh::rotateBone(float angle, QVector3D axis)
@@ -231,6 +266,17 @@ Mesh::Mesh(std::vector<QVector3D> vertices,
     indices { indices }, normals { normals }, skeleton { skeleton }
 {
     CoRs.reserve(indices.size());
+}
+
+Mesh::Mesh(vector<QVector3D> vertices,
+           vector<unsigned> indices,
+           vector<QVector3D> normals,
+           Skeleton skeleton,
+           vector<QVector3D> cors) : vertices { vertices },
+    indices { indices }, normals { normals },
+    skeleton { skeleton }, CoRs { cors }
+{
+
 }
 
 const vector<QVector3D> &Mesh::computeCoRs() {

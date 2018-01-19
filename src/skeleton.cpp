@@ -37,6 +37,78 @@ Skeleton::Skeleton(const string &skelFile, const string &weightFile, size_t mesh
     parseWeights(weightFile, meshVertexCount);
 }
 
+using std::array;
+using std::pair;
+
+Skeleton::Skeleton(vector<QVector3D> articulations,
+                   vector<array<uint32_t, 2>> bones,
+                   uint32_t edgeCount,
+                   vector<vector<pair<uint32_t, float>>> weightLists) :
+    articulations { articulations },
+    edgeNb { edgeCount }
+{
+    transformations = std::vector<QMatrix4x4>(edgeCount);
+    quaternions = std::vector<QVector4D>(edgeCount, QVector4D(0, 0, 0, 1));
+    transformationsDQNonDualPart = std::vector<QVector4D>(edgeCount, QVector4D(0, 0, 0, 1));
+    transformationsDQDualPart = std::vector<QVector4D>(edgeCount, QVector4D(0, 0, 0, 0));
+
+    vector<vector<uint32_t>> outgoingEdges(articulations.size());
+
+    for (const auto bone : bones) {
+        outgoingEdges[bone[0]].push_back(bone[1]);
+    }
+
+    vector<Bone> mBones;
+    mBones.reserve(bones.size());
+
+    for (uint32_t i = 0; i < edgeCount; ++i) {
+        const auto bone = Bone(
+                    true,
+                    bones[i][0],
+                bones[i][1],
+                outgoingEdges[bones[i][1]].size()
+                );
+
+        for (uint32_t j = 0; j < bone.successorNb; ++j) {
+            bone.successors[j] = outgoingEdges[bones[i][1]][j];
+        }
+
+        mBones.push_back(bone);
+    }
+
+    for (size_t i = edgeCount; i < bones.size(); ++i) {
+        const auto bone = Bone(
+                    false,
+                    bones[i][0],
+                bones[i][1],
+                outgoingEdges[bones[i][1]].size()
+                );
+
+        for (uint32_t j = 0; j < bone.successorNb; ++j) {
+            bone.successors[j] = outgoingEdges[i][j];
+        }
+
+        mBones.push_back(bone);
+    }
+
+    weights = new float *[weightLists.size()];
+    boneInd = new uint *[weightLists.size()];
+
+    for (size_t i = 0; i < weightLists.size(); ++i) {
+        const auto &list = weightLists[i];
+
+        weights[i] = new float[list.size() + 1];
+        boneInd[i] = new uint[list.size()];
+
+        for (size_t j = 0; j < list.size(); ++j) {
+            boneInd[i][j] = list[j].first;
+            weights[i][j] = list[j].second;
+        }
+
+        weights[i][list.size()] = -1.0f;
+    }
+}
+
 Skeleton::Skeleton(){}
 
 Skeleton::~Skeleton() {

@@ -29,10 +29,18 @@ struct Bone {
     }
 };
 
+using std::vector;
+using std::pair;
+using std::array;
+
 class Skeleton
 {
 public:
     Skeleton(const std::string &weightFile, const std::string &skelFile, size_t meshVertexCount);
+    Skeleton(vector<QVector3D> articulations,
+             vector<array<uint32_t, 2>> bones,
+             uint32_t edgeCount,
+             vector<vector<pair<uint32_t, float>>> weightLists);
     Skeleton(uint, uint, aiBone**);
     Skeleton();
     ~Skeleton();

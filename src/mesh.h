@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+using std::vector;
+
 #include<QVector3D>
 #include "skeleton.h"
 #include "config.h"
@@ -19,6 +21,12 @@ public:
          std::vector<unsigned> indices,
          std::vector<QVector3D> normals,
          Skeleton skeleton);
+
+    Mesh(vector<QVector3D> vertices,
+         vector<unsigned> indices,
+         vector<QVector3D> normals,
+         Skeleton skeleton,
+         vector<QVector3D> cors);
 
     std::vector<QVector3D>& getVertices() { return vertices; }
     std::vector<unsigned>& getIndices() { return indices;}
