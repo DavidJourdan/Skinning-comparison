@@ -159,15 +159,51 @@ Mesh Mesh::fromOcorFile(const string &fileName)
     }
 
     char id[4];
-
-    ifstream.read(id, 4);
-
+    file.read(id, 4);
     const auto ok = id[0] == 'O' && id[1] == 'C' && id[2] == 'O' && id[3] == 'R';
-
     if (!ok) {
         std::cerr << "File identifier does not match.\n";
         std::exit(EXIT_FAILURE);
     }
+
+    char endianness[4];
+    file.read(endianness, 4);
+    if (endianness != 0) {
+        std::cerr << "Big-endian files unsupported for now\n";
+    }
+
+    uint32_t vertexCount;
+    file.read(reinterpret_cast<char *>(&vertexCount), 4);
+
+    using std::vector;
+    vector<QVector3D> vertices(vertexCount);
+    file.read(reinterpret_cast<char *>(vertices.data()), vertices.size() * sizeof(QVector3D));
+
+    uint32_t triangleCount;
+    file.read(reinterpret_cast<char *>(&triangleCount), 4);
+
+    vector<uint32_t> indices(3 * triangleCount);
+    file.read(reinterpret_cast<char *>(indices.data()), 3 * 4 * triangleCount);
+
+    uint32_t articulationCount;
+    file.read(reinterpret_cast<char *>(&articulationCount), 4);
+
+    vector<QVector3D> articulations(articulationCount);
+    file.read(reinterpret_cast<char *>(articulations.data()), articulationCount * sizeof(QVector3D));
+
+    uint32_t edgeCount;
+    file.read(reinterpret_cast<char *>(&edgeCount), 4);
+
+    vector<uint32_t[2]> edges(edgeCount);
+    file.read(reinterpret_cast<char *>(edges.data()), edgeCount * sizeof(uint32_t[2]));
+
+    uint32_t relationCount;
+    file.read(reinterpret_cast<char *>(&relationCount), 4);
+
+    vector<uint32_t[2]> relations(relationCount);
+    file.read(reinterpret_cast<char *>(relations.data()), relationCount * sizeof(uint32_t[2]));
+
+
 }
 
 void Mesh::rotateBone(float angle, QVector3D axis)
