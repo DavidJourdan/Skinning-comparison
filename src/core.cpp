@@ -1,6 +1,5 @@
 #include "core.h"
 #include "view/base.h"
-#include <iostream>
 
 using namespace std;
 
@@ -62,7 +61,6 @@ void Core::noCorActiv()
 void Core::showCorActiv()
 {
     uint i = mesh.getCorSelected();
-    std::cout << i << std::endl;
     QVector4D data[1] = { QVector4D(0.0, 0.8, 0.8, 1.0) };
     corColors.bind();
     corColors.write(i * sizeof(QVector4D), data, sizeof(QVector4D));
@@ -110,6 +108,8 @@ void Core::computeCoRs() {
                 centers.push_back(QVector3D(list.at(0).toFloat(), list.at(1).toFloat(), list.at(2).toFloat()));
             }
         }
+
+        mesh.setCoRs(centers);
     } else {
         {        
             const auto cursor = QCursor { Qt::CursorShape::WaitCursor };

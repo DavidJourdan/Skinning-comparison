@@ -288,9 +288,9 @@ void Base::endPickCor()
     const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
     QGuiApplication::setOverrideCursor(cursor);
 
-    std::vector<QVector3D> cors = core->mesh.getCoRs();
+    const std::vector<QVector3D> &cors = core->mesh.getCoRs();
 
-    const auto sqDst = [&](QVector3D cor) {
+    const auto sqDst = [&](const QVector3D &cor) {
         auto &viewMatrix = core->viewMatrix;
         auto &modelMatrix = core->modelMatrix;
 
@@ -303,10 +303,10 @@ void Base::endPickCor()
     };
 
     // find closest vertex
-    auto min = std::numeric_limits<float>::max();
+    float min = std::numeric_limits<float>::max();
     uint corIdx = 0;
     for (size_t i = 0; i < cors.size(); ++i) {
-        const auto d = sqDst(cors[i]);
+        float d = sqDst(cors[i]);
         if (d < min) {
             min = d;
             corIdx = i;
@@ -314,8 +314,8 @@ void Base::endPickCor()
     }
 
     core->mesh.setCorSelected(corIdx);
-    // core->noCorActiv();
-    // core->showCorActiv();
+    core->noCorActiv();
+    core->showCorActiv();
     core->update();
 }
 

@@ -24,10 +24,12 @@ public:
     std::vector<unsigned>& getIndices() { return indices;}
     std::vector<QVector3D>& getNormals() {return normals;}
     std::vector<QVector3D> getSkelLines() { return skeleton.getSkelLines(); }
-    std::vector<QVector3D> &getCoRs(void) { return CoRs; }
-    const std::vector<QVector3D> &getCoRs(void) const { return CoRs; }
     const std::vector<QVector3D> &getArticulations() const { return skeleton.getArticulations(); }
     const std::vector<Bone> &getBones() const { return skeleton.getBones(); }
+
+    std::vector<QVector3D> &getCoRs(void) { return CoRs; }
+    const std::vector<QVector3D> &getCoRs(void) const { return CoRs; }
+    void setCoRs(std::vector<QVector3D> cors) { CoRs = cors; }
 
     size_t getEdgeNumber() {return skeleton.getEdgeNumber();}
     
