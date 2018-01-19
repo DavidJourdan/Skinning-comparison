@@ -241,6 +241,75 @@ Mesh Mesh::fromOcorFile(const string &fileName)
     return retVal;
 }
 
+void Mesh::writeToFile(const string &fileName)
+{
+    ofstream file { fileName, std::ios::binary | std::ios::out };
+
+    if (!file.is_open()) {
+        std::cerr << "Could not open file for writing\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    const array<char, 4> id { 'O', 'C', 'O', 'R' };
+    file.write(id.data(), id.size());
+
+    // Assuming little-endianness for now
+    const uint32_t endianness = 0;
+    file.write(reinterpret_cast<char *>(&endianness), 4);
+
+    const uint32_t vertexCount = vertices.size();
+    file.write(reinterpret_cast<char *>(&vertexCount), 4);
+
+    file.write(reinterpret_cast<char *>(vertices.data()), vertexCount * sizeof(QVector3D));
+
+    file.write(reinterpret_cast<char *>(normals.data()), vertexCount * sizeof(QVector3D));
+
+    const uint32_t triangleCount = indices.size() / 3;
+    file.write(reinterpret_cast<char *>(&triangleCount), 4);
+
+    file.write(reinterpret_cast<char *>(indices.data()), 3 * triangleCount * sizeof(uint32_t));
+
+    const auto &articulations = skeleton.getArticulations();
+
+    uint32_t articulationCount = articulations.size();
+    file.write(reinterpret_cast<char *>(&articulationCount), 4);
+
+    file.write(reinterpret_cast<char *>(articulations.data()), articulationCount * sizeof(QVector3D));
+
+    uint32_t edgeCount = skeleton.edgeNb;
+    file.write(reinterpret_cast<char *>(&edgeCount), 4);
+
+    const auto &bones = skeleton.getBones();
+
+    vector<array<uint32_t, 2>> outBones;
+    outBones.reserve(edgeCount);
+
+    for (uint32_t i = 0; i < edgeCount; ++i) {
+        array<uint32_t, 2> outBone;
+
+        outBone[i][0] = bones[i].parent;
+        outBone[i][1] = bones[i].child;
+
+        outBones.push_back(outBone);
+    }
+
+    file.write(reinterpret_cast<char *>(outBones.data()), edgeCount * sizeof(array<uint32_t, 2>>));
+
+    uint32_t relationCount = bones.size() - edgeCount;
+    file.write(reinterpret_cast<char *>(&relationCount), 4);
+
+    vector<array<uint32_t, 2>> relations;
+    relations.reserve(relationCount);
+
+    for (uint32_t i = edgeCount; i < bones.size(); ++i) {
+        array<uint32_t, 2> relation { bones[i].parent, bones[i].child };
+
+        relations.push_back(relation);
+    }
+
+    file.write(reinterpret_cast<char *>(relations.data()), relationCount * sizeof(array<uint32_t, 2>>));
+}
+
 void Mesh::rotateBone(float angle, QVector3D axis)
 {
     skeleton.rotateBone(boneSelected, angle, axis);

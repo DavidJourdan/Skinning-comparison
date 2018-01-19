@@ -5,6 +5,7 @@
 #include <vector>
 
 using std::vector;
+using std::string;
 
 #include<QVector3D>
 #include "skeleton.h"
@@ -49,6 +50,8 @@ public:
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);
     static Mesh fromOcorFile(const std::string &fileName);
+
+    void writeToFile(const string &fileName);
 
     void rotateBone(float angle, QVector3D axis);
 
