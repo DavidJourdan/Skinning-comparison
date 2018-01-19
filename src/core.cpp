@@ -49,13 +49,13 @@ void Core::showBoneActiv()
 
 void Core::noCorActiv()
 {
-    int i = mesh.getCorSelected();
-    if(i>=0) {
-        QVector4D data[1] = { QVector4D(1.0, 0.0, 0.0, 1.0) };
+    uint n = mesh.getCoRs().size();
+    std::vector<QVector4D> colors(n, QVector4D(1.0, 0.0, 0.0, 1.0));
+
         corColors.bind();
-        corColors.write(i * sizeof(QVector4D), data, sizeof(QVector4D));
+        corColors.write(0, colors.data(), n * sizeof(QVector4D));
         corColors.release();
-    }
+
 }
 
 void Core::showCorActiv()

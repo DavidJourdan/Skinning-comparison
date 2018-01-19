@@ -49,6 +49,22 @@ void Base::mouseMoveEvent(QMouseEvent *event)
 
         } else if(mod & Qt::ShiftModifier && core->mesh.getCorSelected() >= 0) {
             // move selected CoR
+            int i = core->mesh.getCorSelected();
+
+            const auto pos = screenToViewport(event->localPos());
+            std::vector<QVector3D> centers = core->mesh.getCoRs();
+            float near = 1.0; // z near plane
+
+            // centers[i] = core->viewMatrix * core->modelMatrix * centers[i];
+
+            float t = centers[i].z() / near;
+            centers[i] = QVector3D(t * pos.x(), t * pos.y(), t * near);
+
+            QVector3D data[1] = { centers[i] };
+
+            core->corBuffer.bind();
+            core->corBuffer.write(i * sizeof(QVector3D), data, sizeof(QVector3D));
+            core->corBuffer.release();
 
         } else {
             auto pos = screenToViewport(event->localPos());
