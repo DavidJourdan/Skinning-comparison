@@ -319,6 +319,8 @@ void Mesh::writeToFile(const string &fileName)
             ++weightCount;
         }
 
+        file.write(reinterpret_cast<const char *>(&weightCount), 4);
+
         for (uint32_t j = 0; j < weightCount; ++j) {
             file.write(reinterpret_cast<const char *>(boneIndices[i] + j), sizeof(uint32_t));
             file.write(reinterpret_cast<const char *>(weights[i] + j), sizeof(float));

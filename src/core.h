@@ -81,7 +81,7 @@ public:
 
 private:
     bool initialized { false };
-    bool corsComputed_ { false };
+    bool corsComputed_ { true };
 };
 
 #endif // CORE_H

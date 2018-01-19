@@ -54,8 +54,8 @@ Skeleton::Skeleton(vector<QVector3D> articulations,
 
     vector<vector<uint32_t>> outgoingEdges(articulations.size());
 
-    for (const auto bone : bones) {
-        outgoingEdges[bone[0]].push_back(bone[1]);
+    for (size_t i = 0; i < bones.size(); ++i) {
+        outgoingEdges[bones[i][0]].push_back(i);
     }
 
     vector<Bone> mBones;
@@ -85,11 +85,13 @@ Skeleton::Skeleton(vector<QVector3D> articulations,
                 );
 
         for (uint32_t j = 0; j < bone.successorNb; ++j) {
-            bone.successors[j] = outgoingEdges[i][j];
+            bone.successors[j] = outgoingEdges[bones[i][1]][j];
         }
 
         mBones.push_back(bone);
     }
+
+    this->bones = std::move(mBones);
 
     weights = new float *[weightLists.size()];
     boneInd = new uint *[weightLists.size()];

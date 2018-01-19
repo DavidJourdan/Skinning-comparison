@@ -4,7 +4,7 @@
 using namespace std;
 
 Core::Core(const Config &config) :
-    mesh { Mesh::fromCustomFile(config) },
+    mesh { Mesh::fromOcorFile(config.inputFile) },
     vbo(QOpenGLBuffer::VertexBuffer),
     normBuffer(QOpenGLBuffer::VertexBuffer),
     boneDataBuffer { QOpenGLBuffer::VertexBuffer },
@@ -105,10 +105,6 @@ void Core::computeCoRs() {
         }
     }
 
-    corBuffer.bind();
-    corBuffer.write(0, centers.data(), centers.size()*sizeof(QVector3D));
-    corBuffer.release();
-
     corsComputed_ = true;
 }
 
@@ -168,7 +164,7 @@ void Core::initialize()
 
     corBuffer.create();
     corBuffer.bind();
-    std::vector<QVector3D> cors = std::vector<QVector3D>(vertices.size());
+    std::vector<QVector3D> cors = mesh.getCoRs();
     corBuffer.allocate(cors.data(), cors.size() * sizeof(QVector3D));
 
     auto boneData = std::vector<GLfloat>(MAX_BONE_COUNT * vertices.size());
