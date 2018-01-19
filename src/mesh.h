@@ -40,6 +40,7 @@ public:
 
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);
+    static Mesh fromOcorFile(const std::string &fileName);
 
     void rotateBone(float angle, QVector3D axis);
 

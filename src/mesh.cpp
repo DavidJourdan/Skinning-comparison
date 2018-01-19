@@ -149,6 +149,27 @@ Mesh Mesh::fromCustomFile(const Config &config)
     return Mesh(vertices, indices, normals, skeleton);
 }
 
+Mesh Mesh::fromOcorFile(const string &fileName)
+{
+    ifstream file { fileName, std::ios::binary | std::io::in };
+
+    if (!file.is_open()) {
+        std::cerr << "Could not open file.\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    char id[4];
+
+    ifstream.read(id, 4);
+
+    const auto ok = id[0] == 'O' && id[1] == 'C' && id[2] == 'O' && id[3] == 'R';
+
+    if (!ok) {
+        std::cerr << "File identifier does not match.\n";
+        std::exit(EXIT_FAILURE);
+    }
+}
+
 void Mesh::rotateBone(float angle, QVector3D axis)
 {
     skeleton.rotateBone(boneSelected, angle, axis);
