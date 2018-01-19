@@ -55,10 +55,14 @@ void Base::mouseMoveEvent(QMouseEvent *event)
             std::vector<QVector3D> centers = core->mesh.getCoRs();
             float near = 1.0; // z near plane
 
-            // centers[i] = core->viewMatrix * core->modelMatrix * centers[i];
+            QMatrix4x4 viewModel =  core->viewMatrix * core->modelMatrix;
+
+            centers[i] = viewModel * centers[i];
 
             float t = centers[i].z() / near;
-            centers[i] = QVector3D(t * pos.x(), t * pos.y(), t * near);
+            centers[i] = QVector3D(t * - pos.x(), t * - pos.y(), t * near);
+
+            centers[i] = viewModel.inverted() * centers[i];
 
             QVector3D data[1] = { centers[i] };
 
