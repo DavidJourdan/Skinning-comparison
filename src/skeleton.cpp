@@ -47,29 +47,28 @@ Skeleton::~Skeleton() {
 }
 
 float Skeleton::simil(uint vertexInd, Triangle t) {
-    uint i = 0;
     uint a = 0, b = 0, c = 0;
     vector<float> triWeights;
     vector<uint> triInds;
-    while(weights[vertexInd][i] > 0) { // weight arrays end with a negative number
+    for(uint i = 0; i < weightsSize[vertexInd]; i++) {
         uint bone = boneInd[vertexInd][i];
         float w = 0.0;
 
         // get matching bone indices (if either vertex or triangle doesn't have a weight 
         // on a given bone, we don't compute it)
-        while(boneInd[t.a][a] < bone && weights[t.a][a] > 0) // bone indices are sorted 
+        while(boneInd[t.a][a] < bone && a < weightsSize[t.a]) // bone indices are sorted 
             ++a;
         if(boneInd[t.a][a] == bone) {
             w += weights[t.a][a];
         }
 
-        while(boneInd[t.b][b] < bone && weights[t.b][b] > 0)
+        while(boneInd[t.b][b] < bone && b < weightsSize[t.b])
             ++b;
         if(boneInd[t.b][b] == bone) {
             w += weights[t.b][b];
         }
 
-        while(boneInd[t.c][c] < bone && weights[t.c][c] > 0)
+        while(boneInd[t.c][c] < bone && c < weightsSize[t.c])
             ++c;
         if(boneInd[t.c][c] == bone) {
             w += weights[t.c][c];
@@ -80,8 +79,6 @@ float Skeleton::simil(uint vertexInd, Triangle t) {
             triWeights.push_back(w);
             triInds.push_back(i); // list of bone indices with non-zero weights for vertex and triangle
         }
-
-        ++i;
     }
 
     float sum = 0.0;
@@ -242,7 +239,7 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
         lineStream >> weightCount;
 
         weightsSize[vertexIndex] = weightCount;
-        weights[vertexIndex] = new float[weightCount+1];
+        weights[vertexIndex] = new float[weightCount];
         boneInd[vertexIndex] = new uint[weightCount];
 
         uint bone, i = 0;
@@ -251,7 +248,6 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
             boneInd[vertexIndex][i] = bone;
             i++;
         }
-        weights[vertexIndex][i] = -1;
     }
 }
 

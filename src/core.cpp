@@ -205,7 +205,7 @@ void Core::initialize()
 
     for (size_t i = 0; i < vertices.size(); ++i) {
         boneListSizes[i] = weightCount[i];
-        for (size_t j = 0; weights[i][j] > -0.5f; ++j) {
+        for (size_t j = 0; j < weightCount[i]; ++j) {
             const auto idx = i * MAX_BONE_COUNT + j;
             boneData[idx] = weights[i][j];
             boneIndices[idx] = pBoneIndices[i][j];
