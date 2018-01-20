@@ -380,7 +380,17 @@ const vector<QVector3D> &Mesh::computeCoRs() {
             c += (vertices[t.a]+vertices[t.b]+vertices[t.c])/3.*skeleton.simil(i, t)*area(t);
             s += skeleton.simil(i, t) * area(t);
         }
-        CoRs.push_back(c/s);
+
+        const auto &articulations = skeleton.getArticulations();
+        const auto &bones = skeleton.getBones();
+        const auto &boneInd = skeleton.getBoneIndices();
+
+        const auto firstBone = bones[boneInd[i][0]];
+        const auto firstBoneCor = articulations[firstBone.parent];
+
+        const auto cor = s != 0.0f ? c / s : firstBoneCor;
+
+        CoRs.push_back(cor);
     }
     return CoRs;
 }
