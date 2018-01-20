@@ -18,7 +18,9 @@ Base::Base(Core *core, QWidget *parent) : QOpenGLWidget(parent),
 void Base::resizeGL(int w, int h)
 {
     QMatrix4x4 mat { };
-    mat.perspective(30.0f, w / static_cast<float>(h), 1.0f, 30.0f);
+
+    aspect =  w / static_cast<float>(h);
+    mat.perspective(angleOfView, aspect, near, far);
     projectionMatrix = mat;
 }
 
@@ -51,16 +53,17 @@ void Base::mouseMoveEvent(QMouseEvent *event)
             // move selected CoR
             int i = core->mesh.getCorSelected();
 
-            const auto pos = screenToViewport(event->localPos());
             std::vector<QVector3D> centers = core->mesh.getCoRs();
-            float near = 1.0; // z near plane
 
             QMatrix4x4 viewModel =  core->viewMatrix * core->modelMatrix;
 
             centers[i] = viewModel * centers[i];
 
-            float t = centers[i].z() / near;
-            centers[i] = QVector3D(t * - pos.x(), t * - pos.y(), t * near);
+            QVector3D pos = screenToViewport(event->localPos());
+            float xMax = centers[i].z() * tan(angleOfView * 3.14159 / 180);
+            float yMax = xMax / aspect;
+
+            centers[i] = QVector3D(xMax * - pos.x(), yMax * - pos.y(), centers[i].z());
 
             centers[i] = viewModel.inverted() * centers[i];
 
