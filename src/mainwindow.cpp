@@ -42,7 +42,7 @@ MainWindow::MainWindow(const Config &config, QWidget *parent) : QMainWindow { pa
 
     setupView();
 
-    setupSkeleton();
+    setupSelection();
 
     setupMiscellaneous();
 }
@@ -254,11 +254,11 @@ void MainWindow::setupView()
     menu->addAction(toggleCorDisplay);
 }
 
-void MainWindow::setupSkeleton()
+void MainWindow::setupSelection()
 {
-    auto menu = menuBar()->addMenu(tr("&Squelette"));
+    auto menu = menuBar()->addMenu(tr("&Sélection"));
 
-    auto pickBone = new QAction { tr("Sélectionner un os à la souris"), this };
+    auto pickBone = new QAction { tr("Sélectionner un os"), this };
     pickBone->setShortcut(tr("s"));
 
     connect(pickBone, &QAction::triggered, [=] {
@@ -269,6 +269,19 @@ void MainWindow::setupSkeleton()
     });
 
     menu->addAction(pickBone);
+
+    auto pickCor = new QAction { tr("Sélectionner un centre de rotation"), this };
+    pickCor->setShortcut(tr("d"));
+
+    connect(pickCor, &QAction::triggered, [=] {
+        core.isPickingCor = true;
+
+        const auto cursor = QCursor { Qt::CursorShape::CrossCursor };
+        QGuiApplication::setOverrideCursor(cursor);
+    });
+
+    menu->addAction(pickCor);
+
 }
 
 void MainWindow::openHelpWindow() {

@@ -28,7 +28,7 @@ private:
     void setUpDeform();
     void setupMiscellaneous();
     void setupView();
-    void setupSkeleton();
+    void setupSelection();
 
     void openHelpWindow();
 };

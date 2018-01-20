@@ -55,6 +55,7 @@ protected:
     QVector3D prevPos;
 
     void endPickBone();
+    void endPickCor();
 
     QVector3D screenToViewport(QPointF screenPos);
 
@@ -63,6 +64,12 @@ protected:
 
     virtual void draw() = 0;
     void drawBones();
+
+    // camera parameters
+    float aspect; // aspect ratio
+    float angleOfView {30.0} ; // angle of view (in degrees)
+    float near {1.0}; // near clipping plane
+    float far {30.0}; // far clipping plane
 };
 
 }

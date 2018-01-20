@@ -14,6 +14,7 @@ Core::Core(const Config &config) :
     lineBuffer(QOpenGLBuffer::VertexBuffer),
     lineIndices(QOpenGLBuffer::IndexBuffer),
     lineColors(QOpenGLBuffer::VertexBuffer),
+    corColors(QOpenGLBuffer::VertexBuffer),
     meshMode(GL_FILL),
     fileName(config.inputFile)
 {
@@ -25,8 +26,8 @@ void Core::noBoneActiv()
     uint n = mesh.getEdgeNumber();
     std::vector<QVector4D> colors(2*n);
     for(uint i = 0; i < n ; i++) {
-        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
-        QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
+        QVector4D parentColor(1.0, 0.0, 0.0, 1.0); //red
+        QVector4D childColor(1.0, 1.0, 1.0, 1.0); // black
         colors[2*i] = parentColor;
         colors[2*i + 1] = childColor;
     }
@@ -45,6 +46,27 @@ void Core::showBoneActiv()
     lineColors.write(2*i * sizeof(QVector4D), d.data(), 2*sizeof(QVector4D));
     lineColors.release();
 }
+
+void Core::noCorActiv()
+{
+    uint n = mesh.getCoRs().size();
+    std::vector<QVector4D> colors(n, QVector4D(1.0, 0.0, 0.0, 1.0));
+
+        corColors.bind();
+        corColors.write(0, colors.data(), n * sizeof(QVector4D));
+        corColors.release();
+
+}
+
+void Core::showCorActiv()
+{
+    uint i = mesh.getCorSelected();
+    QVector4D data[1] = { QVector4D(0.0, 0.8, 0.8, 1.0) };
+    corColors.bind();
+    corColors.write(i * sizeof(QVector4D), data, sizeof(QVector4D));
+    corColors.release();
+}
+
 
 void Core::resetCamera()
 {
@@ -86,6 +108,8 @@ void Core::computeCoRs() {
                 centers.push_back(QVector3D(list.at(0).toFloat(), list.at(1).toFloat(), list.at(2).toFloat()));
             }
         }
+
+        mesh.setCoRs(centers);
     } else {
         {        
             const auto cursor = QCursor { Qt::CursorShape::WaitCursor };
@@ -186,6 +210,11 @@ void Core::initialize()
             ++boneListSizes[i];
         }
     }
+
+    corColors.create();
+    corColors.bind();
+    std::vector<QVector4D> colorCors(vertices.size(), QVector4D(1., 0., 0., 1.));
+    corColors.allocate(colorCors.data(), 4 * sizeof(GLfloat) * colorCors.size());
 
     boneDataBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
     boneDataBuffer.create();

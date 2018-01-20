@@ -40,6 +40,7 @@ public:
     QOpenGLBuffer vbo;
     QOpenGLBuffer normBuffer;
     QOpenGLBuffer corBuffer;
+    QOpenGLBuffer corColors;
     QOpenGLBuffer boneDataBuffer;
     QOpenGLBuffer boneIndexBuffer;
     QOpenGLBuffer boneListSizeBuffer;
@@ -70,6 +71,9 @@ public:
     void showBoneActiv();
     void noBoneActiv();
 
+    void showCorActiv();
+    void noCorActiv();
+
     GLenum meshMode;
     bool showBones { true };
     bool showCors { true };
@@ -77,6 +81,7 @@ public:
     void updateSkeleton();
 
     bool isPickingBone { false };
+    bool isPickingCor { false };
     bool corsComputed() { return corsComputed_; }
 
 private:

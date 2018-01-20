@@ -128,6 +128,13 @@ void view::Cor::setUpPoints()
 
     core->boneListSizeBuffer.release();
 
+    core->corColors.bind();
+
+    glVertexAttribPointer(2 + (2 * MAX_BONE_COUNT) / 4, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(2 + (2 * MAX_BONE_COUNT) / 4);
+
+    core->corColors.release();
+
     pointVao.release();
 
     pointProg.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/pointshader.vert");

@@ -24,19 +24,23 @@ public:
     std::vector<unsigned>& getIndices() { return indices;}
     std::vector<QVector3D>& getNormals() {return normals;}
     std::vector<QVector3D> getSkelLines() { return skeleton.getSkelLines(); }
+    const std::vector<QVector3D> &getArticulations() const { return skeleton.getArticulations(); }
+    const std::vector<Bone> &getBones() const { return skeleton.getBones(); }
+
+    std::vector<QVector3D> &getCoRs(void) { return CoRs; }
+    const std::vector<QVector3D> &getCoRs(void) const { return CoRs; }
+    void setCoRs(std::vector<QVector3D> cors) { CoRs = cors; }
+
     size_t getEdgeNumber() {return skeleton.getEdgeNumber();}
+    
     const std::vector<QVector3D> &computeCoRs(void);
-    const std::vector<QVector3D> &getCoRs(void) { return CoRs; }
     QVector3D computeCoR(uint i);
-    uint getBoneSelected() const {return boneSelected;}
+    
+    int getBoneSelected() const {return boneSelected;}
     void setBoneSelected(uint i) {boneSelected = i%skeleton.getEdgeNumber();}
 
-    const std::vector<QVector3D> &getArticulations() const
-    {
-        return skeleton.getArticulations();
-    }
-
-    const std::vector<Bone> &getBones() const { return skeleton.getBones(); }
+    int getCorSelected() const {return corSelected;}
+    void setCorSelected(int i) {corSelected = i;}
 
     static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);
@@ -56,7 +60,8 @@ private:
     std::vector<QVector3D> normals;
     std::vector<QVector3D> CoRs;
     Skeleton skeleton;
-    uint boneSelected { 0 };
+    int boneSelected { - 1 };
+    int corSelected {  - 1 };
     float area(Triangle t);
 };
 
