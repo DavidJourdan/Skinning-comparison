@@ -23,16 +23,19 @@ Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones) {
 
     weights = new float*[numVertices];
     boneInd = new uint*[numVertices];
+    weightsSize = new size_t[numVertices];
     for(uint i = 0; i < numVertices; i++) {
         weights[i] = vectorWeight[i].data();
         boneInd[i] = vectorBone[i].data();
+        weightsSize[i] = vectorWeight[i].size();
     }
 }
 
 Skeleton::Skeleton(const string &skelFile, const string &weightFile, size_t meshVertexCount) {
     parseSkelFile(skelFile);
     weights = new float*[meshVertexCount];
-    boneInd = new uint*[meshVertexCount];   
+    boneInd = new uint*[meshVertexCount];
+    weightsSize = new size_t[meshVertexCount];
 
     parseWeights(weightFile, meshVertexCount);
 }
@@ -238,6 +241,7 @@ void Skeleton::parseWeights(const string &fileName, size_t meshVertexCount)
         size_t weightCount;
         lineStream >> weightCount;
 
+        weightsSize[vertexIndex] = weightCount;
         weights[vertexIndex] = new float[weightCount+1];
         boneInd[vertexIndex] = new uint[weightCount];
 

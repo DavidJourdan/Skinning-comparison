@@ -49,6 +49,8 @@ public:
 
     float **getWeights() { return skeleton.getWeights(); }
     unsigned **getBoneIndices() { return skeleton.getBoneIndices(); }
+    size_t *getWeightsSize() { return skeleton.getWeightsSize(); }
+
     const std::vector<QMatrix4x4> &getTransformations() const { return skeleton.getTransformations(); }
     const std::vector<QVector4D> &getQuaternions() const { return skeleton.getQuaternions(); }
     const std::vector<QVector4D> &getDQuatTransformationsNonDualPart() const {return skeleton.getDQuatTransformationsNonDualPart();}

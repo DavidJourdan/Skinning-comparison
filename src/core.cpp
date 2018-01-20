@@ -201,13 +201,14 @@ void Core::initialize()
 
     const auto weights = mesh.getWeights();
     const auto pBoneIndices = mesh.getBoneIndices();
+    const auto weightCount = mesh.getWeightsSize();
 
     for (size_t i = 0; i < vertices.size(); ++i) {
+        boneListSizes[i] = weightCount[i];
         for (size_t j = 0; weights[i][j] > -0.5f; ++j) {
             const auto idx = i * MAX_BONE_COUNT + j;
             boneData[idx] = weights[i][j];
             boneIndices[idx] = pBoneIndices[i][j];
-            ++boneListSizes[i];
         }
     }
 

@@ -50,6 +50,7 @@ public:
 
     float **getWeights() const { return weights; }
     unsigned **getBoneIndices() const { return boneInd; }
+    size_t *getWeightsSize() const { return weightsSize; }
 
     const std::vector<QMatrix4x4> &getTransformations() const { return transformations; }
     const std::vector<QVector4D> &getQuaternions() const { return quaternions; }
@@ -60,6 +61,7 @@ public:
 private:
     float **weights;
     uint **boneInd;
+    size_t *weightsSize;
     size_t edgeNb; // bones whose index is inferior to this number are EDGES, the  other are PARENT_RELATIONS
 
     std::vector<QVector3D> articulations;
