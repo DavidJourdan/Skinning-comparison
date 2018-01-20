@@ -74,7 +74,7 @@ float Skeleton::simil(uint vertexInd, Triangle t) {
             w += weights[t.c][c];
         }
 
-        if(w > 0) {
+        if(w != 0) {
             w = w/3.; // barycenter of weights
             triWeights.push_back(w);
             triInds.push_back(i); // list of bone indices with non-zero weights for vertex and triangle

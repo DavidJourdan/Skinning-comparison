@@ -188,7 +188,9 @@ const vector<QVector3D> &Mesh::computeCoRs() {
             c += (vertices[t.a]+vertices[t.b]+vertices[t.c])/3.*skeleton.simil(i, t)*area(t);
             s += skeleton.simil(i, t) * area(t);
         }
-        CoRs.push_back(c/s);
+        if(abs(s) < 1e-10) { // vertex is (almost) controlled by a unique bone
+            CoR.push_back(QVector3D(0,0,0)); // we default to the standard LBS case
+        } else CoRs.push_back(c/s);
     }
     return CoRs;
 }
