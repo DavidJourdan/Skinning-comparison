@@ -18,15 +18,20 @@ struct Triangle {
 };
 
 struct Bone {
-    bool isEdge; // false if it's a PARENT_RELATION
-    uint parent; // index of parent joint position
-    uint child; // index of child joint position
-    size_t successorNb;
-    uint *successors; //array of Bone indices
-    Bone(bool edge, uint parInd, uint childInd, size_t childNb = 0): isEdge(edge), 
-        parent(parInd), child(childInd), successorNb(childNb) {
-            successors = (successorNb != 0) ? new uint[successorNb] : nullptr;
+    QVector3D head; // index of parent joint position
+    QVector3D tail; // index of child joint position
+    vector<uint32_t> childList;
+
+    Bone(QVector3D h, QVector3D t, vector<uint32_t> cl):
+        head(h), tail(t), childList(cl) {
     }
+};
+
+struct Weight {
+    uint32_t boneIndex;
+    float value;
+
+    Weight(uint32_t bIdx, float val): boneIndex { bIdx }, value { val } { }
 };
 
 using std::vector;
@@ -36,28 +41,13 @@ using std::array;
 class Skeleton
 {
 public:
-    Skeleton(const std::string &weightFile, const std::string &skelFile, size_t meshVertexCount);
-    Skeleton(vector<QVector3D> articulations,
-             vector<array<uint32_t, 2>> bones,
-             uint32_t edgeCount,
-             vector<vector<pair<uint32_t, float>>> weightLists);
-    Skeleton(uint, uint, aiBone**);
-    Skeleton();
-    ~Skeleton();
-    float simil(uint vertexInd, Triangle t);
-    bool parseSkelFile(const std::string& file);
+    Skeleton(vector<Bone> bl,
+             vector<vector<Weight>> wll);
     std::vector<QVector3D> getSkelLines();
-    size_t getEdgeNumber() {return edgeNb;}
 
-    const std::vector<QVector3D> &getArticulations() const { return articulations; }
     const std::vector<Bone> &getBones() const { return bones; }
 
-    void parseWeights(const std::string &fileName, size_t meshVertexCount);
-
     void rotateBone(const size_t boneIndex, float angle, const QVector3D &axis);
-
-    float **getWeights() const { return weights; }
-    unsigned **getBoneIndices() const { return boneInd; }
 
     const std::vector<QMatrix4x4> &getTransformations() const { return transformations; }
     const std::vector<QVector4D> &getQuaternions() const { return quaternions; }
@@ -66,9 +56,7 @@ public:
     const std::vector<QVector4D> &getDQuatTransformationsDualPart() const {return transformationsDQDualPart;}
 
 private:
-    float **weights;
-    uint **boneInd;
-    size_t edgeNb; // bones whose index is inferior to this number are EDGES, the  other are PARENT_RELATIONS
+    vector<vector<Weight>> weightListList;
 
     std::vector<QVector3D> articulations;
     std::vector<Bone> bones;
