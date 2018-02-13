@@ -8,7 +8,6 @@ using namespace std;
 Core::Core(const Config &config) :
     mesh { Mesh::fromOcorFile(config.inputFile) },
     vbo(QOpenGLBuffer::VertexBuffer),
-    normBuffer(QOpenGLBuffer::VertexBuffer),
     boneDataBuffer { QOpenGLBuffer::VertexBuffer },
     boneIndexBuffer { QOpenGLBuffer::VertexBuffer },
     boneListSizeBuffer { QOpenGLBuffer::VertexBuffer },

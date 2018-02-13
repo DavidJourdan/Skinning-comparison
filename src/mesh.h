@@ -43,12 +43,11 @@ public:
     void rotateBone(float angle, QVector3D axis);
 
 private:
-    std::vector<Vertex> vertices;
-    std::vector<Triangle> triangles;
-    std::vector<QVector3D> CoRs;
+    vector<Vertex> vertices;
+    vector<Triangle> triangles;
+    vector<QVector3D> CoRs;
     Skeleton skeleton;
     uint boneSelected { 0 };
-    float area(Triangle t);
 };
 
 #endif // MESH_H

@@ -6,6 +6,7 @@
 
 using std::array;
 using std::pair;
+using std::vector;
 
 Skeleton::Skeleton(vector<Bone> bl, vector<vector<Weight> > wll) :
     bones { bl }, weightListList { wll }, transformations(bl.size()),
@@ -15,7 +16,7 @@ Skeleton::Skeleton(vector<Bone> bl, vector<vector<Weight> > wll) :
 
 }
 
-std::vector<QVector3D> Skeleton::getSkelLines() const {
+vector<QVector3D> Skeleton::getSkelLines() const {
     vector<QVector3D> lines;
 
     for(Bone b : bones) {

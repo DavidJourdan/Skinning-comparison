@@ -37,7 +37,6 @@ public:
 
     // OpenGL resources meant to be shared across multiple rendering widgets.
     QOpenGLBuffer vbo;
-    QOpenGLBuffer normBuffer;
     QOpenGLBuffer corBuffer;
     QOpenGLBuffer boneDataBuffer;
     QOpenGLBuffer boneIndexBuffer;
