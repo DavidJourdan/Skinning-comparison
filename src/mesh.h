@@ -33,8 +33,8 @@ public:
 
     const vector<Vertex> &getVertices() const { return vertices; }
     const vector<Triangle> &getTriangles() const { return triangles; }
-    const vector<QVector3D> &getCoRs() const { return CoRs; }
     const Skeleton &getSkeleton() const { return skeleton; }
+    const vector<QVector3D> &getCoRs() const { return CoRs; }
     uint getBoneSelected() const { return boneSelected; }
     void setBoneSelected(uint i) { boneSelected = i % skeleton.getBones().size(); }
 
@@ -45,8 +45,8 @@ public:
 private:
     vector<Vertex> vertices;
     vector<Triangle> triangles;
-    vector<QVector3D> CoRs;
     Skeleton skeleton;
+    vector<QVector3D> CoRs;
     uint boneSelected { 0 };
 };
 

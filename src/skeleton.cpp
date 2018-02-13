@@ -10,8 +10,8 @@ using std::vector;
 
 Skeleton::Skeleton(vector<Bone> bl, vector<vector<Weight> > wll) :
     bones { bl }, weightListList { wll }, transformations(bl.size()),
-    quaternions(bl.size()), transformationsDQDualPart(bl.size()),
-    transformationsDQNonDualPart(bl.size())
+    quaternions(bl.size()), transformationsDQNonDualPart(bl.size()),
+    transformationsDQDualPart(bl.size())
 {
 
 }

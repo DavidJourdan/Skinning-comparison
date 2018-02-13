@@ -12,7 +12,7 @@ class HelpWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    HelpWindow(QWidget *parent = 0) {
+    HelpWindow(QWidget *parent = 0): QMainWindow(parent) {
         this->resize(400,300);
         this->setWindowTitle(tr("Aide"));
         textWidget = new QTextEdit(this);

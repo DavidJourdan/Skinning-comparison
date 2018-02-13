@@ -44,8 +44,8 @@ public:
     Skeleton(vector<Bone> bl,
              vector<vector<Weight>> wll);
 
-    const vector<vector<Weight>> getWeights() const { return weightListList; }
     const vector<Bone> &getBones() const { return bones; }
+    const vector<vector<Weight>> getWeights() const { return weightListList; }
     const vector<QMatrix4x4> &getTransformations() const { return transformations; }
     const vector<QVector4D> &getQuaternions() const { return quaternions; }
     const vector<QVector4D> &getDQuatTransformationsNonDualPart() const { return transformationsDQNonDualPart; }
@@ -55,8 +55,8 @@ public:
     void rotateBone(const size_t boneIndex, float angle, const QVector3D &axis);
 
 private:
-    vector<vector<Weight>> weightListList;
     vector<Bone> bones;
+    vector<vector<Weight>> weightListList;
     vector<QMatrix4x4> transformations;
     vector<QVector4D> quaternions;
     vector<QVector4D> transformationsDQNonDualPart;
