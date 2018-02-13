@@ -17,6 +17,8 @@ struct Vertex
         pos { pos }, normal { normal }
     { }
 
+    Vertex() { }
+
     QVector3D pos;
     QVector3D normal;
 };
@@ -29,9 +31,10 @@ public:
          Skeleton skeleton,
          vector<QVector3D> cors);
 
-    const vector<Vertex> &getVertices() { return vertices; }
-    const vector<Triangle> &getTriangles() { return triangles;}
-    const std::vector<QVector3D> &getCoRs(void) { return CoRs; }
+    const vector<Vertex> &getVertices() const { return vertices; }
+    const vector<Triangle> &getTriangles() const { return triangles; }
+    const vector<QVector3D> &getCoRs() const { return CoRs; }
+    const Skeleton &getSkeleton() const { return skeleton; }
     uint getBoneSelected() const { return boneSelected; }
     void setBoneSelected(uint i) { boneSelected = i % skeleton.getBones().size(); }
 

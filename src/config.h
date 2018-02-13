@@ -3,26 +3,12 @@
 
 #include <string>
 
+using std::string;
+
 struct Config {
-    std::string inputFile;
-    std::string skelFile;
-    std::string weightFile;
-    std::string outputFile;
+    string inputFile;
 
-    enum class Mode {
-        precompute,
-        gui,
-    };
-
-    Mode mode;
-
-    Config(std::string inputFile,
-           std::string skelFile,
-           std::string weightFile,
-           std::string outputFile,
-           Mode mode) : inputFile { inputFile },
-        skelFile { skelFile }, weightFile { weightFile },
-        outputFile { outputFile }, mode { mode }
+    Config(string input) : inputFile { input }
     {
 
     }

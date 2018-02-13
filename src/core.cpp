@@ -1,6 +1,8 @@
 #include "core.h"
 #include "view/base.h"
 
+#include <QVector4D>
+
 using namespace std;
 
 Core::Core(const Config &config) :
@@ -14,15 +16,14 @@ Core::Core(const Config &config) :
     lineBuffer(QOpenGLBuffer::VertexBuffer),
     lineIndices(QOpenGLBuffer::IndexBuffer),
     lineColors(QOpenGLBuffer::VertexBuffer),
-    meshMode(GL_FILL),
-    fileName(config.inputFile)
+    meshMode(GL_FILL)
 {
 
 }
 
 void Core::noBoneActiv()
 {
-    uint n = mesh.getEdgeNumber();
+    uint n = mesh.getSkeleton().getBones().size();
     std::vector<QVector4D> colors(2*n);
     for(uint i = 0; i < n ; i++) {
         QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
@@ -60,62 +61,13 @@ void Core::focusSelectedBone()
     update();
 }
 
-void Core::computeCoRs() {
-    if (corsComputed_) {
-        return;
-    }
-    std::vector<QVector3D> centers;
-
-    QString name = QString(fileName.data());
-    name = name.split("/").last();
-    name = "ressources/" + name;
-    int size = name.size();
-
-    name.truncate(size - 4); // remove the '.obj'
-    name += ".cor";
-
-    QFile file(name);
-
-    if(file.exists()) {
-        if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-
-            QTextStream in(&file);
-            while (!in.atEnd()) {
-                QString line = in.readLine();
-                QStringList list = line.split(" ");
-                centers.push_back(QVector3D(list.at(0).toFloat(), list.at(1).toFloat(), list.at(2).toFloat()));
-            }
-        }
-    } else {
-        {        
-            const auto cursor = QCursor { Qt::CursorShape::WaitCursor };
-            QGuiApplication::setOverrideCursor(cursor);
-        }
-
-        centers = mesh.computeCoRs();
-
-        const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
-        QGuiApplication::setOverrideCursor(cursor);
-
-        if (file.open(QFile::WriteOnly | QFile::Truncate)) {
-            QTextStream out(&file);
-            for(QVector3D v : centers) {
-                out << v.x() << " " << v.y() << " " << v.z() << "\n";
-            }
-        }
-    }
-
-    corsComputed_ = true;
-}
-
 void Core::editBone(size_t i)
 {
-    const auto articulations = mesh.getArticulations();
-    const auto edges = mesh.getBones();
+    const auto edges = mesh.getSkeleton().getBones();
 
     const auto &bone = edges.at(i);
-    const auto &center = articulations.at(bone.parent);
-    const auto &child = articulations.at(bone.child);
+    const auto center = bone.head;
+    const auto child = bone.tail;
 
     const auto length = (child - center).length();
 
@@ -128,7 +80,7 @@ void Core::editBone(size_t i)
 
 void Core::updateSkeleton()
 {
-    const auto lines = mesh.getSkelLines();
+    const auto lines = mesh.getSkeleton().getSkelLines();
     lineBuffer.bind();
     lineBuffer.write(0, lines.data(), sizeof(QVector3D) * lines.size());
 }
@@ -154,13 +106,8 @@ void Core::initialize()
 
     vbo.create();
     vbo.bind();
-    std::vector<QVector3D>& vertices = mesh.getVertices();
-    vbo.allocate(vertices.data(), vertices.size() * sizeof(QVector3D));
-
-    normBuffer.create();
-    normBuffer.bind();
-    std::vector<QVector3D> normals = mesh.getNormals();
-    normBuffer.allocate(normals.data(), normals.size() * sizeof(QVector3D));
+    const auto& vertices = mesh.getVertices();
+    vbo.allocate(vertices.data(), vertices.size() * sizeof(Vertex));
 
     corBuffer.create();
     corBuffer.bind();
@@ -171,15 +118,14 @@ void Core::initialize()
     auto boneIndices = std::vector<GLuint>(MAX_BONE_COUNT * vertices.size());
     auto boneListSizes = std::vector<GLuint>(vertices.size());
 
-    const auto weights = mesh.getWeights();
-    const auto pBoneIndices = mesh.getBoneIndices();
+    const auto weights = mesh.getSkeleton().getWeights();
 
     for (size_t i = 0; i < vertices.size(); ++i) {
-        for (size_t j = 0; weights[i][j] > -0.5f; ++j) {
+        boneListSizes[i] = weights[i].size();
+        for (size_t j = 0; j < weights[i].size(); ++j) {
             const auto idx = i * MAX_BONE_COUNT + j;
-            boneData[idx] = weights[i][j];
-            boneIndices[idx] = pBoneIndices[i][j];
-            ++boneListSizes[i];
+            boneData[idx] = weights[i][j].value;
+            boneIndices[idx] = weights[i][j].boneIndex;
         }
     }
 
@@ -203,19 +149,19 @@ void Core::initialize()
 
     ebo.create();
     ebo.bind();
-    std::vector<uint>& indices = mesh.getIndices();
-    ebo.allocate(indices.data(), indices.size() * sizeof(uint));
+    const auto& triangles = mesh.getTriangles();
+    ebo.allocate(triangles.data(), triangles.size() * sizeof(Triangle));
     ebo.release();
 
     lineBuffer.create();
     lineBuffer.bind();
-    std::vector<QVector3D> lines = mesh.getSkelLines();
+    std::vector<QVector3D> lines = mesh.getSkeleton().getSkelLines();
     lineBuffer.allocate(lines.data(), lines.size() * sizeof(QVector3D));
 
     lineColors.create();
     lineColors.bind();
     std::vector<QVector4D> colors(lines.size());
-    uint n = mesh.getEdgeNumber();
+    uint n = mesh.getSkeleton().getBones().size();
 
     for(uint i = 0; i < n ; i++) {
         QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //red

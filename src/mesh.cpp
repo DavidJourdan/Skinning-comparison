@@ -9,6 +9,13 @@
 
 using std::array;
 using std::pair;
+using std::ifstream;
+
+Mesh::Mesh(vector<Vertex> vertices, vector<Triangle> triangles, Skeleton skeleton, vector<QVector3D> cors):
+    vertices { vertices }, triangles { triangles }, skeleton { skeleton }, CoRs { cors }
+{
+
+}
 
 Mesh Mesh::fromOcorFile(const string &fileName)
 {
@@ -81,7 +88,7 @@ Mesh Mesh::fromOcorFile(const string &fileName)
 
     using std::move;
 
-    const Skeleton skeleton(move(bones),
+    const Skeleton skeleton(move(boneList),
                             move(weightLists));
 
     vector<QVector3D> cors(vertexCount);

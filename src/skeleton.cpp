@@ -15,7 +15,7 @@ Skeleton::Skeleton(vector<Bone> bl, vector<vector<Weight> > wll) :
 
 }
 
-std::vector<QVector3D> Skeleton::getSkelLines() {
+std::vector<QVector3D> Skeleton::getSkelLines() const {
     vector<QVector3D> lines;
 
     for(Bone b : bones) {
@@ -65,7 +65,7 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
         auto &tail = bones[bIdx].tail;
         tail = transform * tail;
 
-        for (const auto c : bones[bIdex].childList) {
+        for (const auto c : bones[bIdx].childList) {
             stack.push_back(c);
         }
     }

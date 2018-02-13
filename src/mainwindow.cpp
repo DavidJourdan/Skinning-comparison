@@ -55,15 +55,12 @@ MainWindow::~MainWindow()
 void MainWindow::setUpViews()
 {
     auto lbsView = new view::Lbs { &core, this };
-
     core.lbsView = lbsView;
 
     auto dqsView = new view::Dqs { &core, this };
-
     core.dqsView = dqsView;
 
     auto corView = new view::Cor { &core, this };
-
     core.corView = corView;
 }
 
@@ -169,15 +166,6 @@ void MainWindow::setUpDeform()
 void MainWindow::setupMiscellaneous()
 {
     auto menu = menuBar()->addMenu(tr("&Divers"));
-
-    auto computeCors = new QAction { tr("&Calculer les centres de rotation"), this };
-    computeCors->setShortcut(QKeySequence(tr("c")));
-
-    connect(computeCors, &QAction::triggered, [=] {
-        core.computeCoRs();
-    });
-
-    menu->addAction(computeCors);
 
     auto help = new QAction { tr("&Aide"), this };
     help->setShortcut(QKeySequence(tr("h")));

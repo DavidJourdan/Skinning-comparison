@@ -89,15 +89,15 @@ void view::Dqs::draw()
     prog.setUniformValue("viewMatrix", core->viewMatrix);
     prog.setUniformValue("projectionMatrix", projectionMatrix);
 
-    const auto &dualPart = core->mesh.getDQuatTransformationsDualPart();
-    const auto &nonDualPart = core->mesh.getDQuatTransformationsNonDualPart();
+    const auto &dualPart = core->mesh.getSkeleton().getDQuatTransformationsDualPart();
+    const auto &nonDualPart = core->mesh.getSkeleton().getDQuatTransformationsNonDualPart();
     prog.setUniformValueArray("dqTrDual", dualPart.data(), dualPart.size());
     prog.setUniformValueArray("dqTrNonDual", nonDualPart.data(), nonDualPart.size());
 
     core->ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, core->meshMode);
 
-    glDrawElements(GL_TRIANGLES, core->mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, core->mesh.getTriangles().size() * 3, GL_UNSIGNED_INT, 0);
     core->ebo.release();
     vao.release();
     prog.release();

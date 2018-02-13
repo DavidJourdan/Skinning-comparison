@@ -31,7 +31,6 @@ public:
     Core(const Config &config);
 
     Mesh mesh;
-    std::string fileName;
 
     // Set up OpenGL resources.
     void initialize();
@@ -63,7 +62,6 @@ public:
 
     void moveBone(float angle);
     void editBone(size_t i);
-    void computeCoRs();
     void toggleBoneActiv();
     void resetCamera();
     void focusSelectedBone();
@@ -77,11 +75,9 @@ public:
     void updateSkeleton();
 
     bool isPickingBone { false };
-    bool corsComputed() { return corsComputed_; }
 
 private:
     bool initialized { false };
-    bool corsComputed_ { true };
 };
 
 #endif // CORE_H

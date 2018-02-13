@@ -11,6 +11,10 @@
 
 #include "dualquaternion.hpp"
 
+using std::vector;
+using std::pair;
+using std::array;
+
 struct Triangle {
     uint a;
     uint b;
@@ -32,19 +36,17 @@ struct Weight {
     float value;
 
     Weight(uint32_t bIdx, float val): boneIndex { bIdx }, value { val } { }
+    Weight() { }
 };
-
-using std::vector;
-using std::pair;
-using std::array;
 
 class Skeleton
 {
 public:
     Skeleton(vector<Bone> bl,
              vector<vector<Weight>> wll);
-    std::vector<QVector3D> getSkelLines();
 
+    std::vector<QVector3D> getSkelLines() const;
+    const vector<vector<Weight>> getWeights() const { return weightListList; }
     const std::vector<Bone> &getBones() const { return bones; }
 
     void rotateBone(const size_t boneIndex, float angle, const QVector3D &axis);
@@ -57,8 +59,6 @@ public:
 
 private:
     vector<vector<Weight>> weightListList;
-
-    std::vector<QVector3D> articulations;
     std::vector<Bone> bones;
     std::vector<QMatrix4x4> transformations;
     std::vector<QVector4D> quaternions;

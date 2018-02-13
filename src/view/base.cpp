@@ -30,7 +30,7 @@ void Base::mouseMoveEvent(QMouseEvent *event)
 
     const auto mod = event->modifiers();
 
-    if(leftButtonPressed && !(mod & Qt::ControlModifier))
+    if (leftButtonPressed && !(mod & Qt::ControlModifier))
     {
         auto pos = screenToViewport(event->localPos());
         QVector3D movement{ pos - prevPos };
@@ -60,7 +60,7 @@ void Base::mouseMoveEvent(QMouseEvent *event)
 
         const auto pos = screenToViewport(event->localPos());
         const auto movement = pos - prevPos;
-        const auto center = mesh.getArticulations()[mesh.getBones()[mesh.getBoneSelected()].parent];
+        const auto center = mesh.getSkeleton().getBones()[mesh.getBoneSelected()].head;
         const auto x = prevPos - projectionMatrix * core->viewMatrix * core->modelMatrix * center;
 
         const auto t0 = QVector3D::crossProduct(QVector3D { 0.0, 0.0, 1.0 }, x);
@@ -72,7 +72,7 @@ void Base::mouseMoveEvent(QMouseEvent *event)
         prevPos = pos;
     }
 
-    else if(rightButtonPressed)
+    else if (rightButtonPressed)
     {
         auto pos = screenToViewport(event->localPos());
 
@@ -188,7 +188,7 @@ void Base::drawBones()
         core->lineIndices.bind();
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glLineWidth((GLfloat)5);
-        glDrawElements(GL_LINES, mesh.getSkelLines().size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_LINES, mesh.getSkeleton().getSkelLines().size(), GL_UNSIGNED_INT, 0);
         core->lineIndices.release();
         linevao.release();
         boneProg.release();
@@ -225,8 +225,7 @@ void Base::endPickBone()
     const auto cursor = QCursor { Qt::CursorShape::ArrowCursor };
     QGuiApplication::setOverrideCursor(cursor);
 
-    const auto &bones = core->mesh.getBones();
-    const auto &art = core->mesh.getArticulations();
+    const auto &bones = core->mesh.getSkeleton().getBones();
 
     size_t bone = 0;
     auto min = std::numeric_limits<float>::max();
@@ -235,8 +234,8 @@ void Base::endPickBone()
         auto &viewMatrix = core->viewMatrix;
         auto &modelMatrix = core->modelMatrix;
 
-        auto p0 = projectionMatrix * viewMatrix * modelMatrix * art[bone.parent];
-        auto p1 = projectionMatrix * viewMatrix * modelMatrix * art[bone.child];
+        auto p0 = projectionMatrix * viewMatrix * modelMatrix * bone.head;
+        auto p1 = projectionMatrix * viewMatrix * modelMatrix * bone.tail;
 
         p0.setZ(0.0f);
         p1.setZ(0.0f);
@@ -256,7 +255,7 @@ void Base::endPickBone()
         return v0.lengthSquared() - proj.lengthSquared();
     };
 
-    for (size_t i = 0; i < core->mesh.getEdgeNumber(); ++i) {
+    for (size_t i = 0; i < core->mesh.getSkeleton().getBones().size(); ++i) {
         const auto d = sqDst(bones[i]);
         if (d < min) {
             min = d;

@@ -146,16 +146,16 @@ void view::Cor::draw()
     prog.setUniformValue("viewMatrix", core->viewMatrix);
     prog.setUniformValue("projectionMatrix", projectionMatrix);
 
-    const auto &quaternions = core->mesh.getQuaternions();
+    const auto &quaternions = core->mesh.getSkeleton().getQuaternions();
     prog.setUniformValueArray("qArr", quaternions.data(), quaternions.size());
 
-    const auto &transformations = core->mesh.getTransformations();
+    const auto &transformations = core->mesh.getSkeleton().getTransformations();
     prog.setUniformValueArray("tArr", transformations.data(), transformations.size());
 
     core->ebo.bind();
     glPolygonMode(GL_FRONT_AND_BACK, core->meshMode);
 
-    glDrawElements(GL_TRIANGLES, core->mesh.getIndices().size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, core->mesh.getTriangles().size() * 3, GL_UNSIGNED_INT, 0);
     core->ebo.release();
     vao.release();
     prog.release();
@@ -163,7 +163,7 @@ void view::Cor::draw()
 
 void view::Cor::drawPoints()
 {
-    if (core->corsComputed() && core->showCors) {
+    if (core->showCors) {
         glDisable(GL_DEPTH_TEST);
 
         pointProg.bind();
@@ -173,7 +173,7 @@ void view::Cor::drawPoints()
         pointProg.setUniformValue("viewMatrix", core->viewMatrix);
         pointProg.setUniformValue("projectionMatrix", projectionMatrix);
 
-        const auto &transformations = core->mesh.getTransformations();
+        const auto &transformations = core->mesh.getSkeleton().getTransformations();
         pointProg.setUniformValueArray("tArr", transformations.data(), transformations.size());
 
         core->corBuffer.bind();
