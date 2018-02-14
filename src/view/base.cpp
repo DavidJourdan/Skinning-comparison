@@ -35,6 +35,11 @@ void Base::resizeGL(int w, int h)
     projectionMatrix = mat;
 }
 
+void Base::updateProjMatrix()
+{
+
+}
+
 void Base::mouseMoveEvent(QMouseEvent *event)
 {
     if (core->isPickingBone) {

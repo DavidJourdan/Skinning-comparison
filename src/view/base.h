@@ -32,6 +32,7 @@ protected:
 
     void paintGL() override = 0;
 
+    void updateProjMatrix();
     void mouseMoveEvent(QMouseEvent *event) final;
     void mousePressEvent(QMouseEvent *event) final;
     void mouseReleaseEvent(QMouseEvent *event) final;

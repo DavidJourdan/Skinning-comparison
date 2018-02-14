@@ -52,7 +52,7 @@ public:
     QMatrix4x4 viewMatrix;
 
     // Useful to choose initial MVP matrix
-    QVector3D barycenter;
+    QVector3D center;
     float maxDist;
     float zoomFactor { 1.0f };
 

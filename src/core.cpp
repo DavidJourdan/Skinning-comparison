@@ -1,8 +1,11 @@
 #include "core.h"
 #include "view/base.h"
 
+#include <limits>
+
 #include <QVector4D>
 
+using std::numeric_limits;
 using namespace std;
 
 Core::Core(const Config &config) :
@@ -17,26 +20,54 @@ Core::Core(const Config &config) :
     lineColors(QOpenGLBuffer::VertexBuffer),
     meshMode(GL_FILL)
 {
-    auto sum = QVector3D {};
+    auto maxX = numeric_limits<float>::lowest();
+    auto maxY = numeric_limits<float>::lowest();
+    auto maxZ = numeric_limits<float>::lowest();
+
+    auto minX = numeric_limits<float>::max();
+    auto minY = numeric_limits<float>::max();
+    auto minZ = numeric_limits<float>::max();
 
     for (auto v : mesh.getVertices()) {
-        sum += v.pos;
+        auto p = v.pos;
+
+        if (p.x() > maxX) {
+            maxX = p.x();
+        }
+        if (p.x() < minX) {
+            minX = p.x();
+        }
+
+        if (p.y() > maxY) {
+            maxY = p.y();
+        }
+        if (p.y() < minY) {
+            minY = p.y();
+        }
+
+        if (p.z() > maxZ) {
+            maxZ = p.z();
+        }
+        if (p.z() < minZ) {
+            minZ = p.z();
+        }
     }
 
-    sum /= mesh.getVertices().size();
-
-    barycenter = sum;
+    center = QVector3D { (minX + maxX) / 2.0f, (minY + maxY) / 2.0f, (minZ + maxZ) / 2.0f };
 
     auto maxDist2 = 0.0f;
 
     for (auto v : mesh.getVertices()) {
-        auto x = (v.pos - barycenter).lengthSquared();
+        auto x = (v.pos - center).lengthSquared();
         if (x > maxDist2) {
             maxDist2 = x;
         }
     }
 
     maxDist = sqrt(maxDist2);
+
+    modelMatrix.translate(-center);
+    viewMatrix.translate(0.0f, 0.0f, -2.0 * maxDist);
 }
 
 void Core::noBoneActiv()
@@ -50,7 +81,7 @@ void Core::noBoneActiv()
         colors[2*i + 1] = childColor;
     }
     lineColors.bind();
-    lineColors.write(0, colors.data(), 2*n*sizeof(QVector4D));
+    lineColors.write(0, colors.data(), 2 * n * sizeof(QVector4D));
     lineColors.release();
 }
 
@@ -69,7 +100,6 @@ void Core::resetCamera()
 {
     modelMatrix.setToIdentity();
     viewMatrix.setToIdentity();
-    viewMatrix.translate(0.0f, 0.0f, -15.0f);
     update();
 }
 
@@ -202,8 +232,6 @@ void Core::initialize()
     }
     lineIndices.allocate(ind.data(), ind.size() * sizeof(uint));
     lineIndices.release();
-
-    viewMatrix.translate(0.0f, 0.0f, -15.0f);
 }
 
 void Core::update()
