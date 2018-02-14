@@ -67,7 +67,7 @@ Core::Core(const Config &config) :
     maxDist = sqrt(maxDist2);
 
     modelMatrix.translate(-center);
-    viewMatrix.translate(0.0f, 0.0f, -2.0 * maxDist);
+    viewMatrix.translate(0.0f, 0.0f, -4.0 * maxDist);
 }
 
 void Core::noBoneActiv()
@@ -100,6 +100,12 @@ void Core::resetCamera()
 {
     modelMatrix.setToIdentity();
     viewMatrix.setToIdentity();
+    modelMatrix.translate(-center);
+    viewMatrix.translate(0.0f, 0.0f, -4.0 * maxDist);
+    zoomFactor = 1.0;
+    lbsView->updateProjMatrix();
+    dqsView->updateProjMatrix();
+    corView->updateProjMatrix();
     update();
 }
 
@@ -122,8 +128,10 @@ void Core::editBone(size_t i)
     modelMatrix.setToIdentity();
     modelMatrix.translate(-center);
 
-    const auto col = QVector4D { 0.0, 0.0, -5.0f * length, 1.0 };
-    viewMatrix.setColumn(3, col);
+    zoomFactor = maxDist * length / 2.0;
+    lbsView->updateProjMatrix();
+    dqsView->updateProjMatrix();
+    corView->updateProjMatrix();
 }
 
 void Core::updateSkeleton()

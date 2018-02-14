@@ -35,8 +35,8 @@ void Base::updateProjMatrix()
     float right = e;
     float bottom = -d;
     float top = d;
-    float near = core->maxDist;
-    float far = 3.0f * core->maxDist;
+    float near = 2.0f * core->maxDist;
+    float far = 6.0f * core->maxDist;
 
     mat.frustum(left, right, bottom, top, near, far);
 
