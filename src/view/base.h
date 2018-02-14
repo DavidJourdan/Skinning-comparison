@@ -24,6 +24,7 @@ class Base : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
 public:
     Base(Core *core, QWidget *parent);
+    void updateProjMatrix();
 
 protected:
     void initializeGL() override = 0;
@@ -32,7 +33,6 @@ protected:
 
     void paintGL() override = 0;
 
-    void updateProjMatrix();
     void mouseMoveEvent(QMouseEvent *event) final;
     void mousePressEvent(QMouseEvent *event) final;
     void mouseReleaseEvent(QMouseEvent *event) final;

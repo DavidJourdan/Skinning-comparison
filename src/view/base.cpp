@@ -17,7 +17,15 @@ Base::Base(Core *core, QWidget *parent) : QOpenGLWidget(parent),
 
 void Base::resizeGL(int w, int h)
 {
+    updateProjMatrix();
+}
+
+void Base::updateProjMatrix()
+{
     QMatrix4x4 mat { };
+
+    auto w = width();
+    auto h = height();
 
     const auto d = core->zoomFactor * core->maxDist;
     const auto ratio = static_cast<float>(w) / static_cast<float>(h);
@@ -33,11 +41,6 @@ void Base::resizeGL(int w, int h)
     mat.frustum(left, right, bottom, top, near, far);
 
     projectionMatrix = mat;
-}
-
-void Base::updateProjMatrix()
-{
-
 }
 
 void Base::mouseMoveEvent(QMouseEvent *event)
@@ -143,12 +146,10 @@ void Base::wheelEvent(QWheelEvent *event)
 {
     QPoint numDegrees = event->angleDelta();
 
-    if(qFabs(numDegrees.y()) != 0)
-    {
-        qreal zoom = numDegrees.y() / qFabs(numDegrees.y());
-
-        core->viewMatrix.translate(zoom * viewDirection());
-        core->update();
+    if (numDegrees.y() > 0.0f) {
+        core->zoom(1.0f / 1.1f);
+    } else {
+        core->zoom(1.1f);
     }
 }
 

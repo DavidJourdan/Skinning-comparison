@@ -240,3 +240,12 @@ void Core::update()
     dqsView->update();
     corView->update();
 }
+
+void Core::zoom(float f)
+{
+    zoomFactor *= f;
+    lbsView->updateProjMatrix();
+    dqsView->updateProjMatrix();
+    corView->updateProjMatrix();
+    update();
+}

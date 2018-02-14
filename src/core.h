@@ -63,6 +63,7 @@ public:
 
     // Update views.
     void update();
+    void zoom(float f);
 
     void moveBone(float angle);
     void editBone(size_t i);
