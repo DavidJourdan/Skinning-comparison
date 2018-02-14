@@ -17,8 +17,29 @@ Base::Base(Core *core, QWidget *parent) : QOpenGLWidget(parent),
 
 void Base::resizeGL(int w, int h)
 {
+    updateProjMatrix();
+}
+
+void Base::updateProjMatrix()
+{
     QMatrix4x4 mat { };
-    mat.perspective(30.0f, w / static_cast<float>(h), 1.0f, 30.0f);
+
+    auto w = width();
+    auto h = height();
+
+    const auto d = core->zoomFactor * core->maxDist;
+    const auto ratio = static_cast<float>(w) / static_cast<float>(h);
+    const auto e = ratio * d;
+
+    float left = -e;
+    float right = e;
+    float bottom = -d;
+    float top = d;
+    float near = 2.0f * core->maxDist;
+    float far = 6.0f * core->maxDist;
+
+    mat.frustum(left, right, bottom, top, near, far);
+
     projectionMatrix = mat;
 }
 
@@ -125,12 +146,10 @@ void Base::wheelEvent(QWheelEvent *event)
 {
     QPoint numDegrees = event->angleDelta();
 
-    if(qFabs(numDegrees.y()) != 0)
-    {
-        qreal zoom = numDegrees.y() / qFabs(numDegrees.y());
-
-        core->viewMatrix.translate(zoom * viewDirection());
-        core->update();
+    if (numDegrees.y() > 0.0f) {
+        core->zoom(1.0f / 1.1f);
+    } else {
+        core->zoom(1.1f);
     }
 }
 

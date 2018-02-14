@@ -24,6 +24,7 @@ class Base : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core
 
 public:
     Base(Core *core, QWidget *parent);
+    void updateProjMatrix();
 
 protected:
     void initializeGL() override = 0;

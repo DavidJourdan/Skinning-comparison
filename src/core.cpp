@@ -1,8 +1,11 @@
 #include "core.h"
 #include "view/base.h"
 
+#include <limits>
+
 #include <QVector4D>
 
+using std::numeric_limits;
 using namespace std;
 
 Core::Core(const Config &config) :
@@ -17,7 +20,54 @@ Core::Core(const Config &config) :
     lineColors(QOpenGLBuffer::VertexBuffer),
     meshMode(GL_FILL)
 {
+    auto maxX = numeric_limits<float>::lowest();
+    auto maxY = numeric_limits<float>::lowest();
+    auto maxZ = numeric_limits<float>::lowest();
 
+    auto minX = numeric_limits<float>::max();
+    auto minY = numeric_limits<float>::max();
+    auto minZ = numeric_limits<float>::max();
+
+    for (auto v : mesh.getVertices()) {
+        auto p = v.pos;
+
+        if (p.x() > maxX) {
+            maxX = p.x();
+        }
+        if (p.x() < minX) {
+            minX = p.x();
+        }
+
+        if (p.y() > maxY) {
+            maxY = p.y();
+        }
+        if (p.y() < minY) {
+            minY = p.y();
+        }
+
+        if (p.z() > maxZ) {
+            maxZ = p.z();
+        }
+        if (p.z() < minZ) {
+            minZ = p.z();
+        }
+    }
+
+    center = QVector3D { (minX + maxX) / 2.0f, (minY + maxY) / 2.0f, (minZ + maxZ) / 2.0f };
+
+    auto maxDist2 = 0.0f;
+
+    for (auto v : mesh.getVertices()) {
+        auto x = (v.pos - center).lengthSquared();
+        if (x > maxDist2) {
+            maxDist2 = x;
+        }
+    }
+
+    maxDist = sqrt(maxDist2);
+
+    modelMatrix.translate(-center);
+    viewMatrix.translate(0.0f, 0.0f, -4.0 * maxDist);
 }
 
 void Core::noBoneActiv()
@@ -25,13 +75,13 @@ void Core::noBoneActiv()
     uint n = mesh.getSkeleton().getBones().size();
     std::vector<QVector4D> colors(2*n);
     for(uint i = 0; i < n ; i++) {
-        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
+        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); // black
         QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
         colors[2*i] = parentColor;
         colors[2*i + 1] = childColor;
     }
     lineColors.bind();
-    lineColors.write(0, colors.data(), 2*n*sizeof(QVector4D));
+    lineColors.write(0, colors.data(), 2 * n * sizeof(QVector4D));
     lineColors.release();
 }
 
@@ -50,7 +100,12 @@ void Core::resetCamera()
 {
     modelMatrix.setToIdentity();
     viewMatrix.setToIdentity();
-    viewMatrix.translate(0.0f, 0.0f, -15.0f);
+    modelMatrix.translate(-center);
+    viewMatrix.translate(0.0f, 0.0f, -4.0 * maxDist);
+    zoomFactor = 1.0;
+    lbsView->updateProjMatrix();
+    dqsView->updateProjMatrix();
+    corView->updateProjMatrix();
     update();
 }
 
@@ -73,8 +128,10 @@ void Core::editBone(size_t i)
     modelMatrix.setToIdentity();
     modelMatrix.translate(-center);
 
-    const auto col = QVector4D { 0.0, 0.0, -5.0f * length, 1.0 };
-    viewMatrix.setColumn(3, col);
+    zoomFactor = maxDist * length / 2.0;
+    lbsView->updateProjMatrix();
+    dqsView->updateProjMatrix();
+    corView->updateProjMatrix();
 }
 
 void Core::updateSkeleton()
@@ -183,8 +240,6 @@ void Core::initialize()
     }
     lineIndices.allocate(ind.data(), ind.size() * sizeof(uint));
     lineIndices.release();
-
-    viewMatrix.translate(0.0f, 0.0f, -15.0f);
 }
 
 void Core::update()
@@ -192,4 +247,13 @@ void Core::update()
     lbsView->update();
     dqsView->update();
     corView->update();
+}
+
+void Core::zoom(float f)
+{
+    zoomFactor *= f;
+    lbsView->updateProjMatrix();
+    dqsView->updateProjMatrix();
+    corView->updateProjMatrix();
+    update();
 }

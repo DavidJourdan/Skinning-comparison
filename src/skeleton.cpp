@@ -10,7 +10,8 @@ using std::vector;
 
 Skeleton::Skeleton(vector<Bone> bl, vector<vector<Weight> > wll) :
     bones { bl }, weightListList { wll }, transformations(bl.size()),
-    quaternions(bl.size()), transformationsDQNonDualPart(bl.size()),
+    quaternions(bl.size(), QVector4D(0.0f, 0.0f, 0.0f, 1.0f)),
+    transformationsDQNonDualPart(bl.size(), QVector4D(0.0f, 0.0f, 0.0f, 1.0f)),
     transformationsDQDualPart(bl.size())
 {
 
@@ -63,6 +64,8 @@ void Skeleton::rotateBone(const size_t boneIndex, float angle, const QVector3D &
         transformationsDQNonDualPart[bIdx] = dq.getNonDualPart().toVector4D();
         transformationsDQDualPart[bIdx] = dq.getDualPart().toVector4D();
 
+        auto &head = bones[bIdx].head;
+        head = transform * head;
         auto &tail = bones[bIdx].tail;
         tail = transform * tail;
 
