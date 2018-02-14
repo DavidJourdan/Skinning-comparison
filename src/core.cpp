@@ -128,7 +128,7 @@ void Core::editBone(size_t i)
     modelMatrix.setToIdentity();
     modelMatrix.translate(-center);
 
-    zoomFactor = maxDist * length / 2.0;
+    zoomFactor = length / maxDist;
     lbsView->updateProjMatrix();
     dqsView->updateProjMatrix();
     corView->updateProjMatrix();
