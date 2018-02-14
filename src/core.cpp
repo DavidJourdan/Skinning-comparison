@@ -17,7 +17,26 @@ Core::Core(const Config &config) :
     lineColors(QOpenGLBuffer::VertexBuffer),
     meshMode(GL_FILL)
 {
+    auto sum = QVector3D {};
 
+    for (auto v : mesh.getVertices()) {
+        sum += v.pos;
+    }
+
+    sum /= mesh.getVertices().size();
+
+    barycenter = sum;
+
+    auto maxDist2 = 0.0f;
+
+    for (auto v : mesh.getVertices()) {
+        auto x = (v.pos - barycenter).lengthSquared();
+        if (x > maxDist2) {
+            maxDist2 = x;
+        }
+    }
+
+    maxDist = sqrt(maxDist2);
 }
 
 void Core::noBoneActiv()
@@ -25,7 +44,7 @@ void Core::noBoneActiv()
     uint n = mesh.getSkeleton().getBones().size();
     std::vector<QVector4D> colors(2*n);
     for(uint i = 0; i < n ; i++) {
-        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); //black
+        QVector4D parentColor(1.0, 0.0, 0.0, 0.9); // black
         QVector4D childColor(1.0, 1.0, 1.0, 0.9); // red
         colors[2*i] = parentColor;
         colors[2*i + 1] = childColor;

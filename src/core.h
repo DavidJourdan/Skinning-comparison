@@ -51,6 +51,11 @@ public:
     QMatrix4x4 modelMatrix;
     QMatrix4x4 viewMatrix;
 
+    // Useful to choose initial MVP matrix
+    QVector3D barycenter;
+    float maxDist;
+    float zoomFactor { 1.0f };
+
     // Every view applies a specific deformation method on the model.
     view::Base *lbsView;
     view::Base *dqsView;

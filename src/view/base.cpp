@@ -18,7 +18,20 @@ Base::Base(Core *core, QWidget *parent) : QOpenGLWidget(parent),
 void Base::resizeGL(int w, int h)
 {
     QMatrix4x4 mat { };
-    mat.perspective(30.0f, w / static_cast<float>(h), 1.0f, 30.0f);
+
+    const auto d = core->zoomFactor * core->maxDist;
+    const auto ratio = static_cast<float>(w) / static_cast<float>(h);
+    const auto e = ratio * d;
+
+    float left = -e;
+    float right = e;
+    float bottom = -d;
+    float top = d;
+    float near = core->maxDist;
+    float far = 3.0f * core->maxDist;
+
+    mat.frustum(left, right, bottom, top, near, far);
+
     projectionMatrix = mat;
 }
 
