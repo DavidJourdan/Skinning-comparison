@@ -74,7 +74,11 @@ void main(void)
 
     mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
     // vec4 res = vec4(quatToMat(quat)*(aPos - cor), 0.0); // alternative using matrices
-    gl_Position = MVP * (rotate(aPos - cor, quat) + tMat * vec4(cor, 1.0));
+    if (!isnan(cor.x)) {
+        gl_Position = MVP * (rotate(aPos - cor, quat) + tMat * vec4(cor, 1.0));
+    } else {
+        gl_Position = MVP * tMat * vec4(aPos, 1.0);
+    }
 
     vec4 nRes = rotate(aNorm, quat);
 
