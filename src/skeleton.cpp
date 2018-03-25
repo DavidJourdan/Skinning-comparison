@@ -6,31 +6,6 @@
 
 using namespace std;
 
-// TODO: implement bone hierarchy loading.
-// This is difficult because Assimp doesn't really have a structure for that,
-// we need to look for bone.mName in the node hierarchy
-Skeleton::Skeleton(uint numBones, uint numVertices, aiBone** bones) {
-    vector<vector<float>> vectorWeight(numVertices);
-    vector<vector<uint>> vectorBone(numVertices);
-
-    for(uint i = 0; i < numBones; i++) {
-        aiBone *b = bones[i];
-        for(uint j = 0; j < b->mNumWeights; j++) {
-            vectorWeight[b->mWeights[j].mVertexId].push_back(b->mWeights[j].mWeight);
-            vectorBone[b->mWeights[j].mVertexId].push_back(i);
-        }
-    }
-
-    weights = new float*[numVertices];
-    boneInd = new uint*[numVertices];
-    weightsSize = new size_t[numVertices];
-    for(uint i = 0; i < numVertices; i++) {
-        weights[i] = vectorWeight[i].data();
-        boneInd[i] = vectorBone[i].data();
-        weightsSize[i] = vectorWeight[i].size();
-    }
-}
-
 Skeleton::Skeleton(const string &skelFile, const string &weightFile, size_t meshVertexCount) {
     parseSkelFile(skelFile);
     weights = new float*[meshVertexCount];

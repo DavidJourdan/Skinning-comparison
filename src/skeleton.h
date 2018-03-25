@@ -1,7 +1,6 @@
 #ifndef SKELETON_H
 #define SKELETON_H
 
-#include <assimp/scene.h>
 #include <vector>
 #include <QVector3D>
 #include <QMatrix4x4>
@@ -33,7 +32,6 @@ class Skeleton
 {
 public:
     Skeleton(const std::string &weightFile, const std::string &skelFile, size_t meshVertexCount);
-    Skeleton(uint, uint, aiBone**);
     Skeleton();
     ~Skeleton();
     float simil(uint vertexInd, Triangle t);

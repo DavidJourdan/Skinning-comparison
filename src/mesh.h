@@ -42,7 +42,6 @@ public:
     int getCorSelected() const {return corSelected;}
     void setCorSelected(int i) {corSelected = i;}
 
-    static Mesh fromGenericFile(const std::string &fileName);
     static Mesh fromCustomFile(const Config &config);
 
     void rotateBone(float angle, QVector3D axis);

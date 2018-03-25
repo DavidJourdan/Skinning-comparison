@@ -44,12 +44,8 @@ HEADERS  += src/mainwindow.h \
     src/view/cor.h \
     src/helpwindow.h
 
-unix:!macx {
-    LIBS += -lassimp
-}
 
 macx: {
-    LIBS += -L/usr/local/lib -lassimp
     INCLUDEPATH += /usr/local/include
 }
 
